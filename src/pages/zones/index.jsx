@@ -12,7 +12,7 @@ const Zones = () => {
   const [loading, setLoading] = useState(false);
   const [popup, setPopup] = useState(null);
 
-  const handleSubmit = async (e) => {
+  const handleAddZone = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
@@ -78,7 +78,7 @@ const Zones = () => {
       )}
       {/* Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Zone" size="sm">
-        <ZoneForm onSubmit={handleSubmit} />
+        <ZoneForm onSubmit={handleAddZone} />
       </Modal>
       {zones.map((zone) => (
         <Zone
