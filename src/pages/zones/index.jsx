@@ -11,6 +11,7 @@ const Zones = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [popup, setPopup] = useState(null);
+  const [form, setForm] = useState(null);
 
   const handleAddZone = async (e) => {
     e.preventDefault();
@@ -56,13 +57,20 @@ const Zones = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     loadZones();
   }, []);
   return (
     <div className="p-8 space-y-4">
       <div className="min-w-full flex justify-center items-center">
-        <button onClick={() => setIsModalOpen(true)} className="btn-sm">
+        <button
+          onClick={() => {
+            setIsModalOpen(true);
+            setForm({ type: "addZone" });
+          }}
+          className="btn-sm"
+        >
           Add New Zone
         </button>
       </div>
@@ -77,14 +85,22 @@ const Zones = () => {
         />
       )}
       {/* Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Zone" size="sm">
-        <ZoneForm onSubmit={handleAddZone} />
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Zone Management" size="sm">
+        <ZoneForm onSubmit={handleAddZone} type={form?.type} />
       </Modal>
       {zones.map((zone) => (
         <Zone
           key={zone._id}
           name={zone.zoneName}
           totalSubZone={zone.subZones.length}
+          onEdit={() => {
+            setForm({ type: "renameZone" });
+            setIsModalOpen(true);
+          }}
+          onAddSubZone={()=>{
+            setForm({type: 'addSubZone'})
+            setIsModalOpen(true)
+          }}
           onDelete={() => {
             setPopup({
               type: "confirmation",
