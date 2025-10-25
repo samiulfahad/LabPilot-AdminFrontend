@@ -22,7 +22,7 @@ const ZoneForm = ({ onSubmit, type }) => {
         <input name={name} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none" />
       </div>
 
-      <button type="submit" className="w-full py-2 px-4 btn-sm">
+      <button type="submit" className="w-full btn-sm !mb-6">
         {btn}
       </button>
     </form>

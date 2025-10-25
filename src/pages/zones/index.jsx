@@ -13,7 +13,7 @@ const Zones = () => {
   const [popup, setPopup] = useState(null);
   const [form, setForm] = useState(null);
 
-  const handleAddZone = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
@@ -21,12 +21,31 @@ const Zones = () => {
     setIsModalOpen(false);
     try {
       setLoading(true);
-      const response = await zoneService.addZone(data);
-      // Push the new zone to zones array without reloading
-      setZones((prevZones) => [...prevZones, response.data.zone]);
-      //   console.log(response.data.zone);
-      setPopup({ type: "success", message: "Zone Added Successfully" });
-      // console.log(response.data);
+      if (form.type === "addZone") {
+        const response = await zoneService.addZone(data);
+        // Push the new zone to zones array without reloading
+        setZones((prevZones) => [...prevZones, response.data.zone]);
+        //   console.log(response.data.zone);
+        setPopup({ type: "success", message: "Zone Added Successfully" });
+        // console.log(response.data);
+      }
+
+      if (form.type === "renameZone") {
+        const response = await zoneService.editZone({
+          zoneId: form.zoneId,
+          zoneName: data.zoneName,
+        });
+        setForm(null);
+        setPopup({ type: "success", message: "Zone renamed successfully" });
+        // Update the renamed zone in the DOM
+        setZones((prevZones) =>
+          prevZones.map((zone) =>
+            zone._id === form.zoneId
+              ? { ...zone, zoneName: data.zoneName }
+              : zone
+          )
+        );
+      }
     } catch {
       setPopup({ type: "error", message: "Could not add zone" });
     }
@@ -37,10 +56,15 @@ const Zones = () => {
       setLoading(true);
       const response = await zoneService.deleteZone(popup.zoneId);
       // Remove the zone from the array without reloading
-      setZones((prevZones) => prevZones.filter((zone) => zone._id !== popup.zoneId));
+      setZones((prevZones) =>
+        prevZones.filter((zone) => zone._id !== popup.zoneId)
+      );
       setPopup({ type: "success", message: "Zone Deleted Successfully" });
     } catch (e) {
-      setPopup({ type: "error", message: "Something went wrong. Zone was not deleted" });
+      setPopup({
+        type: "error",
+        message: "Something went wrong. Zone was not deleted",
+      });
       console.log(e);
     }
   };
@@ -85,8 +109,13 @@ const Zones = () => {
         />
       )}
       {/* Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Zone Management" size="sm">
-        <ZoneForm onSubmit={handleAddZone} type={form?.type} />
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Zone Management"
+        size="sm"
+      >
+        <ZoneForm onSubmit={handleSubmit} type={form?.type} />
       </Modal>
       {zones.map((zone) => (
         <Zone
@@ -94,12 +123,12 @@ const Zones = () => {
           name={zone.zoneName}
           totalSubZone={zone.subZones.length}
           onEdit={() => {
-            setForm({ type: "renameZone" });
+            setForm({ type: "renameZone", zoneId: zone._id });
             setIsModalOpen(true);
           }}
-          onAddSubZone={()=>{
-            setForm({type: 'addSubZone'})
-            setIsModalOpen(true)
+          onAddSubZone={() => {
+            setForm({ type: "addSubZone" });
+            setIsModalOpen(true);
           }}
           onDelete={() => {
             setPopup({

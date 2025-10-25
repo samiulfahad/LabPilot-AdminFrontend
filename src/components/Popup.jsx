@@ -1,4 +1,6 @@
+// components/Popup.js
 import React from 'react';
+import Portal from './Portal';
 
 const Popup = ({ 
   type = 'success', // 'success', 'error', or 'confirmation'
@@ -62,46 +64,70 @@ const Popup = ({
     }
   };
 
+  // Close popup when clicking on backdrop
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose?.();
+    }
+  };
+
+  // Close popup on Escape key
+  React.useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
   return (
-    <div className="fixed top-0 left-0 w-full h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-      <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4">
-        <div className="p-6 text-center">
-          {config.icon}
-          <h3 className={`text-xl font-semibold mb-2 ${config.titleColor}`}>
-            {config.title}
-          </h3>
-          <p className="text-gray-600 mb-6">
-            {message}
-          </p>
-          
-          {config.singleButton ? (
-            // Single button for success/error
-            <button
-              onClick={onClose}
-              className={`w-full py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.buttonColor}`}
-            >
-              OK
-            </button>
-          ) : (
-            // Dual buttons for confirmation
-            <div className="flex gap-3">
+    <Portal>
+      <div 
+        className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4"
+        onClick={handleBackdropClick}
+      >
+        <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-auto animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-6 text-center">
+            {config.icon}
+            <h3 className={`text-xl font-semibold mb-2 ${config.titleColor}`}>
+              {config.title}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {message}
+            </p>
+            
+            {config.singleButton ? (
+              // Single button for success/error
               <button
                 onClick={onClose}
-                className={`flex-1 py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.cancelButtonColor}`}
+                className={`w-full py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.buttonColor}`}
               >
-                {cancelText}
+                OK
               </button>
-              <button
-                onClick={handleConfirm}
-                className={`flex-1 py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.confirmButtonColor}`}
-              >
-                {confirmText}
-              </button>
-            </div>
-          )}
+            ) : (
+              // Dual buttons for confirmation
+              <div className="flex gap-3">
+                <button
+                  onClick={onClose}
+                  className={`flex-1 py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.cancelButtonColor}`}
+                >
+                  {cancelText}
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  className={`flex-1 py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.confirmButtonColor}`}
+                >
+                  {confirmText}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </Portal>
   );
 };
 

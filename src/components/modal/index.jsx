@@ -44,14 +44,14 @@ const Modal = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-2 bg-black/50 backdrop-blur-sm"
       onClick={handleOverlayClick}
     >
       <div
         className={`w-full ${sizeClasses[size]} bg-white rounded-2xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-2 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
           <button
             onClick={onClose}
@@ -64,7 +64,7 @@ const Modal = ({
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="px-6 py-2">
           {children}
         </div>
       </div>
