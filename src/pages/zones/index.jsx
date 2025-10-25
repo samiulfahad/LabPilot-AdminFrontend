@@ -48,6 +48,8 @@ const Zones = () => {
       }
     } catch {
       setPopup({ type: "error", message: "Could not add zone" });
+    } finally {
+      setForm(null)
     }
   };
 
