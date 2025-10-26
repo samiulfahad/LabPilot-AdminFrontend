@@ -1,25 +1,25 @@
-const ZoneForm = ({ onSubmit, type }) => {
+const ZoneForm = ({ input, handleInput, onSubmit, type }) => {
   let name = null;
   let label = null;
   let btn = null;
-  if (type === "addZone" || type === "renameZone") {
+  if (type === "addZone" || type === "editZone") {
     name = "zoneName";
     label = "Zone Name";
     btn = "Add Zone";
-    if (type === "renameZone") btn = "Rename Zone";
+    if (type === "editZone") btn = "Save";
   }
-  if (type === "addSubZone" || type === "renameSubZone") {
+  if (type === "addSubZone" || type === "editSubZone") {
     name = "subZoneName";
     label = "Sub Zone Name";
     btn = "Add Sub Zone";
-    if (type === "renameSubZone") btn = "Rename Sub Zone";
+    if (type === "editSubZone") btn = "Save";
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-        <input name={name} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none" />
+        <input value={input} onChange={handleInput} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none" />
       </div>
 
       <button type="submit" className="w-full btn-sm !mb-6">

@@ -7,7 +7,7 @@ const Zone = ({name, totalSubZone, onAddSubZone, onEdit, onDelete}) => {
            </div>
            <div>
             <button onClick={onAddSubZone} className="btn-sm mx-4">Add Sub Zone</button>
-            <button onClick={onEdit} className="btn-sm mx-4">Rename Zone</button>
+            <button onClick={onEdit} className="btn-sm mx-4">Edit Zone</button>
             <button onClick={onDelete} className="delete-btn mx-4">Delete Zone</button>
            </div>
         </div>
