@@ -39,6 +39,22 @@ const Zones = () => {
           )
         );
       }
+
+      if (form.type === "addSubZone") {
+        const data = { zoneId: form.zoneId, subZoneName: form.input };
+        // console.log(data);
+        const response = await zoneService.addSubZone(data);
+        // console.log(response.data);
+        setZones((prevZones) =>
+          prevZones.map((zone) =>
+            zone._id === response.data._id ? response.data : zone
+          )
+        );
+        setForm(null);
+        setPopup({ type: "success", message: "Sub Zone added successfully" });
+
+        setZones((prev) => [...prev]);
+      }
     } catch {
       setPopup({ type: "error", message: "Could not edit zone" });
     } finally {
@@ -49,12 +65,36 @@ const Zones = () => {
   const handleDelete = async () => {
     try {
       setLoading(true);
-      const response = await zoneService.deleteZone(popup.zoneId);
-      // Remove the zone from the array without reloading
-      setZones((prevZones) =>
-        prevZones.filter((zone) => zone._id !== popup.zoneId)
-      );
-      setPopup({ type: "success", message: "Zone Deleted Successfully" });
+      if (popup.delete === "zone") {
+        const response = await zoneService.deleteZone(popup.zoneId);
+        // Remove the zone from the array without reloading
+        setZones((prevZones) =>
+          prevZones.filter((zone) => zone._id !== popup.zoneId)
+        );
+        setPopup({ type: "success", message: "Zone Deleted Successfully" });
+      }
+      if (popup.delete === "subZone") {
+        console.log(popup.zoneId);
+        console.log(popup.subZoneId);
+        const response = await zoneService.deleteSubZone(
+          popup.zoneId,
+          popup.subZoneId
+        );
+        // Remove the subzone from the array without reloading
+        setZones((prevZones) =>
+          prevZones.map((zone) =>
+            zone._id === popup.zoneId
+              ? {
+                  ...zone,
+                  subZones: zone.subZones.filter(
+                    (subZone) => subZone._id !== popup.subZoneId
+                  ),
+                }
+              : zone
+          )
+        );
+        setPopup({ type: "success", message: "Sub Zone Deleted Successfully" });
+      }
     } catch (e) {
       setPopup({
         type: "error",
@@ -123,7 +163,7 @@ const Zones = () => {
         <Zone
           key={zone._id}
           name={zone.zoneName}
-          totalSubZone={zone.subZones.length}
+          subZones={zone.subZones}
           onEdit={() => {
             setForm({
               input: zone.zoneName,
@@ -133,14 +173,24 @@ const Zones = () => {
             setIsModalOpen(true);
           }}
           onAddSubZone={() => {
-            setForm({ type: "addSubZone" });
+            setForm({ type: "addSubZone", zoneId: zone._id });
             setIsModalOpen(true);
           }}
-          onDelete={() => {
+          onDeleteZone={() => {
             setPopup({
               type: "confirmation",
               message: `You are going to delete ${zone.zoneName} zone`,
               zoneId: zone._id,
+              delete: "zone",
+            });
+          }}
+          onDeleteSubZone={(subZoneId, subZoneName) => {
+            setPopup({
+              type: "confirmation",
+              message: `You are going to delete sub zone ${subZoneName} under zone ${zone.zoneName}`,
+              zoneId: zone._id,
+              subZoneId: subZoneId,
+              delete: "subZone",
             });
           }}
         />
