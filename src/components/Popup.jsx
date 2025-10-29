@@ -71,17 +71,25 @@ const Popup = ({
     }
   };
 
-  // Close popup on Escape key
+  // Close popup on Escape key or Enter key for success/error modals
   React.useEffect(() => {
-    const handleEscape = (e) => {
+    const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         onClose?.();
       }
+      // Close success/error modals on Enter key
+      if (e.key === 'Enter' && config.singleButton) {
+        onClose?.();
+      }
+      // Trigger confirm on Enter for confirmation modals
+      if (e.key === 'Enter' && !config.singleButton) {
+        handleConfirm();
+      }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, config.singleButton]);
 
   return (
     <Portal>
@@ -103,7 +111,12 @@ const Popup = ({
               // Single button for success/error
               <button
                 onClick={onClose}
-                className={`w-full py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.buttonColor}`}
+                className={`
+                  w-full py-3 px-4 text-white font-medium rounded-lg 
+                  transition-colors focus:outline-none
+                  ${config.buttonColor}
+                `}
+                autoFocus
               >
                 OK
               </button>
@@ -112,13 +125,21 @@ const Popup = ({
               <div className="flex gap-3">
                 <button
                   onClick={onClose}
-                  className={`flex-1 py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.cancelButtonColor}`}
+                  className={`
+                    flex-1 py-3 px-4 text-white font-medium rounded-lg 
+                    transition-colors focus:outline-none
+                    ${config.cancelButtonColor}
+                  `}
                 >
                   {cancelText}
                 </button>
                 <button
                   onClick={handleConfirm}
-                  className={`flex-1 py-3 px-4 text-white font-medium rounded-lg transition-colors ${config.confirmButtonColor}`}
+                  className={`
+                    flex-1 py-3 px-4 text-white font-medium rounded-lg 
+                    transition-colors focus:outline-none
+                    ${config.confirmButtonColor}
+                  `}
                 >
                   {confirmText}
                 </button>

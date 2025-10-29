@@ -34,9 +34,7 @@ const Zones = () => {
         setPopup({ type: "success", message: "Zone renamed successfully" });
         // Update the edited zone in the DOM
         setZones((prevZones) =>
-          prevZones.map((zone) =>
-            zone._id === form.zoneId ? { ...zone, zoneName: form.input } : zone
-          )
+          prevZones.map((zone) => (zone._id === form.zoneId ? { ...zone, zoneName: form.input } : zone))
         );
       }
 
@@ -45,18 +43,30 @@ const Zones = () => {
         // console.log(data);
         const response = await zoneService.addSubZone(data);
         // console.log(response.data);
-        setZones((prevZones) =>
-          prevZones.map((zone) =>
-            zone._id === response.data._id ? response.data : zone
-          )
-        );
+        setZones((prevZones) => prevZones.map((zone) => (zone._id === response.data._id ? response.data : zone)));
         setForm(null);
         setPopup({ type: "success", message: "Sub Zone added successfully" });
 
         setZones((prev) => [...prev]);
       }
-    } catch {
-      setPopup({ type: "error", message: "Could not edit zone" });
+
+      if (form.type === "editSubZone") {
+        const data = { zoneId: form.zoneId, subZoneId: form.subZoneId, subZoneName: form.input };
+        // console.log(data);
+        const response = await zoneService.editSubZone(data);
+        // console.log(response.data);
+        setZones((prevZones) => prevZones.map((zone) => (zone._id === response.data._id ? response.data : zone)));
+        setForm(null);
+        setPopup({ type: "success", message: "Sub Zone added successfully" });
+
+        setZones((prev) => [...prev]);
+      }
+    } catch (e) {
+      if (e.response.data.duplicate ) {
+        setPopup({ type: "error", message: "This name is already present" });
+      } else {
+        setPopup({ type: "error", message: "Could not complete operation" });
+      }
     } finally {
       setForm(null);
     }
@@ -68,27 +78,18 @@ const Zones = () => {
       if (popup.delete === "zone") {
         const response = await zoneService.deleteZone(popup.zoneId);
         // Remove the zone from the array without reloading
-        setZones((prevZones) =>
-          prevZones.filter((zone) => zone._id !== popup.zoneId)
-        );
+        setZones((prevZones) => prevZones.filter((zone) => zone._id !== popup.zoneId));
         setPopup({ type: "success", message: "Zone Deleted Successfully" });
       }
       if (popup.delete === "subZone") {
-        console.log(popup.zoneId);
-        console.log(popup.subZoneId);
-        const response = await zoneService.deleteSubZone(
-          popup.zoneId,
-          popup.subZoneId
-        );
+        const response = await zoneService.deleteSubZone(popup.zoneId, popup.subZoneId);
         // Remove the subzone from the array without reloading
         setZones((prevZones) =>
           prevZones.map((zone) =>
             zone._id === popup.zoneId
               ? {
                   ...zone,
-                  subZones: zone.subZones.filter(
-                    (subZone) => subZone._id !== popup.subZoneId
-                  ),
+                  subZones: zone.subZones.filter((subZone) => subZone._id !== popup.subZoneId),
                 }
               : zone
           )
@@ -100,7 +101,7 @@ const Zones = () => {
         type: "error",
         message: "Something went wrong. Zone was not deleted",
       });
-      console.log(e);
+      // console.log(e);
     }
   };
 
@@ -109,7 +110,7 @@ const Zones = () => {
       setLoading(true);
       const response = await zoneService.getZones();
       setZones(response.data.zones);
-      console.log(response.data);
+      // console.log(response.data);
     } catch (err) {
       setPopup({ type: "error", message: "Could not load zones" });
     } finally {
@@ -128,7 +129,7 @@ const Zones = () => {
             setIsModalOpen(true);
             setForm({ type: "addZone" });
           }}
-          className="btn-sm"
+          className="btn-sm flex"
         >
           Add New Zone
         </button>
@@ -144,19 +145,12 @@ const Zones = () => {
         />
       )}
       {/* Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Zone Management"
-        size="sm"
-      >
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Zone Management" size="sm">
         <ZoneForm
           onSubmit={handleSubmit}
           type={form?.type}
           input={form?.input || ""}
-          handleInput={(e) =>
-            setForm((prev) => ({ ...prev, input: e.target.value }))
-          }
+          handleInput={(e) => setForm((prev) => ({ ...prev, input: e.target.value }))}
         />
       </Modal>
       {zones.map((zone) => (
@@ -164,11 +158,20 @@ const Zones = () => {
           key={zone._id}
           name={zone.zoneName}
           subZones={zone.subZones}
-          onEdit={() => {
+          onEditZone={() => {
             setForm({
               input: zone.zoneName,
               type: "editZone",
               zoneId: zone._id,
+            });
+            setIsModalOpen(true);
+          }}
+          onEditSubZone={(subZoneId, subZoneName) => {
+            setForm({
+              input: subZoneName,
+              type: "editSubZone",
+              zoneId: zone._id,
+              subZoneId: subZoneId,
             });
             setIsModalOpen(true);
           }}

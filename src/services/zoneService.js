@@ -6,8 +6,8 @@ const zoneService = {
   editZone: (data) => api.patch("/zone/edit", data),
   deleteZone: (_id) => api.delete("/zone/delete", { data: { zoneId: _id } }),
   addSubZone: (data) => api.post("/zone/subzone/add", data),
-  deleteSubZone: (zoneId, subZoneId) =>
-    api.delete("/zone/subzone/delete", { data: { zoneId, subZoneId } }),
+  editSubZone: (data) => api.patch("/zone/subzone/edit", data),
+  deleteSubZone: (zoneId, subZoneId) => api.delete("/zone/subzone/delete", { data: { zoneId, subZoneId } }),
   updateUser: (id, userData) => api.put(`/users/${id}`, userData),
 };
 
