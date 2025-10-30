@@ -33,7 +33,7 @@ const Labs = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     let req = "addLab";
     if (formData.type === "editLab") req = "editLab";
     delete formData.type;
@@ -133,7 +133,7 @@ const Labs = () => {
       </div>
 
       {/* Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Lab Management" size="lg">
+      <Modal isOpen={isModalOpen} size="lg">
         <LabForm
           formData={formData}
           onChange={handleFormChange}
@@ -144,10 +144,16 @@ const Labs = () => {
         />
       </Modal>
 
-      {labs.map((item) => (
+      {labs.map((item, index) => (
         <Lab
           key={item._id}
           input={item}
+          index={index}
+          onEdit={() => {
+            loadZones();
+            setFormData({ ...item, type: "editLab" });
+            setIsModalOpen(true);
+          }}
           onDelete={() =>
             setPopup({
               type: "confirmation",

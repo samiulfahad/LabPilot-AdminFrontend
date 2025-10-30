@@ -1,4 +1,4 @@
-const Lab = ({ input, onEdit, onDelete }) => {
+const Lab = ({ input, index, onEdit, onDelete }) => {
   // console.log(input.labId);
 
   return (
@@ -8,7 +8,8 @@ const Lab = ({ input, onEdit, onDelete }) => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 flex-1">
           {/* Lab Name */}
           <div className="flex items-center">
-            <span className="text-gray-900 font-medium">{input.labName}</span>
+            {index + 1}.
+            <span className="pl-2 text-gray-900 font-medium text-center">{input.labName}</span>
           </div>
 
           {/* Lab ID */}

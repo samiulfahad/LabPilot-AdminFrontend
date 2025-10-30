@@ -2,10 +2,18 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onCancel }) => {
   // Get subzones for selected zone
   const selectedZone = zones.find((zone) => zone._id === formData.zoneId);
   const subZones = selectedZone?.subZones || [];
-
+  const label = {};
+  if (formData.type === "editLab") {
+    label.formTitle = "Edit Lab";
+    label.button = "Update Lab";
+  } else {
+    label.formTitle = "Add New Lab";
+    label.button = "Create Lab";
+  }
   return (
     <form onSubmit={onSubmit} className="space-y-2 py-4 min-w-2xl">
       {/* First Row: Lab Name & Lab ID */}
+      <div className="w-full mx-auto text-lg">{label.formTitle}</div>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <label htmlFor="labName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -26,12 +34,17 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onCancel }) => {
             Lab ID
           </label>
           <input
+            disabled={formData.type === "editLab" ? true : false}
             type="text"
             id="labId"
             name="labId"
             value={formData.labId || ""}
             onChange={(e) => onChange("labId", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={
+              formData.type === "editLab"
+                ? "w-full px-4 py-2 rounded bg-gray-300 "
+                : "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            }
           />
         </div>
       </div>
@@ -76,12 +89,14 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onCancel }) => {
             name="isActive"
             value={formData.isActive}
             onChange={(e) => onChange("isActive", e.target.value === "true")}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-transparent ${
+              formData.isActive ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
+            }`}
           >
-            <option value="true" className="text-green-600">
+            <option value="true" className="text-green-600 bg-green-50">
               Active
             </option>
-            <option value="false" className="text-red-600">
+            <option value="false" className="text-red-600 bg-red-50">
               Inactive
             </option>
           </select>
@@ -177,7 +192,7 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onCancel }) => {
           type="submit"
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Create Lab
+          {label.button}
         </button>
       </div>
     </form>

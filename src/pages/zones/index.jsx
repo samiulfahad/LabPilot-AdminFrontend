@@ -145,12 +145,13 @@ const Zones = () => {
         />
       )}
       {/* Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Zone Management" size="sm">
+      <Modal isOpen={isModalOpen} size="sm">
         <ZoneForm
           onSubmit={handleSubmit}
           type={form?.type}
           input={form?.input || ""}
           handleInput={(e) => setForm((prev) => ({ ...prev, input: e.target.value }))}
+          onClose={()=>setIsModalOpen(false)}
         />
       </Modal>
       {zones.map((zone) => (

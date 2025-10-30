@@ -1,4 +1,4 @@
-const ZoneForm = ({ input, handleInput, onSubmit, type, loading = false }) => {
+const ZoneForm = ({ input, handleInput, onSubmit, type, onClose }) => {
   const getFormConfig = () => {
     const config = {
       addZone: { label: "Zone Name", btn: "Add Zone" },
@@ -15,28 +15,28 @@ const ZoneForm = ({ input, handleInput, onSubmit, type, loading = false }) => {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label}
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
         <input
           name={name}
           value={input}
           onChange={handleInput}
           required
-          disabled={loading}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 transition-colors"
           placeholder={`Enter ${label.toLowerCase()}`}
           autoFocus
         />
       </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 mb-4 px-4 rounded-lg font-medium transition-colors duration-200"
-      >
-        {loading ? "Processing..." : btn}
-      </button>
+      <div className="flex justify-between items-center">
+        <button type="button" onClick={onClose} className="px-4 py-1 mb-4 border-2 border-red-300 text-red-400 rounded">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="w-2/3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 mb-4 px-4 rounded-lg font-medium transition-colors duration-200"
+        >
+          {btn}
+        </button>
+      </div>
     </form>
   );
 };
