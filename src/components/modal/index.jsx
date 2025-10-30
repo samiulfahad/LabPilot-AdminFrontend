@@ -36,10 +36,10 @@ const Modal = ({
   if (!isOpen) return null;
 
   const sizeClasses = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl'
+    sm: 'min-w-md',
+    md: 'min-w-lg',
+    lg: 'min-w-2xl',
+    xl: 'min-w-4xl'
   };
 
   return createPortal(
@@ -48,7 +48,7 @@ const Modal = ({
       onClick={handleOverlayClick}
     >
       <div
-        className={`w-full ${sizeClasses[size]} bg-white rounded-2xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100`}
+        className={`${sizeClasses[size]} bg-white rounded-2xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-2 border-b border-gray-200">

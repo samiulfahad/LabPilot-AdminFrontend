@@ -62,7 +62,7 @@ const Zones = () => {
         setZones((prev) => [...prev]);
       }
     } catch (e) {
-      if (e.response.data.duplicate ) {
+      if (e.response.data.duplicate) {
         setPopup({ type: "error", message: "This name is already present" });
       } else {
         setPopup({ type: "error", message: "Could not complete operation" });
