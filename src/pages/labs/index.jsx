@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import labService from "../../services/labSevice";
 import Modal from "../../components/modal";
-import Popup from "../../components/Popup";
+import Popup from "../../components/popup/Popup";
 import Lab from "./Lab";
 import LabForm from "./LabForm";
 import zoneService from "../../services/zoneService";
@@ -34,44 +34,40 @@ const Labs = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let req = "addLab";
-    if (formData.type === "editLab") req = "editLab";
-    delete formData.type;
-    setLoading(true);
     try {
-      if (req === "addLab") {
+      setLoading(true);
+      if (formData.type === "addLab") {
         const response = await labService.addLab(formData);
+        console.log(response.data);
         // Add the new lab to the state without reloading
-        if (response.data.success && response.data.lab) {
-          setLabs((prev) => [...prev, response.data.lab]);
+        if (response.data && response.data) {
+          setLabs((prev) => [...prev, response.data]);
         }
+        setPopup({ type: "success", message: "Lab created successfully" });
       }
 
-      if (req === "editLab") {
-        console.log(formData);
+      if (formData.type === "editLab") {
         await labService.editLab(formData);
         // Update the edited document without reload
         setLabs((prev) => {
           return prev.map((item) => (item._id === formData._id ? { ...item, ...formData } : item));
         });
+        setPopup({ type: "success", message: "Lab updated successfully" });
       }
       setIsModalOpen(false);
       setFormData(initialData);
-      // setPopup({type: 'success', message: "Operation Done Successfully"})
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       let message = "Could not add lab";
-      if (req === "editLab") message = "Could not edit lab";
-      if (e.response?.data?.duplicate) {
-        message = "Lab ID is not unique";
-      }
+      if (formData.type === "editLab") message = "Could not edit lab";
+      if (e.response?.data?.duplicate) message = "Lab ID is not unique";
       setPopup({ type: "error", message: message });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancel = () => {
+  const handleClose = () => {
     setIsModalOpen(false);
     setFormData(initialData);
   };
@@ -82,6 +78,7 @@ const Labs = () => {
       await labService.deleteLab(popup._id);
       // Remove lab dynamically without reload
       setLabs((prev) => prev.filter((lab) => lab._id !== popup._id));
+      setLoading(false);
       setPopup({ type: "success", message: "Lab deleted successfully" });
     } catch (e) {
       setPopup({ type: "error", message: "Could not delete lab" });
@@ -108,6 +105,7 @@ const Labs = () => {
       const response = await zoneService.getZones();
       setZones(response.data.zones);
     } catch (e) {
+      console.log(e.response);
       setPopup({ type: "error", message: "Could not load zones" });
       setIsModalOpen(false);
     } finally {
@@ -133,7 +131,7 @@ const Labs = () => {
       <div className="flex items-center justify-center -mt-4 my-2">
         <button
           onClick={() => {
-            setFormData((prev) => ({ ...prev, type: "addLab" }));
+            setFormData({...initialData, type: "addLab"});
             setIsModalOpen(true);
             loadZones();
           }}
@@ -149,7 +147,7 @@ const Labs = () => {
           formData={formData}
           onChange={handleFormChange}
           onSubmit={handleSubmit}
-          onCancel={handleCancel}
+          onClose={handleClose}
           type={formData.type}
           zones={zones}
         />

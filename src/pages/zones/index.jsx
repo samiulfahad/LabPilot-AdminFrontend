@@ -4,7 +4,7 @@ import zoneService from "../../services/zoneService";
 import Modal from "../../components/modal";
 import ZoneForm from "./ZoneForm";
 import Zone from "./Zone";
-import Popup from "../../components/Popup";
+import Popup from "../../components/popup/Popup";
 
 const Zones = () => {
   const [zones, setZones] = useState([]);
@@ -15,9 +15,8 @@ const Zones = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsModalOpen(false);
-    setLoading(true);
     try {
+      setLoading(true);
       if (form.type === "addZone") {
         const response = await zoneService.addZone({ zoneName: form.input });
         // Push the new zone to zones array without reloading
@@ -30,12 +29,11 @@ const Zones = () => {
           zoneId: form.zoneId,
           zoneName: form.input,
         });
-        setForm(null);
-        setPopup({ type: "success", message: "Zone renamed successfully" });
         // Update the edited zone in the DOM
         setZones((prevZones) =>
           prevZones.map((zone) => (zone._id === form.zoneId ? { ...zone, zoneName: form.input } : zone))
         );
+        setPopup({ type: "success", message: "Zone renamed successfully" });
       }
 
       if (form.type === "addSubZone") {
@@ -44,7 +42,6 @@ const Zones = () => {
         const response = await zoneService.addSubZone(data);
         // console.log(response.data);
         setZones((prevZones) => prevZones.map((zone) => (zone._id === response.data._id ? response.data : zone)));
-        setForm(null);
         setPopup({ type: "success", message: "Sub Zone added successfully" });
       }
 
@@ -54,18 +51,18 @@ const Zones = () => {
         const response = await zoneService.editSubZone(data);
         // console.log(response.data);
         setZones((prevZones) => prevZones.map((zone) => (zone._id === response.data._id ? response.data : zone)));
-        setForm(null);
         setPopup({ type: "success", message: "Sub Zone added successfully" });
       }
-    } catch (e) {
-      if (e.response.data.duplicate) {
-        setPopup({ type: "error", message: "This name is already present" });
-      } else {
-        setPopup({ type: "error", message: "Could not complete operation" });
-      }
-    } finally {
+
       setForm(null);
-      setLoading(false)
+      setIsModalOpen(false);
+    } catch (e) {
+      // console.log(e);
+      let message = "Could not complete operation";
+      if (e.response?.data?.duplicate) message: "This name is already present";
+      setPopup({ type: "error", message: message });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,6 +75,7 @@ const Zones = () => {
         setZones((prevZones) => prevZones.filter((zone) => zone._id !== popup.zoneId));
         setPopup({ type: "success", message: "Zone Deleted Successfully" });
       }
+
       if (popup.delete === "subZone") {
         const response = await zoneService.deleteSubZone(popup.zoneId, popup.subZoneId);
         // Remove the subzone from the array without reloading
@@ -96,10 +94,17 @@ const Zones = () => {
     } catch (e) {
       setPopup({
         type: "error",
-        message: "Something went wrong. Zone was not deleted",
+        message: "Something went wrong. Item was not deleted",
       });
       // console.log(e);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setForm(null);
   };
 
   const loadZones = async () => {
@@ -119,7 +124,7 @@ const Zones = () => {
     loadZones();
   }, []);
   return (
-    <div className="p-8 space-y-4">
+    <div className="space-y-4 -mt-2">
       <div className="min-w-full flex justify-center items-center">
         <button
           onClick={() => {
@@ -148,7 +153,7 @@ const Zones = () => {
           type={form?.type}
           input={form?.input || ""}
           handleInput={(e) => setForm((prev) => ({ ...prev, input: e.target.value }))}
-          onClose={()=>setIsModalOpen(false)}
+          onClose={handleClose}
         />
       </Modal>
       {zones.map((zone) => (

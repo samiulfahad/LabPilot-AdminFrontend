@@ -1,4 +1,4 @@
-const LabForm = ({ formData, zones = [], onChange, onSubmit, onCancel }) => {
+const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
   // Get subzones for selected zone
   const selectedZone = zones.find((zone) => zone._id === formData.zoneId);
   const subZones = selectedZone?.subZones || [];
@@ -87,7 +87,7 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onCancel }) => {
           <select
             id="isActive"
             name="isActive"
-            value={formData.isActive === true ? "true" : "false"}
+            value={formData.isActive ? "true" : "false"}
             onChange={(e) => onChange("isActive", e.target.value === "true")}
             className={`w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-transparent ${
               formData.isActive
@@ -185,7 +185,7 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onCancel }) => {
       <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
         <button
           type="button"
-          onClick={onCancel}
+          onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           Cancel
