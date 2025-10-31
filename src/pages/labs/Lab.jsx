@@ -1,20 +1,19 @@
 const Lab = ({ input, index, onEdit, onDelete }) => {
-  // console.log(input.labId);
-
   return (
-    <section className="bg-white rounded-lg border border-gray-200 p-6 hover:bg-gray-50 transition-colors duration-200">
+    <section className="bg-white rounded-lg border border-gray-200 px-6 py-2 hover:bg-gray-50 transition-colors duration-200">
       <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-        {/* Lab Information - Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 flex-1">
-          {/* Lab Name */}
-          <div className="flex items-center">
-            {index + 1}.
-            <span className="pl-2 text-gray-900 font-medium text-center">{input.labName}</span>
-          </div>
 
-          {/* Lab ID */}
-          <div className="flex items-center">
-            <span className="font-mono text-gray-700">{input.labId}</span>
+        {/* Fixed Column Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-[260px_120px_1fr_1fr] gap-4 flex-1">
+
+          {/* Lab Name + ID */}
+          <div className="flex flex-col overflow-hidden">
+            <span className="font-medium text-gray-900 text-nowrap overflow-hidden text-ellipsis">
+              {index + 1}. {input.labName}
+            </span>
+            <span className="text-sm text-gray-700">
+              Lab ID: <span className="font-mono">{input.labId}</span>
+            </span>
           </div>
 
           {/* Status */}
@@ -29,22 +28,20 @@ const Lab = ({ input, index, onEdit, onDelete }) => {
           </div>
 
           {/* Address */}
-          <div className="flex items-center">
-            <span className="text-gray-600">{input.address}</span>
+          <div className="flex items-center text-gray-600">
+            {input.address}
           </div>
 
-          {/* Contacts */}
-          <div className="flex items-center">
-            <span className="text-gray-600">
-              {input.contact1}
-              {input.contact2 && `, ${input.contact2}`}
-            </span>
+          {/* Contact Numbers */}
+          <div className="flex items-center text-gray-600 text-nowrap overflow-hidden text-ellipsis">
+            {input.contact1}
+            {input.contact2 && `, ${input.contact2}`}
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex justify-center lg:justify-end gap-2">
-          {/* Edit Button */}
+
           <button
             onClick={onEdit}
             className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none transition-colors duration-200"
@@ -60,7 +57,6 @@ const Lab = ({ input, index, onEdit, onDelete }) => {
             Edit
           </button>
 
-          {/* Delete Button (Hard Delete) */}
           <button
             onClick={onDelete}
             className="inline-flex items-center px-3 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 hover:border-red-400 focus:outline-none transition-colors duration-200"

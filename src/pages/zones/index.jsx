@@ -16,8 +16,8 @@ const Zones = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsModalOpen(false);
+    setLoading(true);
     try {
-      setLoading(true);
       if (form.type === "addZone") {
         const response = await zoneService.addZone({ zoneName: form.input });
         // Push the new zone to zones array without reloading
@@ -46,8 +46,6 @@ const Zones = () => {
         setZones((prevZones) => prevZones.map((zone) => (zone._id === response.data._id ? response.data : zone)));
         setForm(null);
         setPopup({ type: "success", message: "Sub Zone added successfully" });
-
-        setZones((prev) => [...prev]);
       }
 
       if (form.type === "editSubZone") {
@@ -58,8 +56,6 @@ const Zones = () => {
         setZones((prevZones) => prevZones.map((zone) => (zone._id === response.data._id ? response.data : zone)));
         setForm(null);
         setPopup({ type: "success", message: "Sub Zone added successfully" });
-
-        setZones((prev) => [...prev]);
       }
     } catch (e) {
       if (e.response.data.duplicate) {
@@ -69,6 +65,7 @@ const Zones = () => {
       }
     } finally {
       setForm(null);
+      setLoading(false)
     }
   };
 

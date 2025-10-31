@@ -87,10 +87,12 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onCancel }) => {
           <select
             id="isActive"
             name="isActive"
-            value={formData.isActive}
+            value={formData.isActive === true ? "true" : "false"}
             onChange={(e) => onChange("isActive", e.target.value === "true")}
             className={`w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-transparent ${
-              formData.isActive ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
+              formData.isActive
+                ? "bg-green-50 text-green-700 border-green-200"
+                : "bg-red-50 text-red-700 border-red-200"
             }`}
           >
             <option value="true" className="text-green-600 bg-green-50">

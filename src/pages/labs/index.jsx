@@ -37,6 +37,7 @@ const Labs = () => {
     let req = "addLab";
     if (formData.type === "editLab") req = "editLab";
     delete formData.type;
+    setLoading(true);
     try {
       if (req === "addLab") {
         const response = await labService.addLab(formData);
@@ -45,8 +46,18 @@ const Labs = () => {
           setLabs((prev) => [...prev, response.data.lab]);
         }
       }
+
+      if (req === "editLab") {
+        console.log(formData);
+        await labService.editLab(formData);
+        // Update the edited document without reload
+        setLabs((prev) => {
+          return prev.map((item) => (item._id === formData._id ? { ...item, ...formData } : item));
+        });
+      }
       setIsModalOpen(false);
       setFormData(initialData);
+      // setPopup({type: 'success', message: "Operation Done Successfully"})
     } catch (e) {
       console.log(e);
       let message = "Could not add lab";
@@ -119,14 +130,14 @@ const Labs = () => {
         />
       )}
 
-      <div className="mx-auto w-auto">
+      <div className="flex items-center justify-center -mt-4 my-2">
         <button
           onClick={() => {
             setFormData((prev) => ({ ...prev, type: "addLab" }));
             setIsModalOpen(true);
             loadZones();
           }}
-          className="btn-md"
+          className="btn-md w-60 mx-auto"
         >
           Add new Lab
         </button>
@@ -151,7 +162,7 @@ const Labs = () => {
           index={index}
           onEdit={() => {
             loadZones();
-            setFormData({ ...item, type: "editLab" });
+            setFormData({ ...item, type: "editLab", _id: item._id });
             setIsModalOpen(true);
           }}
           onDelete={() =>
