@@ -28,7 +28,7 @@ const Modal = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-2 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[10] flex items-center justify-center px-4 py-2 bg-black/50 backdrop-blur-sm"
     >
       <div
         className={`${sizeClasses[size]} bg-white rounded-2xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100`}

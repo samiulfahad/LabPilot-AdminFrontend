@@ -5,6 +5,7 @@ import Modal from "../../components/modal";
 import ZoneForm from "./ZoneForm";
 import Zone from "./Zone";
 import Popup from "../../components/popup/Popup";
+import LoadingScreen from "../../components/loadingPage";
 
 const Zones = () => {
   const [zones, setZones] = useState([]);
@@ -124,19 +125,8 @@ const Zones = () => {
     loadZones();
   }, []);
   return (
-    <div className="space-y-4 -mt-2">
-      <div className="min-w-full flex justify-center items-center">
-        <button
-          onClick={() => {
-            setIsModalOpen(true);
-            setForm({ type: "addZone" });
-          }}
-          className="btn-sm flex"
-        >
-          Add New Zone
-        </button>
-      </div>
-
+    <section>
+      {loading && <LoadingScreen />}
       {popup && (
         <Popup
           type={popup.type}
@@ -146,62 +136,75 @@ const Zones = () => {
           confirmText="Yes, Delete"
         />
       )}
-      {/* Modal */}
-      <Modal isOpen={isModalOpen} size="sm">
-        <ZoneForm
-          onSubmit={handleSubmit}
-          type={form?.type}
-          input={form?.input || ""}
-          handleInput={(e) => setForm((prev) => ({ ...prev, input: e.target.value }))}
-          onClose={handleClose}
-        />
-      </Modal>
-      {zones.map((zone) => (
-        <Zone
-          key={zone._id}
-          name={zone.zoneName}
-          subZones={zone.subZones}
-          onEditZone={() => {
-            setForm({
-              input: zone.zoneName,
-              type: "editZone",
-              zoneId: zone._id,
-            });
-            setIsModalOpen(true);
-          }}
-          onEditSubZone={(subZoneId, subZoneName) => {
-            setForm({
-              input: subZoneName,
-              type: "editSubZone",
-              zoneId: zone._id,
-              subZoneId: subZoneId,
-            });
-            setIsModalOpen(true);
-          }}
-          onAddSubZone={() => {
-            setForm({ type: "addSubZone", zoneId: zone._id });
-            setIsModalOpen(true);
-          }}
-          onDeleteZone={() => {
-            setPopup({
-              type: "confirmation",
-              message: `You are going to delete ${zone.zoneName} zone`,
-              zoneId: zone._id,
-              delete: "zone",
-            });
-          }}
-          onDeleteSubZone={(subZoneId, subZoneName) => {
-            setPopup({
-              type: "confirmation",
-              message: `You are going to delete sub zone ${subZoneName} under zone ${zone.zoneName}`,
-              zoneId: zone._id,
-              subZoneId: subZoneId,
-              delete: "subZone",
-            });
-          }}
-        />
-      ))}
-    </div>
+      <div className="space-y-4 -mt-2">
+        <div className="min-w-full flex justify-center items-center">
+          <button
+            onClick={() => {
+              setIsModalOpen(true);
+              setForm({ type: "addZone" });
+            }}
+            className="btn-sm flex"
+          >
+            Add New Zone
+          </button>
+        </div>
+        {/* Modal */}
+        <Modal isOpen={isModalOpen} size="sm">
+          <ZoneForm
+            onSubmit={handleSubmit}
+            type={form?.type}
+            input={form?.input || ""}
+            handleInput={(e) => setForm((prev) => ({ ...prev, input: e.target.value }))}
+            onClose={handleClose}
+          />
+        </Modal>
+        {zones.map((zone) => (
+          <Zone
+            key={zone._id}
+            name={zone.zoneName}
+            subZones={zone.subZones}
+            onEditZone={() => {
+              setForm({
+                input: zone.zoneName,
+                type: "editZone",
+                zoneId: zone._id,
+              });
+              setIsModalOpen(true);
+            }}
+            onEditSubZone={(subZoneId, subZoneName) => {
+              setForm({
+                input: subZoneName,
+                type: "editSubZone",
+                zoneId: zone._id,
+                subZoneId: subZoneId,
+              });
+              setIsModalOpen(true);
+            }}
+            onAddSubZone={() => {
+              setForm({ type: "addSubZone", zoneId: zone._id });
+              setIsModalOpen(true);
+            }}
+            onDeleteZone={() => {
+              setPopup({
+                type: "confirmation",
+                message: `You are going to delete ${zone.zoneName} zone`,
+                zoneId: zone._id,
+                delete: "zone",
+              });
+            }}
+            onDeleteSubZone={(subZoneId, subZoneName) => {
+              setPopup({
+                type: "confirmation",
+                message: `You are going to delete sub zone ${subZoneName} under zone ${zone.zoneName}`,
+                zoneId: zone._id,
+                subZoneId: subZoneId,
+                delete: "subZone",
+              });
+            }}
+          />
+        ))}
+      </div>
+    </section>
   );
 };
 

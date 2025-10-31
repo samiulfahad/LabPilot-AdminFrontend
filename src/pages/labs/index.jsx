@@ -5,6 +5,7 @@ import Popup from "../../components/popup/Popup";
 import Lab from "./Lab";
 import LabForm from "./LabForm";
 import zoneService from "../../services/zoneService";
+import LoadingScreen from "../../components/loadingPage";
 
 const initialData = {
   labName: "",
@@ -119,6 +120,7 @@ const Labs = () => {
 
   return (
     <section>
+      {loading && <LoadingScreen />}
       {popup && (
         <Popup
           type={popup.type}
@@ -131,7 +133,7 @@ const Labs = () => {
       <div className="flex items-center justify-center -mt-4 my-2">
         <button
           onClick={() => {
-            setFormData({...initialData, type: "addLab"});
+            setFormData({ ...initialData, type: "addLab" });
             setIsModalOpen(true);
             loadZones();
           }}
