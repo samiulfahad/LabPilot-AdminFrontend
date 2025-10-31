@@ -1,2 +1,2 @@
-Task 1: Add and implement loading component on lab and zone page
+Task 1 Done: Add and implement loading component on lab and zone page
 Task 2: Add search page 
