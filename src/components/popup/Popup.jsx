@@ -94,7 +94,7 @@ const Popup = ({
   return (
     <Portal>
       <div 
-        className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-[11] p-4"
+        className="fixed inset-0 flex items-center justify-center backdrop-blur-[3px] z-[11] p-4"
         onClick={handleBackdropClick}
       >
         <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-auto animate-in fade-in zoom-in-95 duration-200">
