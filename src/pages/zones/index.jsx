@@ -58,9 +58,9 @@ const Zones = () => {
       setForm(null);
       setIsModalOpen(false);
     } catch (e) {
-      // console.log(e);
+      // console.log(e.response.data.duplicate);
       let message = "Could not complete operation";
-      if (e.response?.data?.duplicate) message: "This name is already present";
+      if (e.response?.data?.duplicate) message = "This name is already present";
       setPopup({ type: "error", message: message });
     } finally {
       setLoading(false);
