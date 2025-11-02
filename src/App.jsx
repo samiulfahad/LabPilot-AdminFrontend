@@ -1,20 +1,22 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from "react-router-dom";
 
-import Layout from './components/layout';
-import Home from './pages/home';
-import Labs from './pages/labs';
-import Zones from './pages/zones';
+import Layout from "./components/layout";
+import Home from "./pages/home";
+import Lab from "./pages/labs";
+import Zone from "./pages/zones";
+import Test from "./pages/tests";
 
 function App() {
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/labs" element={<Labs />} />
-        <Route path="/zones" element={<Zones />} />
+        <Route path="/labs" element={<Lab />} />
+        <Route path="/zones" element={<Zone />} />
+        <Route path="/tests" element={<Test />} />
       </Routes>
     </Layout>
-  )
+  );
 }
 
-export default App
+export default App;
