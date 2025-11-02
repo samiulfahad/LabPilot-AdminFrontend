@@ -2,7 +2,7 @@ const menu = [
   { label: "Home", path: "/" },
   { label: "Labs", path: "/labs" },
   { label: "Zones", path: "/zones" },
-  { label: "Test Categories", path: "/categories" },
+  { label: "Lab Tests", path: "/tests" },
 ];
 
 export default menu;
