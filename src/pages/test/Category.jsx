@@ -1,4 +1,4 @@
-const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDeleteZone, onDeleteSubZone }) => {
+const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCategory, onDeleteCategory }) => {
   return (
     <div className="min-w-full border border-gray-200 rounded-lg bg-white shadow-sm px-5 py-4 mb-4">
       {/* Header Section */}
@@ -6,24 +6,24 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
           <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-            {subZones.length} sub zone{subZones.length !== 1 ? "s" : ""}
+            {tests.length} test{tests.length > 1 ? "s" : ""}
           </span>
         </div>
 
         {/* Zone Action Buttons - Top aligned with zone name */}
         <div className="flex gap-2 flex-shrink-0">
           <button
-            onClick={onAddSubZone}
+            onClick={onAddTest}
             className="flex items-center gap-1.5 px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm font-medium"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add Sub
+            Add Test
           </button>
 
           <button
-            onClick={onEditZone}
+            onClick={onEditCategory}
             className="flex items-center gap-1.5 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm font-medium"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +38,7 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
           </button>
 
           <button
-            onClick={onDeleteZone}
+            onClick={onDeleteCategory}
             className="flex items-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm font-medium"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,21 +54,21 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
         </div>
       </div>
 
-      {/* SubZones List - Full width */}
-      {subZones.length > 0 && (
+      {/* Test List - Full width */}
+      {tests.length > 0 && (
         <div className="mt-4">
           <div className="flex flex-wrap gap-2">
-            {subZones.map((item) => (
+            {tests.map((test) => (
               <div
-                key={item._id}
+                key={test._id}
                 className="flex items-center bg-blue-50 border border-blue-200 rounded-md group hover:bg-blue-100 transition-colors"
               >
-                <span className="px-3 py-1 text-sm text-blue-800 font-medium">{item.subZoneName}</span>
+                <span className="px-3 py-1 text-sm text-blue-800 font-medium">{test.testName}</span>
 
                 {/* Action Buttons */}
                 <div className="flex border-l border-blue-300">
                   <button
-                    onClick={() => onEditSubZone(item._id, item.subZoneName)}
+                    onClick={() => onEditTest(test._id, test.testName, test.isOnline)}
                     className="p-1.5 text-blue-600 hover:bg-blue-200 transition-colors"
                     title="Edit Sub Zone"
                   >
@@ -83,9 +83,9 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
                   </button>
 
                   <button
-                    onClick={() => onDeleteSubZone(item._id, item.subZoneName)}
+                    onClick={() => onDeleteTest(test._id, test.testName)}
                     className="p-1.5 text-red-600 hover:bg-red-200 transition-colors"
-                    title="Delete Sub Zone"
+                    title="Delete Test"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -104,11 +104,11 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
       )}
 
       {/* Empty State */}
-      {subZones.length === 0 && (
+      {tests.length === 0 && (
         <div className="mt-4 text-center py-4 bg-gray-50 rounded border border-dashed border-gray-300">
-          <p className="text-gray-500 text-sm mb-2">No sub zones added yet</p>
-          <button onClick={onAddSubZone} className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-            + Add first sub zone
+          <p className="text-gray-500 text-sm mb-2">No tests added yet</p>
+          <button onClick={onAddTest} className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            + Add first test
           </button>
         </div>
       )}
@@ -116,4 +116,4 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
   );
 };
 
-export default Zone;
+export default Category;
