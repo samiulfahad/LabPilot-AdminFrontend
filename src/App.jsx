@@ -5,6 +5,7 @@ import Home from "./pages/home";
 import Lab from "./pages/lab";
 import Zone from "./pages/zone";
 import Test from "./pages/test";
+import LabManagement from "./pages/labManagement";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/labs" element={<Lab />} />
         <Route path="/zones" element={<Zone />} />
         <Route path="/tests" element={<Test />} />
+        <Route path="/lab-management" element={<LabManagement />} />
       </Routes>
     </Layout>
   );

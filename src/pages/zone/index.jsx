@@ -30,6 +30,7 @@ const Zones = () => {
           zoneId: form.zoneId,
           zoneName: form.input,
         });
+        // console.log(response);
         // Update the edited zone in the DOM
         setZones((prevZones) =>
           prevZones.map((zone) => (zone._id === form.zoneId ? { ...zone, zoneName: form.input } : zone))

@@ -1,8 +1,8 @@
 import api from "./api";
 
-const labService = {
+const labAdminService = {
   getLabs: (params) => api.get("/lab/account/all", { params }),
-  addLab: (data) => api.post("/lab/account/add", data),
+  addAdmin: (data) => api.post("/lab/admin/add", data),
   editLab: (data) => api.patch("/lab/account/edit", data),
   deleteLab: (_id) => api.delete("/lab/account/delete", { data: { _id: _id } }),
   addSubZone: (data) => api.post("/lab/zone/subzone/add", data),
@@ -10,4 +10,4 @@ const labService = {
   deleteSubZone: (zoneId, subZoneId) => api.delete("/lab/zone/subzone/delete", { data: { zoneId, subZoneId } }),
 };
 
-export default labService;
+export default labAdminService;
