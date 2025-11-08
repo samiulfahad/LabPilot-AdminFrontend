@@ -1,6 +1,4 @@
 const AdminForm = ({ formData, onFieldChange, onSubmit, onCancel }) => {
-  
-  
 
   return (
     <div className="space-y-3 p-4 m-4">

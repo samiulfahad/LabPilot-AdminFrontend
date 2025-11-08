@@ -21,12 +21,13 @@ const LabManagement = () => {
   return (
     <section className="min-h-screen">
       {loading && <LoadingScreen />}
+      
       <Modal isOpen={activeModal === "view"}>
         <View />
       </Modal>
 
       <Modal isOpen={activeModal === "addAdmin"}>
-        <AdminForm  />
+        <AdminForm />
       </Modal>
 
       <div className="max-w-6xl mx-auto">
