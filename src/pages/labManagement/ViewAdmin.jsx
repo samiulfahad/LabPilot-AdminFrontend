@@ -1,4 +1,4 @@
-import useLabManagement from "../../store/local/labManagementStore";
+import useLabManagement from "./store";
 
 const ViewAdmin = () => {
   const { viewData } = useLabManagement();

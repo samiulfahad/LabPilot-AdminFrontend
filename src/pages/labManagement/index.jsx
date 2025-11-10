@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import labService from "../../services/labSevice";
 import Lab from "./Lab";
 import Modal from "../../components/modal";
-import View from "./View";
+import Popup from "../../components/popup/Popup";
 import AdminForm from "./AdminForm";
-import labAdminService from "../../services/labAdminService";
-import useLabManagementStore from "../../store/local/labManagementStore";
+import useLabManagement from "./store";
 import LoadingScreen from "../../components/loadingPage";
+import ViewAdmin from "./ViewAdmin";
+import ViewLabDetails from "./ViewLabDetails";
+import ViewStaff from "./ViewStaff";
 
 const LabManagement = () => {
-  const { loading, labs, loadLabs, activeModal, clearState } = useLabManagementStore();
+  const { loading, popup, setActiveModal, error, labs, loadLabs, activeModal, clearState } =
+    useLabManagement();
 
   useEffect(() => {
     loadLabs();
@@ -21,9 +23,17 @@ const LabManagement = () => {
   return (
     <section className="min-h-screen">
       {loading && <LoadingScreen />}
-      
-      <Modal isOpen={activeModal === "view"}>
-        <View />
+      {popup === "error" && <Popup type="error" message={error} />}
+      <Modal isOpen={activeModal === "viewAdmin"}>
+        <ViewAdmin />
+      </Modal>
+
+      <Modal isOpen={activeModal === "viewStaff"}>
+        <ViewStaff />
+      </Modal>
+
+      <Modal isOpen={activeModal === "viewLabDetails"} onClose={() => setActiveModal(null, null)}>
+        <ViewLabDetails />
       </Modal>
 
       <Modal isOpen={activeModal === "addAdmin"}>

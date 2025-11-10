@@ -1,12 +1,18 @@
 import { create } from "zustand";
 import labService from "../../../services/labSevice";
 import addAdminSlice from "./addAdminSlice";
-import appSlice from "../../global/appSlice";
+import modalSlice from "../../../store/common/modalSlice";
+import loadingSlice from "../../../store/common/loadingSlice";
+import popupSlice from "../../../store/common/popupSlice";
 
 const useLabManagement = create((set, get) => ({
   ...addAdminSlice(set, get),
-  ...appSlice(set, get),
+  ...loadingSlice(set, get),
+  ...modalSlice(set, get),
+  ...popupSlice(set, get),
+
   labs: [],
+
   loadLabs: async () => {
     try {
       get().startLoading();
@@ -19,7 +25,24 @@ const useLabManagement = create((set, get) => ({
       get().stopLoading();
     }
   },
-  clearState: () => set({ loading: false, error: null, labs: [], popup: null }),
+
+  clearState: () =>
+    set({
+      loading: false,
+      popup: null,
+      popupMessage: null,
+      activeModal: null,
+      modalData: null,
+      selectedLab: null,
+      adminForm: {},
+    }),
+
+  clearStateButKeepFormData: () =>
+    set({
+      loading: false,
+      error: null,
+      popup: null,
+    }),
 }));
 
 export default useLabManagement;

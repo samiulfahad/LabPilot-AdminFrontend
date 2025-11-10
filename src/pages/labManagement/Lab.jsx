@@ -1,7 +1,7 @@
-import useLabManagementStore from "../../store/local/labManagementStore";
+import useLabManagement from "./store";
 
-const Lab = ({ lab, onView, onAddAdmin, onAddSupportAdmin }) => {
-  const { setView, setActiveModal, setSelectedLab } = useLabManagementStore();
+const Lab = ({ lab, onAddSupportAdmin }) => {
+  const { setActiveModal, setSelectedLab } = useLabManagement();
 
   // Check if there's a support admin
   const hasSupportAdmin = lab.admins?.some((admin) => admin.username === "supportAdmin");
@@ -36,8 +36,7 @@ const Lab = ({ lab, onView, onAddAdmin, onAddSupportAdmin }) => {
         <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-48">
           <button
             onClick={() => {
-              setActiveModal("view");
-              setView("labDetails", lab);
+              setActiveModal("viewLabDetails", lab);
             }}
             className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-white shadow-lg hover:shadow-blue-500/25"
           >
@@ -99,8 +98,8 @@ const Lab = ({ lab, onView, onAddAdmin, onAddSupportAdmin }) => {
             </div>
             <button
               onClick={() => {
-                setActiveModal("addAdmin")
-                setSelectedLab(lab)
+                setActiveModal("addAdmin", lab);
+                setSelectedLab(lab);
               }}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
             >
@@ -175,7 +174,7 @@ const Lab = ({ lab, onView, onAddAdmin, onAddSupportAdmin }) => {
                 </div>
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    onClick={() => setView("staff", staff)}
+                    onClick={() => setActiveModal("viewStaff", staff)}
                     className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
                   >
                     View

@@ -1,26 +1,14 @@
 import labAdminService from "../../../services/labAdminService";
 
-const formData = {
-  name: "",
-  username: "",
-  email: "",
-  phone: "",
-  isActive: "",
-};
-
 const addAdminSlice = (set, get) => ({
   // State
-  adminFormData: { ...formData },
-  selectedLab: null,
-  popup: null,
+  adminForm: {},
 
   // Actions
-  setSelectedLab: (lab) => set({ selectedLab: lab }),
-  setPopup: (type) => set({ popup: type }),
-  updateAdminFormData: (field, value) =>
+  updateAdminForm: (field, value) =>
     set((state) => ({
-      adminFormData: {
-        ...state.adminFormData,
+      adminForm: {
+        ...state.adminForm,
         [field]: value,
       },
     })),
@@ -30,7 +18,8 @@ const addAdminSlice = (set, get) => ({
       get().startLoading();
 
       // 1. Add admin via API
-      const response = await labAdminService.addAdmin(get().adminFormData);
+      // console.log(get().selectedLab._id);
+      const response = await labAdminService.addAdmin({ _id: get().modalData._id, ...get().adminForm });
       const newAdmin = response.data; // The newly created admin
 
       // 2. Update local state - add to admins array
@@ -38,7 +27,7 @@ const addAdminSlice = (set, get) => ({
         labs: state.labs.map((lab) => {
           // Find the lab where this admin should be added
           // You might need to use get().selectedLab or another way to identify the target lab
-          if (lab._id === state.selectedLab?._id) {
+          if (lab._id === state.modalData?._id) {
             return {
               ...lab,
               admins: [...lab.admins, newAdmin],
@@ -47,19 +36,23 @@ const addAdminSlice = (set, get) => ({
           return lab;
         }),
         // Clear form after success
-        adminFormData: { ...formData },
-        selectedLab: null,
-        popup: "success",
+        adminForm: {},
+        popupType: "success",
+        popupMessage: "Admin Added successfully",
+        activeModal: null,
+        modalData: null,
       }));
     } catch (e) {
-      set({ error: "Could not add admin", popup: "error" });
+      set({ popupType: "error", popupMessage: "Could not add admin. Please retry" });
     } finally {
       get().stopLoading();
     }
   },
 
   clearAdminForm: () =>
-    set({ adminFormData: { ...formData }, selectedLab: null, error: null, loading: false, popup: null }),
+    set({
+      adminForm: {},
+    }),
 });
 
 export default addAdminSlice;
