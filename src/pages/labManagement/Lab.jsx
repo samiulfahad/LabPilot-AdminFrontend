@@ -1,7 +1,7 @@
-import useLabManagement from "./store";
+import useLabManagementStore from "./store";
 
 const Lab = ({ lab, onAddSupportAdmin }) => {
-  const { setActiveModal, setSelectedLab } = useLabManagement();
+  const { setActiveModal, setSelectedLab } = useLabManagementStore();
 
   // Check if there's a support admin
   const hasSupportAdmin = lab.admins?.some((admin) => admin.username === "supportAdmin");

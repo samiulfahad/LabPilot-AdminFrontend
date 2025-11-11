@@ -1,7 +1,7 @@
-import useLabManagement from "./store";
+import useLabManagementStore from "./store";
 
 const ViewAdmin = () => {
-  const { viewData } = useLabManagement();
+  const { viewData } = useLabManagementStore();
 
   // Use viewData from store instead of props
   const admin = viewData;

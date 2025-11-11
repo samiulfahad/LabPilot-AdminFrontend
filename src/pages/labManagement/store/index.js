@@ -5,7 +5,7 @@ import modalSlice from "../../../store/common/modalSlice";
 import loadingSlice from "../../../store/common/loadingSlice";
 import popupSlice from "../../../store/common/popupSlice";
 
-const useLabManagement = create((set, get) => ({
+const useLabManagementStore = create((set, get) => ({
   ...addAdminSlice(set, get),
   ...loadingSlice(set, get),
   ...modalSlice(set, get),
@@ -45,4 +45,4 @@ const useLabManagement = create((set, get) => ({
     }),
 }));
 
-export default useLabManagement;
+export default useLabManagementStore;

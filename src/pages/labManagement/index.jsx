@@ -3,15 +3,14 @@ import Lab from "./Lab";
 import Modal from "../../components/modal";
 import Popup from "../../components/popup/Popup";
 import AdminForm from "./AdminForm";
-import useLabManagement from "./store";
+import useLabManagementStore from "./store";
 import LoadingScreen from "../../components/loadingPage";
 import ViewAdmin from "./ViewAdmin";
 import ViewLabDetails from "./ViewLabDetails";
 import ViewStaff from "./ViewStaff";
 
 const LabManagement = () => {
-  const { loading, popup, setActiveModal, error, labs, loadLabs, activeModal, clearState } =
-    useLabManagement();
+  const { loading, popup, setActiveModal, error, labs, loadLabs, activeModal, clearState } = useLabManagementStore();
 
   useEffect(() => {
     loadLabs();
@@ -32,7 +31,7 @@ const LabManagement = () => {
         <ViewStaff />
       </Modal>
 
-      <Modal isOpen={activeModal === "viewLabDetails"} onClose={() => setActiveModal(null, null)}>
+      <Modal isOpen={activeModal === "viewLabDetails"}>
         <ViewLabDetails />
       </Modal>
 
