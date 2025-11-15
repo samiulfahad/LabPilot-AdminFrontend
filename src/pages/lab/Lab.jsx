@@ -1,6 +1,6 @@
 const Lab = ({ input, index, onEdit, onDelete }) => {
   return (
-    <section className="bg-white rounded-lg border border-gray-200 px-6 py-2 hover:bg-gray-50 transition-colors duration-200">
+    <section className="bg-white rounded-lg border border-gray-200 px-6 py-2 my-1 hover:bg-gray-50 transition-colors duration-200">
       <div className="flex flex-col lg:flex-row lg:items-center gap-6">
 
         {/* Fixed Column Grid */}

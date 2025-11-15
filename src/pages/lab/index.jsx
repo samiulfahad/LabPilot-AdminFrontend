@@ -119,7 +119,7 @@ const Labs = () => {
   }, []);
 
   return (
-    <section>
+    <section className="px-2">
       {loading && <LoadingScreen />}
       {popup && (
         <Popup
@@ -130,7 +130,7 @@ const Labs = () => {
         />
       )}
 
-      <div className="flex items-center justify-center -mt-4 my-2">
+      <div className="flex items-center justify-center mt-4 my-2">
         <button
           onClick={() => {
             setFormData({ ...initialData, type: "addLab" });

@@ -1,8 +1,11 @@
 // src/services/api.js
 import axios from 'axios';
 
+const cloud = "https://labpilot-admin-backend.onrender.com/api/v1"
+const local = 'http://localhost:3000/api/v1'
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api/v1',
+  baseURL: cloud,
   timeout: 10000,
 });
 

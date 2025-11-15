@@ -155,7 +155,7 @@ const Tests = () => {
           confirmText="Yes, Delete"
         />
       )}
-      <div className="space-y-4 -mt-2">
+      <div className="space-y-4 mt-4 px-2">
         <div className="min-w-full flex justify-center items-center">
           <button
             onClick={() => {
