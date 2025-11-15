@@ -1,0 +1,6 @@
+Task 1: Deactivate admin and staff
+Task 2: Edit staff access
+Task 3: Split lab component into different parts
+Task 4: Add referrers section and implement add, edit, delete referrers
+Task 5: Add billing history
+Task 6: Lab management by lab search (search by lab ID, zone, subzone, phone number)
