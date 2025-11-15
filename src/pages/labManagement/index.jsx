@@ -8,9 +8,21 @@ import LoadingScreen from "../../components/loadingPage";
 import ViewAdmin from "./ViewAdmin";
 import ViewLabDetails from "./ViewLabDetails";
 import ViewStaff from "./ViewStaff";
+import StaffForm from "./StaffForm";
 
 const LabManagement = () => {
-  const { loading, popup, setActiveModal, error, labs, loadLabs, activeModal, clearState } = useLabManagementStore();
+  const {
+    loading,
+    popup,
+    popupMessage,
+    closePopup,
+    labs,
+    loadLabs,
+    activeModal,
+    deleteStaff,
+    deleteAdmin,
+    clearState,
+  } = useLabManagementStore();
 
   useEffect(() => {
     loadLabs();
@@ -22,7 +34,15 @@ const LabManagement = () => {
   return (
     <section className="min-h-screen">
       {loading && <LoadingScreen />}
-      {popup === "error" && <Popup type="error" message={error} />}
+      {popup === "error" && <Popup type="error" message={popupMessage} onClose={closePopup} />}
+      {popup === "deleteStaff" && (
+        <Popup type="deleteStaff" message={popupMessage} onConfirm={deleteStaff} onClose={closePopup} />
+      )}
+
+      {popup === "deleteAdmin" && (
+        <Popup type="deleteAdmin" message={popupMessage} onConfirm={deleteAdmin} onClose={closePopup} />
+      )}
+      {popup === "success" && <Popup type="success" message={popupMessage} onClose={closePopup} />}
       <Modal isOpen={activeModal === "viewAdmin"}>
         <ViewAdmin />
       </Modal>
@@ -37,6 +57,10 @@ const LabManagement = () => {
 
       <Modal isOpen={activeModal === "addAdmin"}>
         <AdminForm />
+      </Modal>
+
+      <Modal isOpen={activeModal === "addStaff"}>
+        <StaffForm />
       </Modal>
 
       <div className="max-w-6xl mx-auto">

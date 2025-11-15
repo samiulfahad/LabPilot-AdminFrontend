@@ -1,10 +1,56 @@
 import useLabManagementStore from "./store";
 
 const Lab = ({ lab, onAddSupportAdmin }) => {
-  const { setActiveModal, setSelectedLab } = useLabManagementStore();
+  const { setActiveModal, deleteStaff, setPopup, setPopupMessage, setPopupData } = useLabManagementStore();
 
+  // console.log(lab);
   // Check if there's a support admin
   const hasSupportAdmin = lab.admins?.some((admin) => admin.username === "supportAdmin");
+
+  const handleDeleteAdmin = (e, lab, admin) => {
+    e.preventDefault();
+    setPopup("deleteAdmin");
+    setPopupData({ labId: lab._id, adminId: admin._id });
+    const message = (
+      <div className="text-start">
+        <p>
+          Username: <span className="font-bold">{admin.username}</span>
+        </p>
+        <p>
+          Lab ID: <span className="font-bold">{lab.labId}</span>
+        </p>
+        <p>
+          Lab Name: <span className="font-bold">{lab.labName}</span>
+        </p>
+      </div>
+    );
+    setPopupMessage(message);
+  };
+
+  const handleDeleteStaff = (e, lab, staff) => {
+    e.preventDefault();
+    setPopup("deleteStaff");
+    setPopupData({ labId: lab._id, staffId: staff._id });
+
+    const message = (
+      <div className="text-start">
+        <p>
+          Username: <span className="font-bold">{staff.username}</span>
+        </p>
+        <p>
+          Access: <span className="font-bold">{staff.access}</span>
+        </p>
+        <p>
+          Lab ID: <span className="font-bold">{lab.labId}</span>
+        </p>
+        <p>
+          Lab Name: <span className="font-bold">{lab.labName}</span>
+        </p>
+      </div>
+    );
+
+    setPopupMessage(message);
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 text-gray-900 shadow-lg">
@@ -99,7 +145,6 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             <button
               onClick={() => {
                 setActiveModal("addAdmin", lab);
-                setSelectedLab(lab);
               }}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
             >
@@ -122,7 +167,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                 </div>
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    onClick={() => setView("admin", admin)}
+                    onClick={() => setActiveModal("viewAdmin", admin)}
                     className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
                   >
                     View
@@ -136,6 +181,12 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                       Activate
                     </button>
                   )}
+                  <button
+                    onClick={(e) => handleDeleteAdmin(e, lab, admin)}
+                    className="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
@@ -154,7 +205,12 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                 <p className="text-green-600 text-sm">{lab.staffs?.length || 0} team members</p>
               </div>
             </div>
-            <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2">
+            <button
+              onClick={() => {
+                setActiveModal("addStaff", lab);
+              }}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+            >
               <span>+</span>
               Add Staff
             </button>
@@ -188,6 +244,12 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                       Activate
                     </button>
                   )}
+                  <button
+                    onClick={(e) => handleDeleteStaff(e, lab, staff)}
+                    className="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors"
+                  >
+                    Delete
+                  </button>
                   <button className="px-3 py-1.5 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-xs font-medium transition-colors">
                     Edit
                   </button>

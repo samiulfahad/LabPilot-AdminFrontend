@@ -1,9 +1,12 @@
 const popupSlice = (set, get) => ({
-  popupType: null,
+  popup: null,
   popupMessage: null,
-  popupMessage: (message) => set({ popupMessage: message }),
-  setPopupType: (type) => set({ popupType: type }),
-  closePopup: () => set({ popupType: null, popupMessage: null }),
+  popupData: null,
+
+  setPopupMessage: (message) => set({ popupMessage: message }),
+  setPopup: (type) => set({ popup: type }),
+  setPopupData: (data) => set({popupData: data}),
+  closePopup: () => set({ popup: null, popupMessage: null, popupData: null }),
 });
 
 export default popupSlice;

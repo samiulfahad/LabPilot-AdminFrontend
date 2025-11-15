@@ -1,34 +1,47 @@
 import useLabManagementStore from "./store";
 
-const AdminForm = () => {
-  const { adminForm, updateAdminForm, addAdmin, clearAdminForm, setActiveModal, modalData } = useLabManagementStore();
+const StaffForm = () => {
+  const { staffForm, updateStaffForm, addStaff, clearStaffForm, setActiveModal, modalData } =
+    useLabManagementStore();
+
+  const accessOptions = ["createInvoice", "readInvoice", "updateInvoice", "readCashmemo", "uploadReport"];
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addAdmin();
+    console.log(staffForm);
+    addStaff();
   };
 
   const handleFieldChange = (e) => {
-    const { name, value } = e.target;
-    updateAdminForm(name, value);
+    const { name, value, type, checked } = e.target;
+    updateStaffForm(name, type === "checkbox" ? checked : value);
   };
 
-  const toggleAdminStatus = () => {
-    updateAdminForm("isActive", !adminForm.isActive);
+  const handleAccessChange = (accessItem) => {
+    const currentAccess = staffForm.access || [];
+    const newAccess = currentAccess.includes(accessItem)
+      ? currentAccess.filter((item) => item !== accessItem)
+      : [...currentAccess, accessItem];
+
+    updateStaffForm("access", newAccess);
+  };
+
+  const toggleActiveStatus = () => {
+    updateStaffForm("isActive", !staffForm.isActive);
   };
 
   const closeForm = () => {
-    clearAdminForm();
+    clearStaffForm();
     setActiveModal(null, null);
   };
 
   return (
     <>
-      {/* Admin Form */}
-      <div className="space-y-3 p-4 m-4">
+      {/* Staff Form */}
+      <div className="space-y-3 p-4">
         {/* Heading */}
         <div className="text-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Add new Admin</h2>
+          <h2 className="text-xl font-bold text-gray-800">Add new Staff</h2>
         </div>
 
         {/* Name Field */}
@@ -39,7 +52,7 @@ const AdminForm = () => {
           <input
             type="text"
             name="name"
-            value={adminForm.name || ""}
+            value={staffForm.name || ""}
             onChange={handleFieldChange}
             className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
           />
@@ -53,7 +66,7 @@ const AdminForm = () => {
           <input
             type="text"
             name="username"
-            value={adminForm.username || ""}
+            value={staffForm.username || ""}
             onChange={handleFieldChange}
             className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
           />
@@ -67,7 +80,7 @@ const AdminForm = () => {
           <input
             type="password"
             name="password"
-            value={adminForm.password || ""}
+            value={staffForm.password || ""}
             onChange={handleFieldChange}
             className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
           />
@@ -81,7 +94,7 @@ const AdminForm = () => {
           <input
             type="email"
             name="email"
-            value={adminForm.email || ""}
+            value={staffForm.email || ""}
             onChange={handleFieldChange}
             className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
           />
@@ -95,34 +108,55 @@ const AdminForm = () => {
           <input
             type="tel"
             name="phone"
-            value={adminForm.phone || ""}
+            value={staffForm.phone || ""}
             onChange={handleFieldChange}
             className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
           />
         </div>
 
-        {/* Admin Status Toggle */}
+        {/* Access Permissions */}
+        <div className="border border-gray-300 rounded-lg p-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Access Permissions</label>
+          <div className="grid grid-cols-2 gap-2">
+            {accessOptions.map((accessItem) => (
+              <div key={accessItem} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={accessItem}
+                  checked={(staffForm.access || []).includes(accessItem)}
+                  onChange={() => handleAccessChange(accessItem)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor={accessItem} className="ml-2 text-sm text-gray-700 capitalize">
+                  {accessItem.replace(/([A-Z])/g, " $1").trim()}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Active Status Toggle */}
         <div className="border border-gray-300 rounded-lg p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Admin Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">Staff Status</label>
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">
               Current status:
-              <span className={`ml-2 font-semibold ${adminForm.isActive ? "text-green-600" : "text-red-600"}`}>
-                {adminForm.isActive ? "Active" : "Deactive"}
+              <span className={`ml-2 font-semibold ${staffForm.isActive ? "text-green-600" : "text-red-600"}`}>
+                {staffForm.isActive ? "Active" : "Deactive"}
               </span>
             </span>
 
             {/* Toggle Switch */}
             <button
               type="button"
-              onClick={toggleAdminStatus}
+              onClick={toggleActiveStatus}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                adminForm.isActive ? "bg-green-500" : "bg-gray-300"
+                staffForm.isActive ? "bg-green-500" : "bg-gray-300"
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  adminForm.isActive ? "translate-x-6" : "translate-x-1"
+                  staffForm.isActive ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>
@@ -130,9 +164,9 @@ const AdminForm = () => {
 
           {/* Helper Text */}
           <p className="text-xs text-gray-500 mt-2">
-            {adminForm.isActive
-              ? "Active admin can login and perform assigned tasks."
-              : "Deactive admin cannot login to the system."}
+            {staffForm.isActive
+              ? "Active staff can login and perform assigned tasks."
+              : "Deactive staff cannot login to the system."}
           </p>
         </div>
 
@@ -142,7 +176,7 @@ const AdminForm = () => {
             onClick={handleSubmit}
             className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors text-sm bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Add Admin
+            Add Staff
           </button>
           <button
             onClick={closeForm}
@@ -153,10 +187,10 @@ const AdminForm = () => {
         </div>
 
         {/* Debug info */}
-        {modalData && <div className="text-xs text-gray-500 mt-2">Adding admin to: {modalData.labName}</div>}
+        {modalData && <div className="text-xs text-gray-500 mt-2">Adding staff to: {modalData.labName}</div>}
       </div>
     </>
   );
 };
 
-export default AdminForm;
+export default StaffForm;
