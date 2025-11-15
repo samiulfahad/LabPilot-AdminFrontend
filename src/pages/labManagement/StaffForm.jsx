@@ -38,15 +38,15 @@ const StaffForm = () => {
   return (
     <>
       {/* Staff Form */}
-      <div className="space-y-3 p-4">
+      <div className="space-y-1 p-2 pt-0">
         {/* Heading */}
-        <div className="text-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Add new Staff</h2>
+        <div className="text-center mb-2">
+          <h2 className="text-xl font-bold text-gray-800">Add Staff</h2>
         </div>
 
         {/* Name Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Name
           </label>
           <input
@@ -54,13 +54,13 @@ const StaffForm = () => {
             name="name"
             value={staffForm.name || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Username Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Username
           </label>
           <input
@@ -68,13 +68,13 @@ const StaffForm = () => {
             name="username"
             value={staffForm.username || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Password Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Password
           </label>
           <input
@@ -82,13 +82,13 @@ const StaffForm = () => {
             name="password"
             value={staffForm.password || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Email Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Email
           </label>
           <input
@@ -96,13 +96,13 @@ const StaffForm = () => {
             name="email"
             value={staffForm.email || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Phone Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Phone
           </label>
           <input
@@ -110,14 +110,14 @@ const StaffForm = () => {
             name="phone"
             value={staffForm.phone || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Access Permissions */}
         <div className="border border-gray-300 rounded-lg p-3">
           <label className="block text-sm font-medium text-gray-700 mb-2">Access Permissions</label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-1">
             {accessOptions.map((accessItem) => (
               <div key={accessItem} className="flex items-center">
                 <input
@@ -136,8 +136,8 @@ const StaffForm = () => {
         </div>
 
         {/* Active Status Toggle */}
-        <div className="border border-gray-300 rounded-lg p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Staff Status</label>
+        <div className="border border-gray-300 rounded-lg p-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Staff Status</label>
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">
               Current status:
@@ -163,7 +163,7 @@ const StaffForm = () => {
           </div>
 
           {/* Helper Text */}
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 mt-1">
             {staffForm.isActive
               ? "Active staff can login and perform assigned tasks."
               : "Deactive staff cannot login to the system."}

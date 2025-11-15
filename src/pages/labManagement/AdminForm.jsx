@@ -25,15 +25,15 @@ const AdminForm = () => {
   return (
     <>
       {/* Admin Form */}
-      <div className="space-y-3 p-4 m-4">
+      <div className="space-y-1 p-2">
         {/* Heading */}
         <div className="text-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Add new Admin</h2>
+          <h2 className="text-xl font-bold text-gray-800">Add Admin</h2>
         </div>
 
         {/* Name Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Name
           </label>
           <input
@@ -41,13 +41,13 @@ const AdminForm = () => {
             name="name"
             value={adminForm.name || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Username Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Username
           </label>
           <input
@@ -55,13 +55,13 @@ const AdminForm = () => {
             name="username"
             value={adminForm.username || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Password Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Password
           </label>
           <input
@@ -69,13 +69,13 @@ const AdminForm = () => {
             name="password"
             value={adminForm.password || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Email Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Email
           </label>
           <input
@@ -83,13 +83,13 @@ const AdminForm = () => {
             name="email"
             value={adminForm.email || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Phone Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-2 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Phone
           </label>
           <input
@@ -97,13 +97,13 @@ const AdminForm = () => {
             name="phone"
             value={adminForm.phone || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-2 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Admin Status Toggle */}
         <div className="border border-gray-300 rounded-lg p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Admin Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Admin Status</label>
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">
               Current status:
