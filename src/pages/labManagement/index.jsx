@@ -51,7 +51,7 @@ const LabManagement = () => {
         <ViewStaff />
       </Modal>
 
-      <Modal isOpen={activeModal === "viewLabDetails"}>
+      <Modal isOpen={activeModal === "viewLabDetails"} size="lg">
         <ViewLabDetails />
       </Modal>
 
