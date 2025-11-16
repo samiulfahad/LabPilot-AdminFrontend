@@ -79,35 +79,38 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
         </div>
       </div>
 
-      {/* Test List - Ultra Compact Modern Grid */}
+      {/* Test List - Compact Modern Grid */}
       {tests.length > 0 && (
         <div className="mt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {tests.map((test) => (
               <div
                 key={test._id}
-                className={`group relative p-2.5 rounded-xl border transition-all duration-200 hover:shadow-lg hover:scale-105 ${
+                className={`group relative p-3 rounded-xl border transition-all duration-200 hover:shadow-lg hover:scale-105 ${
                   test.isOnline
                     ? "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:border-green-300"
                     : "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:border-blue-300"
                 }`}
               >
-                {/* Online Status Dot */}
+                {/* Online Status Badge with Animation */}
                 {test.isOnline && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+                  <div className="absolute -top-2 -right-2 flex items-center gap-1 bg-green-500 text-white px-2.5 py-1 rounded-full text-xs font-semibold shadow-lg">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
+                    Online
+                  </div>
                 )}
 
-                {/* Test Content - Ultra Compact */}
-                <div className="flex items-center justify-between gap-2">
+                {/* Test Content */}
+                <div className="flex items-center justify-between">
                   {/* Test Icon and Name */}
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <div
-                      className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
+                      className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
                         test.isOnline ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"
                       }`}
                     >
                       {test.isOnline ? (
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -116,7 +119,7 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
                           />
                         </svg>
                       ) : (
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -129,7 +132,7 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
 
                     <div className="flex-1 min-w-0">
                       <h4
-                        className={`font-semibold text-xs truncate ${
+                        className={`font-semibold text-sm truncate ${
                           test.isOnline ? "text-green-900" : "text-blue-900"
                         }`}
                       >
@@ -137,7 +140,9 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
                       </h4>
                       <div className="flex items-center gap-1 mt-0.5">
                         <div
-                          className={`w-1.5 h-1.5 rounded-full ${test.isOnline ? "bg-green-500" : "bg-blue-400"}`}
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            test.isOnline ? "bg-green-500 animate-pulse" : "bg-blue-400"
+                          }`}
                         ></div>
                         <span className={`text-xs ${test.isOnline ? "text-green-600" : "text-blue-600"}`}>
                           {test.isOnline ? "Live" : "Offline"}
@@ -152,12 +157,12 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
                       onClick={() => onEditTest(test._id, test.testName, test.isOnline)}
                       className={`p-1.5 rounded-lg transition-all duration-200 hover:scale-110 ${
                         test.isOnline
-                          ? "bg-green-100 text-green-700 hover:bg-green-200"
-                          : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                          ? "bg-green-200 text-green-700 hover:bg-green-300"
+                          : "bg-blue-200 text-blue-700 hover:bg-blue-300"
                       }`}
                       title="Edit Test"
                     >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -172,7 +177,7 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
                       className="p-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:scale-110 transition-all duration-200"
                       title="Delete Test"
                     >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
