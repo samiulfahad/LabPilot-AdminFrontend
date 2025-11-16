@@ -3,7 +3,6 @@ import useLabManagementStore from "./store";
 const Lab = ({ lab, onAddSupportAdmin }) => {
   const { setActiveModal, deleteStaff, setPopup, setPopupMessage, setPopupData } = useLabManagementStore();
 
-  // console.log(lab);
   // Check if there's a support admin
   const hasSupportAdmin = lab.admins?.some((admin) => admin.username === "supportAdmin");
 
@@ -53,25 +52,25 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 text-gray-900 shadow-lg">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 text-gray-900 shadow-lg">
       {/* Header Section */}
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 mb-8">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div className="flex-1">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl">L</span>
+          <div className="flex items-center gap-3 sm:gap-4 mb-3">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+              <span className="text-white font-bold text-lg sm:text-xl">L</span>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">{lab.labName}</h3>
-              <p className="text-gray-600">ID: {lab.labId}</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{lab.labName}</h3>
+              <p className="text-gray-600 text-sm sm:text-base">ID: {lab.labId}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-2 ${lab.isActive ? "bg-green-500" : "bg-red-500"}`}></div>
               <span className="text-sm text-gray-600">{lab.isActive ? "Active" : "Inactive"}</span>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-3 sm:gap-4 text-sm text-gray-500">
               <span>👥 {lab.staffs?.length || 0} Staff</span>
               <span>⚡ {lab.admins?.length || 0} Admins</span>
             </div>
@@ -84,19 +83,19 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             onClick={() => {
               setActiveModal("viewLabDetails", lab);
             }}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-white shadow-lg hover:shadow-blue-500/25"
+            className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-white shadow-lg hover:shadow-blue-500/25 text-sm sm:text-base"
           >
             <span>📋</span>
             Lab Details
           </button>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             {lab.isActive ? (
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-200 text-white shadow-lg hover:shadow-red-500/25 text-sm">
+              <button className="flex-1 flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-200 text-white shadow-lg hover:shadow-red-500/25 text-xs sm:text-sm">
                 <span>⏸️</span>
                 Deactivate
               </button>
             ) : (
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 text-white shadow-lg hover:shadow-green-500/25 text-sm">
+              <button className="flex-1 flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 text-white shadow-lg hover:shadow-green-500/25 text-xs sm:text-sm">
                 <span>▶️</span>
                 Activate
               </button>
@@ -107,20 +106,20 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
 
       {/* Support Admin Alert */}
       {!hasSupportAdmin && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl border border-yellow-300 shadow-sm">
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl border border-yellow-300 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                <span className="text-white text-lg">🛡️</span>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <span className="text-white text-base sm:text-lg">🛡️</span>
               </div>
               <div>
-                <p className="text-white font-semibold">No Support Admin</p>
-                <p className="text-white/90 text-sm">Add a support admin for customer support</p>
+                <p className="text-white font-semibold text-sm sm:text-base">No Support Admin</p>
+                <p className="text-white/90 text-xs sm:text-sm">Add a support admin for customer support</p>
               </div>
             </div>
             <button
               onClick={() => onAddSupportAdmin(lab._id)}
-              className="w-full sm:w-auto px-6 py-2 bg-white text-yellow-600 rounded-lg font-medium hover:bg-white/90 transition-colors border border-white shadow-sm"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-white text-yellow-600 rounded-lg font-medium hover:bg-white/90 transition-colors border border-white shadow-sm text-sm sm:text-base"
             >
               + Add Support Admin
             </button>
@@ -129,24 +128,24 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
       )}
 
       {/* Admins and Staff Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {/* Lab Admins Card */}
-        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-5">
+        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <span className="text-blue-600 text-lg">⚡</span>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                <span className="text-blue-600 text-base sm:text-lg">⚡</span>
               </div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900">Lab Admins</h4>
-                <p className="text-blue-600 text-sm">{lab.admins?.length || 0} administrators</p>
+                <h4 className="text-base sm:text-lg font-bold text-gray-900">Lab Admins</h4>
+                <p className="text-blue-600 text-xs sm:text-sm">{lab.admins?.length || 0} administrators</p>
               </div>
             </div>
             <button
               onClick={() => {
                 setActiveModal("addAdmin", lab);
               }}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+              className="px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2 text-sm sm:text-base"
             >
               <span>+</span>
               Add Admin
@@ -156,34 +155,35 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             {lab.admins.map((admin, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group gap-2 sm:gap-0"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${admin.isActive ? "bg-green-500" : "bg-red-500"}`}></div>
                   <div>
-                    <p className="font-semibold text-gray-900">{admin.username}</p>
-                    <p className="text-gray-500 text-sm">{admin.isActive ? "Active" : "Inactive"}</p>
+                    <p className="font-semibold text-gray-900 text-sm sm:text-base">{admin.username}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm">{admin.isActive ? "Active" : "Inactive"}</p>
                   </div>
                 </div>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Action Buttons - Always visible on mobile, hover on desktop */}
+                <div className="flex gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200">
                   <button
                     onClick={() => setActiveModal("viewAdmin", admin)}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
+                    className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
                   >
                     View
                   </button>
                   {admin.isActive ? (
-                    <button className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
+                    <button className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
                       Deactivate
                     </button>
                   ) : (
-                    <button className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors">
+                    <button className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors">
                       Activate
                     </button>
                   )}
                   <button
                     onClick={(e) => handleDeleteAdmin(e, lab, admin)}
-                    className="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors"
+                    className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors"
                   >
                     Delete
                   </button>
@@ -194,22 +194,22 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
         </div>
 
         {/* Lab Staff Card */}
-        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-5">
+        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 sm:p-5 border border-gray-200 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <span className="text-green-600 text-lg">👥</span>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <span className="text-green-600 text-base sm:text-lg">👥</span>
               </div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900">Lab Staff</h4>
-                <p className="text-green-600 text-sm">{lab.staffs?.length || 0} team members</p>
+                <h4 className="text-base sm:text-lg font-bold text-gray-900">Lab Staff</h4>
+                <p className="text-green-600 text-xs sm:text-sm">{lab.staffs?.length || 0} team members</p>
               </div>
             </div>
             <button
               onClick={() => {
                 setActiveModal("addStaff", lab);
               }}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+              className="px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2 text-sm sm:text-base"
             >
               <span>+</span>
               Add Staff
@@ -219,38 +219,39 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             {lab.staffs.map((staff, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors group gap-2 sm:gap-0"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${staff.isActive ? "bg-green-500" : "bg-red-500"}`}></div>
                   <div>
-                    <p className="font-semibold text-gray-900">{staff.username}</p>
-                    <p className="text-gray-500 text-sm">{staff.isActive ? "Active" : "Inactive"}</p>
+                    <p className="font-semibold text-gray-900 text-sm sm:text-base">{staff.username}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm">{staff.isActive ? "Active" : "Inactive"}</p>
                   </div>
                 </div>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Action Buttons - Always visible on mobile, hover on desktop */}
+                <div className="flex gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200">
                   <button
                     onClick={() => setActiveModal("viewStaff", staff)}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
+                    className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
                   >
                     View
                   </button>
                   {staff.isActive ? (
-                    <button className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
+                    <button className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
                       Deactivate
                     </button>
                   ) : (
-                    <button className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors">
+                    <button className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors">
                       Activate
                     </button>
                   )}
                   <button
                     onClick={(e) => handleDeleteStaff(e, lab, staff)}
-                    className="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors"
+                    className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs font-medium transition-colors"
                   >
                     Delete
                   </button>
-                  <button className="px-3 py-1.5 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-xs font-medium transition-colors">
+                  <button className="flex-1 sm:flex-none px-2 sm:px-3 py-1.5 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-xs font-medium transition-colors">
                     Edit
                   </button>
                 </div>

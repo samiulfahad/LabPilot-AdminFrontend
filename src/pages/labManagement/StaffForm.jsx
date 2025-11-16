@@ -46,7 +46,7 @@ const StaffForm = () => {
 
         {/* Name Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Name
           </label>
           <input
@@ -54,13 +54,13 @@ const StaffForm = () => {
             name="name"
             value={staffForm.name || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Username Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Username
           </label>
           <input
@@ -68,13 +68,13 @@ const StaffForm = () => {
             name="username"
             value={staffForm.username || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Password Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Password
           </label>
           <input
@@ -82,13 +82,13 @@ const StaffForm = () => {
             name="password"
             value={staffForm.password || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Email Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Email
           </label>
           <input
@@ -96,13 +96,13 @@ const StaffForm = () => {
             name="email"
             value={staffForm.email || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
         {/* Phone Field */}
         <div className="flex border border-gray-300 rounded-lg">
-          <label className="w-20 px-3 py-0 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+          <label className="w-20 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
             Phone
           </label>
           <input
@@ -110,7 +110,7 @@ const StaffForm = () => {
             name="phone"
             value={staffForm.phone || ""}
             onChange={handleFieldChange}
-            className="flex-1 px-3 py-0 rounded-r-lg focus:outline-none"
+            className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
           />
         </div>
 
@@ -174,13 +174,13 @@ const StaffForm = () => {
         <div className="flex gap-3 pt-2">
           <button
             onClick={handleSubmit}
-            className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors text-sm bg-blue-600 hover:bg-blue-700 text-white"
+            className="flex-1 py-1 px-4 rounded-lg font-semibold transition-colors text-sm bg-blue-600 hover:bg-blue-700 text-white"
           >
             Add Staff
           </button>
           <button
             onClick={closeForm}
-            className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors text-sm bg-gray-500 hover:bg-gray-600 text-white"
+            className="flex-1 py-1 px-4 rounded-lg font-semibold transition-colors text-sm bg-gray-500 hover:bg-gray-600 text-white"
           >
             Cancel
           </button>
