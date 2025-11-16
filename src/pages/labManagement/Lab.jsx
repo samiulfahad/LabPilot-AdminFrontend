@@ -161,7 +161,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
           </button>
           <div className="flex gap-3">
             {lab.isActive ? (
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200 text-white shadow-lg hover:shadow-amber-500/25 text-sm">
+              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200 text-white shadow-lg hover:shadow-amber-500/25 text-sm">
                 <Icons.Pause />
                 Deactivate
               </button>
@@ -289,7 +289,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
               onClick={() => {
                 setActiveModal("addStaff", lab);
               }}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
             >
               <Icons.Add />
               Add Staff
