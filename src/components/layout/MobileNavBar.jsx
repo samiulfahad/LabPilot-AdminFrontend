@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import menu from "./menu"; // Adjust the path as needed
 
 const MobileNavbar = () => {
@@ -124,8 +125,8 @@ const MobileNavbar = () => {
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-gray-800 text-base truncate">Dr. John Smith</p>
-              <p className="text-gray-600 text-sm">@johnsmith</p>
+              <p className="font-bold text-gray-800 text-base truncate">Samiul Fahad</p>
+              <p className="text-gray-600 text-sm">@sfahad</p>
               <div className="flex items-center mt-0.5">
                 <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
                   Administrator
@@ -145,47 +146,71 @@ const MobileNavbar = () => {
           </button>
         </div>
 
-        {/* Scrollable Menu Area */}
-        <div className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto">
+        {/* Scrollable Menu Area with Fixed Bottom Space for Logout */}
+        <div className="flex flex-col h-full">
+          {/* Menu Items - Takes available space */}
+          <div className="flex-1 overflow-y-auto">
             <div className="space-y-1 p-4">
               {menu.map((item, index) => (
-                <a
+                <NavLink
                   key={index}
-                  href={item.path}
-                  className="flex items-center p-4 rounded-xl transition-all duration-200 group hover:bg-white hover:shadow-lg border border-transparent hover:border-blue-200 bg-white/50 backdrop-blur-sm"
+                  to={item.path}
+                  end={item.path === "/"}
+                  className={({ isActive }) =>
+                    `flex items-center p-4 rounded-xl transition-all duration-200 group border backdrop-blur-sm ${
+                      isActive
+                        ? "bg-blue-50 border-blue-200 shadow-md"
+                        : "bg-white/50 border-transparent hover:bg-white hover:shadow-lg"
+                    }`
+                  }
                   onClick={handleMenuClick}
                 >
-                  <div className="flex items-center space-x-4 w-full">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:from-blue-600 group-hover:to-purple-700 transition-all duration-200 shadow-md">
-                      <span className="text-white text-sm">{getIconForMenu(item.label)}</span>
+                  {({ isActive }) => (
+                    <div className="flex items-center space-x-4 w-full">
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 shadow-md ${
+                          isActive
+                            ? "bg-gradient-to-br from-blue-600 to-purple-700"
+                            : "bg-gradient-to-br from-blue-500 to-purple-600 group-hover:from-blue-600 group-hover:to-purple-700"
+                        }`}
+                      >
+                        <span className="text-white text-sm">{getIconForMenu(item.label)}</span>
+                      </div>
+                      <div className="flex-1">
+                        <span
+                          className={`font-semibold transition-colors duration-200 text-sm ${
+                            isActive ? "text-blue-700" : "text-gray-800 group-hover:text-gray-900"
+                          }`}
+                        >
+                          {item.label}
+                        </span>
+                      </div>
+                      <div
+                        className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                          isActive ? "bg-blue-600" : "bg-blue-400 group-hover:bg-blue-500"
+                        }`}
+                      ></div>
                     </div>
-                    <div className="flex-1">
-                      <span className="font-semibold text-gray-800 group-hover:text-gray-900 transition-colors duration-200 text-sm">
-                        {item.label}
-                      </span>
-                    </div>
-                    <div className="w-2 h-2 bg-blue-400 rounded-full group-hover:bg-blue-500 transition-colors duration-200"></div>
-                  </div>
-                </a>
+                  )}
+                </NavLink>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Fixed Logout Section at Bottom */}
-        <div className="border-t border-gray-200/50 bg-white/80 backdrop-blur-sm p-4">
-          <button
-            className="w-full flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-semibold hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 mb-2"
-            onClick={handleMenuClick}
-          >
-            <span className="text-base">🚪</span>
-            <span className="text-sm">Logout</span>
-          </button>
+          {/* Fixed Logout Section - Always at bottom */}
+          <div className="flex-shrink-0 border-t border-gray-200/50 bg-white/80 backdrop-blur-sm p-4 mt-auto">
+            <button
+              className="w-full flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-semibold hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 mb-2"
+              onClick={handleMenuClick}
+            >
+              <span className="text-lg">🚪</span>
+              <span className="text-sm">Logout</span>
+            </button>
 
-          <div className="text-center">
-            <p className="text-gray-400 text-xs">LabPilot v2.1.4</p>
-            <p className="text-gray-400 text-xs">© 2024 Medical Systems</p>
+            <div className="text-center">
+              <p className="text-gray-400 text-xs">LabPilot v1.0.0</p>
+              <p className="text-gray-400 text-xs">© 2025 Lab Pilot</p>
+            </div>
           </div>
         </div>
       </div>
