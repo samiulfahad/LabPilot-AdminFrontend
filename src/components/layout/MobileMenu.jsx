@@ -67,7 +67,7 @@ const MobileMenu = () => {
         >
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
               <span className="text-white font-bold text-sm">LP</span>
             </div>
             <div>
@@ -75,10 +75,10 @@ const MobileMenu = () => {
             </div>
           </Link>
 
-          {/* Hamburger Button */}
+          {/* Enhanced Hamburger Button */}
           <button
             onClick={toggleMenu}
-            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-900"
+            className="w-10 h-10 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl transition-all duration-200 shadow-sm border border-blue-200"
           >
             <div className="flex flex-col items-center justify-center w-5 h-5">
               <span
@@ -115,62 +115,83 @@ const MobileMenu = () => {
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        {/* Enhanced Header with Light Background */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
               <span className="text-white font-bold">SF</span>
             </div>
             <div>
               <p className="text-gray-900 font-medium">Samiul Fahad</p>
-              <p className="text-gray-500 text-sm">Admin</p>
+              <p className="text-gray-600 text-sm">Administrator</p>
             </div>
           </div>
 
-          {/* Close Button */}
+          {/* Enhanced Close Button */}
           <button
             onClick={toggleMenu}
-            className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700"
+            className="w-10 h-10 flex items-center justify-center bg-white text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-200 shadow-sm border border-gray-300 hover:border-red-300"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Menu Items */}
-        <div className="flex-1 overflow-y-auto py-4">
-          <div className="space-y-1 px-3">
+        {/* Scrollable Menu Area */}
+        <div className="flex-1 overflow-y-auto pb-24">
+          <div className="space-y-1 px-3 py-4">
             {menu.map((item, index) => (
               <NavLink
                 key={index}
                 to={item.path}
                 end={item.path === "/"}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200 ${
+                  `flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
                     isActive
-                      ? "bg-blue-50 text-blue-700 border border-blue-200"
+                      ? "bg-blue-50 text-blue-700 border border-blue-200 shadow-sm"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`
                 }
                 onClick={handleMenuClick}
               >
-                <span className="text-lg">{getIconForMenu(item.label)}</span>
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <span className="text-blue-600 text-sm">{getIconForMenu(item.label)}</span>
+                </div>
                 <span className="font-medium text-sm">{item.label}</span>
               </NavLink>
             ))}
           </div>
         </div>
 
-        {/* Logout */}
-        <div className="p-4 border-t border-gray-200">
-          <button
-            className="w-full flex items-center space-x-2 p-3 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-            onClick={handleMenuClick}
-          >
-            <span>🚪</span>
-            <span className="text-sm font-medium">Logout</span>
-          </button>
+        {/* Modern Fixed Logout Section */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white/95 backdrop-blur-sm">
+          <div className="space-y-3">
+            {/* User Status */}
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-xs text-gray-500">Online</span>
+              </div>
+              <span className="text-xs text-gray-400">v1.0.0</span>
+            </div>
+
+            {/* Stylish Logout Button */}
+            <button
+              className="w-full flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+              onClick={handleMenuClick}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+              <span className="text-sm font-semibold">Logout</span>
+            </button>
+          </div>
         </div>
       </div>
     </>
