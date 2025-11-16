@@ -104,7 +104,7 @@ const MobileNavbar = () => {
         </nav>
 
         {/* Spacer div to push content down - This is the key fix */}
-        <div className="h-16"></div>
+        <div className="py-8"></div>
       </div>
 
       {/* Glass Morphism Overlay */}
