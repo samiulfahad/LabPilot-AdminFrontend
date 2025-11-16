@@ -1,6 +1,6 @@
 const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCategory, onDeleteCategory }) => {
   return (
-    <div className="min-w-full border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-300 px-4 sm:px-5 py-4 mb-5">
+    <div className="min-w-full border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition-all duration-300 px-4 sm:px-5 py-4 mb-5">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
         <div className="flex items-center gap-3">
@@ -19,12 +19,12 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
           <div className="flex-1 min-w-0">
             <h3 className="text-lg font-bold text-gray-900 truncate">{name}</h3>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+              <span className="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-medium">
                 {tests.length} test{tests.length > 1 ? "s" : ""}
               </span>
               {/* Online Tests Count */}
               {tests.filter((test) => test.isOnline).length > 0 && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                <span className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                   {tests.filter((test) => test.isOnline).length} online
                 </span>
@@ -33,11 +33,11 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
           </div>
         </div>
 
-        {/* Action Buttons - Compact Design */}
+        {/* Action Buttons - Modern Design */}
         <div className="flex flex-col xs:flex-row gap-2 flex-shrink-0">
           <button
             onClick={onAddTest}
-            className="flex items-center justify-center gap-2 px-3 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-all duration-200 shadow-sm text-sm"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:shadow-md text-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -48,7 +48,7 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
           <div className="flex gap-2">
             <button
               onClick={onEditCategory}
-              className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-all duration-200 shadow-sm text-sm"
+              className="flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-cyan-700 transition-all duration-200 shadow-sm text-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -63,7 +63,7 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
 
             <button
               onClick={onDeleteCategory}
-              className="flex items-center justify-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all duration-200 shadow-sm text-sm"
+              className="flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-medium hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-sm text-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -79,86 +79,85 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
         </div>
       </div>
 
-      {/* Test List - Compact Grid Layout */}
+      {/* Test List - Ultra Compact Modern Grid */}
       {tests.length > 0 && (
         <div className="mt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
             {tests.map((test) => (
               <div
                 key={test._id}
-                className={`group relative p-3 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                className={`group relative p-2.5 rounded-xl border transition-all duration-200 hover:shadow-lg hover:scale-105 ${
                   test.isOnline
-                    ? "bg-green-50 border-green-200 hover:border-green-300"
-                    : "bg-blue-50 border-blue-200 hover:border-blue-300"
+                    ? "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:border-green-300"
+                    : "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:border-blue-300"
                 }`}
               >
-                {/* Online Status Badge */}
+                {/* Online Status Dot */}
                 {test.isOnline && (
-                  <div className="absolute -top-1 -right-1 flex items-center gap-1 bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm">
-                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                    Online
-                  </div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
                 )}
 
-                {/* Test Content */}
-                <div className="flex items-center gap-2">
-                  {/* Medical Test Icon */}
-                  <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                      test.isOnline ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"
-                    }`}
-                  >
-                    {test.isOnline ? (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                        />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h4
-                      className={`font-medium text-sm truncate ${test.isOnline ? "text-green-900" : "text-blue-900"}`}
+                {/* Test Content - Ultra Compact */}
+                <div className="flex items-center justify-between gap-2">
+                  {/* Test Icon and Name */}
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div
+                      className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
+                        test.isOnline ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"
+                      }`}
                     >
-                      {test.testName}
-                    </h4>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <div
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          test.isOnline ? "bg-green-500 animate-pulse" : "bg-blue-400"
+                      {test.isOnline ? (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                          />
+                        </svg>
+                      ) : (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h4
+                        className={`font-semibold text-xs truncate ${
+                          test.isOnline ? "text-green-900" : "text-blue-900"
                         }`}
-                      ></div>
-                      <span className={`text-xs ${test.isOnline ? "text-green-600" : "text-blue-600"}`}>
-                        {test.isOnline ? "Live" : "Offline"}
-                      </span>
+                      >
+                        {test.testName}
+                      </h4>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full ${test.isOnline ? "bg-green-500" : "bg-blue-400"}`}
+                        ></div>
+                        <span className={`text-xs ${test.isOnline ? "text-green-600" : "text-blue-600"}`}>
+                          {test.isOnline ? "Live" : "Offline"}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  {/* Action Buttons - Always Visible on Mobile */}
+                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200">
                     <button
                       onClick={() => onEditTest(test._id, test.testName, test.isOnline)}
-                      className={`p-1.5 rounded-md transition-colors ${
+                      className={`p-1.5 rounded-lg transition-all duration-200 hover:scale-110 ${
                         test.isOnline
-                          ? "bg-green-200 text-green-700 hover:bg-green-300"
-                          : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                          ? "bg-green-100 text-green-700 hover:bg-green-200"
+                          : "bg-blue-100 text-blue-700 hover:bg-blue-200"
                       }`}
                       title="Edit Test"
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -170,10 +169,10 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
 
                     <button
                       onClick={() => onDeleteTest(test._id, test.testName)}
-                      className="p-1.5 rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                      className="p-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:scale-110 transition-all duration-200"
                       title="Delete Test"
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -190,10 +189,10 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
         </div>
       )}
 
-      {/* Empty State - Medical Theme */}
+      {/* Empty State - Modern Design */}
       {tests.length === 0 && (
-        <div className="mt-4 text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+        <div className="mt-4 text-center py-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-400 transition-all duration-300">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl flex items-center justify-center mx-auto mb-3">
             <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -203,15 +202,15 @@ const Category = ({ name, tests, onAddTest, onEditTest, onDeleteTest, onEditCate
               />
             </svg>
           </div>
-          <p className="text-gray-500 text-sm mb-3">No medical tests added yet</p>
+          <p className="text-gray-600 text-sm mb-3">No medical tests in this category</p>
           <button
             onClick={onAddTest}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-cyan-700 transition-all duration-200 shadow-md hover:shadow-lg text-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add First Test
+            Create First Test
           </button>
         </div>
       )}
