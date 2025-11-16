@@ -1,31 +1,47 @@
 const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDeleteZone, onDeleteSubZone }) => {
   return (
-    <div className="min-w-full border border-gray-200 rounded-lg bg-white shadow-sm px-4 sm:px-5 py-4 mb-4">
+    <div className="min-w-full border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-300 px-4 sm:px-6 py-5 mb-5">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3">
-        <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold text-gray-800 break-words flex-1">{name}</h3>
-          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full flex-shrink-0">
-            {subZones.length} sub zone{subZones.length > 1 ? "s" : ""}
-          </span>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+        <div className="flex items-center gap-4">
+          {/* Zone Icon */}
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
+            </svg>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl font-bold text-gray-900 truncate">{name}</h3>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+                {subZones.length} subzone{subZones.length > 1 ? "s" : ""}
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Zone Action Buttons - Stack on mobile, inline on desktop */}
-        <div className="flex flex-col xs:flex-row gap-2 flex-shrink-0">
+        {/* Action Buttons - Modern Design */}
+        <div className="flex flex-col xs:flex-row gap-3 flex-shrink-0">
           <button
             onClick={onAddSubZone}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:shadow-md text-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            <span className="sm:block">Add Sub</span>
+            Add Subzone
           </button>
 
           <div className="flex gap-2">
             <button
               onClick={onEditZone}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm font-medium"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-cyan-700 transition-all duration-200 shadow-sm text-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -35,12 +51,12 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                 />
               </svg>
-              <span className="sm:block">Edit</span>
+              Edit Zone
             </button>
 
             <button
               onClick={onDeleteZone}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm font-medium"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-medium hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-sm text-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -50,56 +66,80 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                 />
               </svg>
-              <span className="sm:block">Delete</span>
+              Delete Zone
             </button>
           </div>
         </div>
       </div>
 
-      {/* SubZones List */}
+      {/* Subzones List - Modern Grid Layout */}
       {subZones.length > 0 && (
-        <div className="mt-4">
-          <div className="flex flex-wrap gap-2">
+        <div className="mt-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {subZones.map((item) => (
               <div
                 key={item._id}
-                className="flex items-center bg-blue-50 border border-blue-200 rounded-md group hover:bg-blue-100 transition-colors min-w-0 flex-1 xs:flex-none"
+                className="group relative p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200"
               >
-                <span className="px-3 py-2 sm:py-1 text-sm text-blue-800 font-medium truncate flex-1">
-                  {item.subZoneName}
-                </span>
+                {/* Subzone Content */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {/* Subzone Icon */}
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                    </div>
 
-                {/* Action Buttons */}
-                <div className="flex border-l border-blue-300 flex-shrink-0">
-                  <button
-                    onClick={() => onEditSubZone(item._id, item.subZoneName)}
-                    className="p-2 sm:p-1.5 text-blue-600 hover:bg-blue-200 transition-colors"
-                    title="Edit Sub Zone"
-                  >
-                    <svg className="w-4 h-4 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                  </button>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-gray-900 text-sm truncate">{item.subZoneName}</h4>
+                      <p className="text-blue-600 text-xs mt-0.5">Subzone</p>
+                    </div>
+                  </div>
 
-                  <button
-                    onClick={() => onDeleteSubZone(item._id, item.subZoneName)}
-                    className="p-2 sm:p-1.5 text-red-600 hover:bg-red-200 transition-colors"
-                    title="Delete Sub Zone"
-                  >
-                    <svg className="w-4 h-4 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
+                  {/* Action Buttons - Always Visible on Mobile */}
+                  <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 ml-2">
+                    <button
+                      onClick={() => onEditSubZone(item._id, item.subZoneName)}
+                      className="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 hover:scale-110 transition-all duration-200"
+                      title="Edit Subzone"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      onClick={() => onDeleteSubZone(item._id, item.subZoneName)}
+                      className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:scale-110 transition-all duration-200"
+                      title="Delete Subzone"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -107,18 +147,29 @@ const Zone = ({ name, subZones, onAddSubZone, onEditZone, onEditSubZone, onDelet
         </div>
       )}
 
-      {/* Empty State */}
+      {/* Empty State - Modern Design */}
       {subZones.length === 0 && (
-        <div className="mt-4 text-center py-4 bg-gray-50 rounded border border-dashed border-gray-300">
-          <p className="text-gray-500 text-sm mb-2">No sub zones added yet</p>
+        <div className="mt-5 text-center py-8 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-400 transition-all duration-300">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <p className="text-gray-600 text-sm mb-3">No subzones added to this zone yet</p>
           <button
             onClick={onAddSubZone}
-            className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg text-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add first sub zone
+            Add First Subzone
           </button>
         </div>
       )}
