@@ -28,7 +28,7 @@ const Layout = ({ children }) => {
 
       {/* Main content */}
       <main className="lg:ml-64 flex-1 min-h-screen bg-gradient-to-br from-gray-50/95 via-gray-100/95 to-white/95 backdrop-blur-sm">
-        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 pt-16 lg:pt-0 duration-500 max-w-7xl mx-auto">
+        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 pt-20 lg:pt-0 duration-500 max-w-7xl mx-auto">
           {children}
         </div>
       </main>
