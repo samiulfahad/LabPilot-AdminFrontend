@@ -108,21 +108,29 @@ const MobileNavbar = () => {
         />
       )}
 
-      {/* Modern Sidebar - Now covers full height */}
+      {/* Modern Sidebar with Clean Header */}
       <div
         className={`lg:hidden fixed top-0 right-0 h-full w-80 bg-gradient-to-br from-white to-gray-50/95 backdrop-blur-2xl shadow-2xl border-l border-white/30 z-50 transform transition-all duration-500 ease-out ${
           isMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         }`}
       >
-        {/* Header with Close Button */}
+        {/* Clean Header with User Info and Close Button */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200/50 bg-white/80 backdrop-blur-sm">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-xl">🧪</span>
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <span className="text-white text-lg">👨‍⚕️</span>
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
-            <div>
-              <p className="text-gray-900 font-bold text-lg">LabPilot</p>
-              <p className="text-gray-500 text-sm">Navigation Menu</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-gray-800 text-base truncate">Dr. John Smith</p>
+              <p className="text-gray-600 text-sm">@johnsmith</p>
+              <div className="flex items-center mt-0.5">
+                <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                  Administrator
+                </span>
+              </div>
             </div>
           </div>
 
@@ -137,63 +145,45 @@ const MobileNavbar = () => {
           </button>
         </div>
 
-        {/* MAIN NAVIGATION MENU - SCROLLABLE */}
-        <div className="flex-1 overflow-y-auto" style={{ height: "calc(100vh - 200px)" }}>
-          <div className="space-y-2 px-4 py-6">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider px-4 mb-4">Main Menu</h3>
-            {menu.map((item, index) => (
-              <a
-                key={index}
-                href={item.path}
-                className="flex items-center p-4 rounded-2xl transition-all duration-200 group hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-blue-200 bg-gradient-to-r from-blue-50/50 to-purple-50/50"
-                onClick={handleMenuClick}
-              >
-                <div className="flex items-center space-x-4 w-full">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:from-blue-600 group-hover:to-purple-700 transition-all duration-200 shadow-md">
-                    <span className="text-white text-lg">{getIconForMenu(item.label)}</span>
+        {/* Scrollable Menu Area */}
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full overflow-y-auto">
+            <div className="space-y-1 p-4">
+              {menu.map((item, index) => (
+                <a
+                  key={index}
+                  href={item.path}
+                  className="flex items-center p-4 rounded-xl transition-all duration-200 group hover:bg-white hover:shadow-lg border border-transparent hover:border-blue-200 bg-white/50 backdrop-blur-sm"
+                  onClick={handleMenuClick}
+                >
+                  <div className="flex items-center space-x-4 w-full">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:from-blue-600 group-hover:to-purple-700 transition-all duration-200 shadow-md">
+                      <span className="text-white text-sm">{getIconForMenu(item.label)}</span>
+                    </div>
+                    <div className="flex-1">
+                      <span className="font-semibold text-gray-800 group-hover:text-gray-900 transition-colors duration-200 text-sm">
+                        {item.label}
+                      </span>
+                    </div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full group-hover:bg-blue-500 transition-colors duration-200"></div>
                   </div>
-                  <div className="flex-1">
-                    <span className="font-bold text-gray-800 group-hover:text-gray-900 transition-colors duration-200 text-base">
-                      {item.label}
-                    </span>
-                    <p className="text-gray-500 text-xs mt-1 group-hover:text-gray-600">{item.path}</p>
-                  </div>
-                  <div className="w-2 h-2 bg-blue-400 rounded-full group-hover:bg-blue-500 transition-colors duration-200"></div>
-                </div>
-              </a>
-            ))}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* User Info and Logout - Fixed at Bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200/50 bg-white/80 backdrop-blur-sm">
-          {/* User Info */}
-          <div className="flex items-center space-x-3 mb-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-              <span className="text-white text-sm">👤</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-800 text-sm truncate">Dr. John Smith</p>
-              <p className="text-gray-600 text-xs">@johnsmith</p>
-              <div className="flex items-center mt-1">
-                <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-medium">
-                  @administrator
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Logout Button */}
+        {/* Fixed Logout Section at Bottom */}
+        <div className="border-t border-gray-200/50 bg-white/80 backdrop-blur-sm p-4">
           <button
-            className="w-full flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-2xl font-semibold hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+            className="w-full flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-semibold hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 mb-2"
             onClick={handleMenuClick}
           >
-            <span className="text-lg">🚪</span>
-            <span>Logout</span>
+            <span className="text-base">🚪</span>
+            <span className="text-sm">Logout</span>
           </button>
 
-          {/* Version Info */}
-          <div className="text-center mt-3">
+          <div className="text-center">
             <p className="text-gray-400 text-xs">LabPilot v2.1.4</p>
             <p className="text-gray-400 text-xs">© 2024 Medical Systems</p>
           </div>
