@@ -219,7 +219,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             {lab.staffs.map((staff, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors group"
+                className="flex flex-wrap items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${staff.isActive ? "bg-green-500" : "bg-red-500"}`}></div>
