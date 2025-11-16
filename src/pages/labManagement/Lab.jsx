@@ -51,6 +51,77 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
     setPopupMessage(message);
   };
 
+  // SVG Icons for consistent styling
+  const Icons = {
+    Play: () => (
+      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    ),
+    Pause: () => (
+      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
+      </svg>
+    ),
+    PowerOn: () => (
+      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z" />
+      </svg>
+    ),
+    PowerOff: () => (
+      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z" />
+        <path d="M12 7v6h2V7h-2z" />
+      </svg>
+    ),
+    View: () => (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+        />
+      </svg>
+    ),
+    Edit: () => (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+        />
+      </svg>
+    ),
+    Delete: () => (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        />
+      </svg>
+    ),
+    Add: () => (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+      </svg>
+    ),
+    Details: () => (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+    ),
+  };
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 text-gray-900 shadow-lg">
       {/* Header Section */}
@@ -85,18 +156,18 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             }}
             className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-white shadow-lg hover:shadow-blue-500/25"
           >
-            <span>📋</span>
+            <Icons.Details />
             Lab Details
           </button>
           <div className="flex gap-3">
             {lab.isActive ? (
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-200 text-white shadow-lg hover:shadow-red-500/25 text-sm">
-                <span>⏸️</span>
+              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200 text-white shadow-lg hover:shadow-amber-500/25 text-sm">
+                <Icons.Pause />
                 Deactivate
               </button>
             ) : (
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 text-white shadow-lg hover:shadow-green-500/25 text-sm">
-                <span>▶️</span>
+              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 text-white shadow-lg hover:shadow-emerald-500/25 text-sm">
+                <Icons.Play />
                 Activate
               </button>
             )}
@@ -106,7 +177,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
 
       {/* Support Admin Alert */}
       {!hasSupportAdmin && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl border border-yellow-300 shadow-sm">
+        <div className="mb-6 p-4 bg-gradient-to-r from-amber-400 to-amber-500 rounded-xl border border-amber-300 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
@@ -119,9 +190,10 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             </div>
             <button
               onClick={() => onAddSupportAdmin(lab._id)}
-              className="w-full sm:w-auto px-6 py-2 bg-white text-yellow-600 rounded-lg font-medium hover:bg-white/90 transition-colors border border-white shadow-sm"
+              className="w-full sm:w-auto px-6 py-2 bg-white text-amber-600 rounded-lg font-medium hover:bg-white/90 transition-colors border border-white shadow-sm flex items-center gap-2"
             >
-              + Add Support Admin
+              <Icons.Add />
+              Add Support Admin
             </button>
           </div>
         </div>
@@ -147,7 +219,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
               }}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
             >
-              <span>+</span>
+              <Icons.Add />
               Add Admin
             </button>
           </div>
@@ -164,50 +236,36 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                     <p className="text-gray-500 text-sm">{admin.isActive ? "Active" : "Inactive"}</p>
                   </div>
                 </div>
-                {/* Admin Action Buttons - Mixed */}
+                {/* Admin Action Buttons */}
                 <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => setActiveModal("viewAdmin", admin)}
-                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
                     title="View Admin"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
+                    <Icons.View />
                   </button>
                   {admin.isActive ? (
-                    <button className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm transition-colors">
-                      Deactivate
+                    <button
+                      className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
+                      title="Deactivate Admin"
+                    >
+                      <Icons.PowerOff />
                     </button>
                   ) : (
-                    <button className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors">
-                      Activate
+                    <button
+                      className="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
+                      title="Activate Admin"
+                    >
+                      <Icons.PowerOn />
                     </button>
                   )}
                   <button
                     onClick={(e) => handleDeleteAdmin(e, lab, admin)}
-                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                    className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
                     title="Delete Admin"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
+                    <Icons.Delete />
                   </button>
                 </div>
               </div>
@@ -233,7 +291,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
               }}
               className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
             >
-              <span>+</span>
+              <Icons.Add />
               Add Staff
             </button>
           </div>
@@ -250,63 +308,42 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                     <p className="text-gray-500 text-sm">{staff.isActive ? "Active" : "Inactive"}</p>
                   </div>
                 </div>
-                {/* Staff Action Buttons - Mixed */}
+                {/* Staff Action Buttons */}
                 <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => setActiveModal("viewStaff", staff)}
-                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
                     title="View Staff"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
+                    <Icons.View />
                   </button>
                   {staff.isActive ? (
-                    <button className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors">
-                      Deactivate
+                    <button
+                      className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
+                      title="Deactivate Staff"
+                    >
+                      <Icons.PowerOff />
                     </button>
                   ) : (
-                    <button className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors">
-                      Activate
+                    <button
+                      className="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
+                      title="Activate Staff"
+                    >
+                      <Icons.PowerOn />
                     </button>
                   )}
                   <button
-                    className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
+                    className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
                     title="Edit Staff"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
+                    <Icons.Edit />
                   </button>
                   <button
                     onClick={(e) => handleDeleteStaff(e, lab, staff)}
-                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                    className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
                     title="Delete Staff"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
+                    <Icons.Delete />
                   </button>
                 </div>
               </div>
