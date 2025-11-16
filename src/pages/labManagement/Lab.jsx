@@ -52,7 +52,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 text-gray-900 shadow-lg">
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 text-gray-900 shadow-lg">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 mb-8">
         <div className="flex-1">
@@ -60,9 +60,9 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
               <span className="text-white font-bold text-xl">L</span>
             </div>
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900">{lab.labName}</h3>
-              <p className="text-gray-600">ID: {lab.labId}</p>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-2xl font-bold text-gray-900 truncate">{lab.labName}</h3>
+              <p className="text-gray-600 truncate">ID: {lab.labId}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -127,17 +127,17 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
         </div>
       )}
 
-      {/* Admins and Staff Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Lab Admins Card */}
-        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-5">
+      {/* Admins and Staff Section - Improved for mobile */}
+      <div className="space-y-6 xl:space-y-0 xl:grid xl:grid-cols-2 xl:gap-6">
+        {/* Lab Admins Card - Larger and cleaner */}
+        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm min-h-[400px]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <span className="text-blue-600 text-lg">⚡</span>
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <span className="text-blue-600 text-xl">⚡</span>
               </div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900">Lab Admins</h4>
+                <h4 className="text-xl font-bold text-gray-900">Lab Admins</h4>
                 <p className="text-blue-600 text-sm">{lab.admins?.length || 0} administrators</p>
               </div>
             </div>
@@ -145,33 +145,37 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
               onClick={() => {
                 setActiveModal("addAdmin", lab);
               }}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+              className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2 w-full sm:w-auto justify-center"
             >
               <span>+</span>
               Add Admin
             </button>
           </div>
-          <div className="space-y-3">
-            {lab.admins.map((admin, index) => (
+
+          <div className="space-y-4 max-h-[300px] overflow-y-auto">
+            {lab.admins?.map((admin, index) => (
               <div
                 key={index}
-                className="flex flex-wrap items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${admin.isActive ? "bg-green-500" : "bg-red-500"}`}></div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{admin.username}</p>
+                <div className="flex items-center gap-3 mb-3 sm:mb-0 flex-1 min-w-0">
+                  <div
+                    className={`w-3 h-3 rounded-full flex-shrink-0 ${admin.isActive ? "bg-green-500" : "bg-red-500"}`}
+                  ></div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-900 truncate text-lg">{admin.username}</p>
                     <p className="text-gray-500 text-sm">{admin.isActive ? "Active" : "Inactive"}</p>
                   </div>
                 </div>
-                {/* Admin Action Buttons - Mixed */}
-                <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+
+                {/* Admin Action Buttons - Always visible on mobile */}
+                <div className="flex gap-2 justify-end sm:justify-start">
                   <button
                     onClick={() => setActiveModal("viewAdmin", admin)}
-                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
                     title="View Admin"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -187,20 +191,20 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                     </svg>
                   </button>
                   {admin.isActive ? (
-                    <button className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm transition-colors">
+                    <button className="px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm transition-colors whitespace-nowrap">
                       Deactivate
                     </button>
                   ) : (
-                    <button className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors">
+                    <button className="px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors whitespace-nowrap">
                       Activate
                     </button>
                   )}
                   <button
                     onClick={(e) => handleDeleteAdmin(e, lab, admin)}
-                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                    className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center"
                     title="Delete Admin"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -215,15 +219,15 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
           </div>
         </div>
 
-        {/* Lab Staff Card */}
-        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-5">
+        {/* Lab Staff Card - Larger and cleaner */}
+        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm min-h-[400px]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <span className="text-green-600 text-lg">👥</span>
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <span className="text-green-600 text-xl">👥</span>
               </div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900">Lab Staff</h4>
+                <h4 className="text-xl font-bold text-gray-900">Lab Staff</h4>
                 <p className="text-green-600 text-sm">{lab.staffs?.length || 0} team members</p>
               </div>
             </div>
@@ -231,33 +235,37 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
               onClick={() => {
                 setActiveModal("addStaff", lab);
               }}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+              className="px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2 w-full sm:w-auto justify-center"
             >
               <span>+</span>
               Add Staff
             </button>
           </div>
-          <div className="space-y-2">
-            {lab.staffs.map((staff, index) => (
+
+          <div className="space-y-4 max-h-[300px] overflow-y-auto">
+            {lab.staffs?.map((staff, index) => (
               <div
                 key={index}
-                className="flex flex-wrap items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors group"
               >
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${staff.isActive ? "bg-green-500" : "bg-red-500"}`}></div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{staff.username}</p>
+                <div className="flex items-center gap-3 mb-3 sm:mb-0 flex-1 min-w-0">
+                  <div
+                    className={`w-3 h-3 rounded-full flex-shrink-0 ${staff.isActive ? "bg-green-500" : "bg-red-500"}`}
+                  ></div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-900 truncate text-lg">{staff.username}</p>
                     <p className="text-gray-500 text-sm">{staff.isActive ? "Active" : "Inactive"}</p>
                   </div>
                 </div>
-                {/* Staff Action Buttons - Mixed */}
-                <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+
+                {/* Staff Action Buttons - Always visible on mobile */}
+                <div className="flex gap-2 justify-end sm:justify-start">
                   <button
                     onClick={() => setActiveModal("viewStaff", staff)}
-                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
                     title="View Staff"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -273,19 +281,19 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                     </svg>
                   </button>
                   {staff.isActive ? (
-                    <button className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors">
+                    <button className="px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors whitespace-nowrap">
                       Deactivate
                     </button>
                   ) : (
-                    <button className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors">
+                    <button className="px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors whitespace-nowrap">
                       Activate
                     </button>
                   )}
                   <button
-                    className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
+                    className="p-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors flex items-center justify-center"
                     title="Edit Staff"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -296,10 +304,10 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                   </button>
                   <button
                     onClick={(e) => handleDeleteStaff(e, lab, staff)}
-                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                    className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center"
                     title="Delete Staff"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
