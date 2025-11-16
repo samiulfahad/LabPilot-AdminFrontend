@@ -1,30 +1,24 @@
 import { NavLink } from "react-router-dom";
 import menu from "./menu";
 import { useState } from "react";
+import MobileNavbar from "./MobileNavBar";
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-md text-white"
-      >
-        ☰
-      </button>
+      <MobileNavbar />
 
-      {/* Sidebar with mobile responsiveness */}
       <nav
-        className={`w-64 py-8 fixed left-0 top-0 h-screen flex flex-col bg-gray-800/90 backdrop-blur-xl border-e border-gray-700/30 shadow-2xl shadow-black/20 transform transition-transform duration-300 ease-in-out z-40
-                ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        className={
+          "hidden lg:flex w-64 py-8 fixed left-0 top-0 h-screen flex-col bg-gray-800/90 backdrop-blur-xl border-e border-gray-700/30 shadow-2xl shadow-black/20 transform transition-transform duration-300 ease-in-out z-40"
+        }
       >
         {menu.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
-            onClick={() => setIsSidebarOpen(false)}
             className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : "nav-link-inactive"}`}
           >
             {item.label}
