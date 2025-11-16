@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import menu from "./menu"; // Adjust the path as needed
 
 const MobileNavbar = () => {
@@ -66,7 +66,7 @@ const MobileNavbar = () => {
           }`}
         >
           {/* Logo with modern design */}
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30">
               <span className="text-white font-bold text-lg">🧪</span>
             </div>
@@ -74,7 +74,7 @@ const MobileNavbar = () => {
               <p className="text-white font-bold text-xl tracking-tight">LabPilot</p>
               <p className="text-white/70 text-xs">Medical Intelligence</p>
             </div>
-          </div>
+          </Link>
 
           {/* Modern Hamburger Button */}
           <button
