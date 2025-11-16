@@ -55,7 +55,7 @@ const MobileNavbar = () => {
     <>
       {/* Modern Header */}
       <nav
-        className={`lg:hidden min-w-full flex justify-between items-center py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-700 shadow-2xl backdrop-blur-lg border-b border-white/20 transition-all duration-500 ${
+        className={`lg:hidden min-w-full flex justify-between items-center mb-6 py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-700 shadow-2xl backdrop-blur-lg border-b border-white/20 transition-all duration-500 ${
           scrollDirection === "down"
             ? "-translate-y-full opacity-0"
             : scrollDirection === "up"
