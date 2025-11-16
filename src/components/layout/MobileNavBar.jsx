@@ -53,53 +53,59 @@ const MobileNavbar = () => {
 
   return (
     <>
-      {/* Modern Header */}
-      <nav
-        className={`lg:hidden min-w-full flex justify-between items-center mb-8 py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-700 shadow-2xl backdrop-blur-lg border-b border-white/20 transition-all duration-500 ${
-          scrollDirection === "down"
-            ? "-translate-y-full opacity-0"
-            : scrollDirection === "up"
-            ? "translate-y-0 opacity-100 shadow-2xl"
-            : "translate-y-0 opacity-100"
-        }`}
-      >
-        {/* Logo with modern design */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30">
-            <span className="text-white font-bold text-lg">🧪</span>
-          </div>
-          <div>
-            <p className="text-white font-bold text-xl tracking-tight">LabPilot</p>
-            <p className="text-white/70 text-xs">Medical Intelligence</p>
-          </div>
-        </div>
-
-        {/* Modern Hamburger Button */}
-        <button
-          className={`relative w-10 h-10 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:scale-105 ${
-            isMenuOpen ? "bg-white/20 rotate-90" : ""
+      {/* Mobile Navbar Container with proper spacing */}
+      <div className="lg:hidden">
+        {/* Fixed Navbar */}
+        <nav
+          className={`fixed top-0 left-0 right-0 z-50 flex justify-between items-center py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-700 shadow-2xl backdrop-blur-lg border-b border-white/20 transition-all duration-500 ${
+            scrollDirection === "down"
+              ? "-translate-y-full opacity-0"
+              : scrollDirection === "up"
+              ? "translate-y-0 opacity-100 shadow-2xl"
+              : "translate-y-0 opacity-100"
           }`}
-          onClick={toggleMenu}
         >
-          <div className="flex flex-col items-center justify-center w-6 h-6">
-            <span
-              className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
-                isMenuOpen ? "rotate-45 translate-y-1.5" : "mb-1.5"
-              }`}
-            ></span>
-            <span
-              className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
-                isMenuOpen ? "opacity-0" : "mb-1.5"
-              }`}
-            ></span>
-            <span
-              className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
-                isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
-              }`}
-            ></span>
+          {/* Logo with modern design */}
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30">
+              <span className="text-white font-bold text-lg">🧪</span>
+            </div>
+            <div>
+              <p className="text-white font-bold text-xl tracking-tight">LabPilot</p>
+              <p className="text-white/70 text-xs">Medical Intelligence</p>
+            </div>
           </div>
-        </button>
-      </nav>
+
+          {/* Modern Hamburger Button */}
+          <button
+            className={`relative w-10 h-10 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:scale-105 ${
+              isMenuOpen ? "bg-white/20 rotate-90" : ""
+            }`}
+            onClick={toggleMenu}
+          >
+            <div className="flex flex-col items-center justify-center w-6 h-6">
+              <span
+                className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
+                  isMenuOpen ? "rotate-45 translate-y-1.5" : "mb-1.5"
+                }`}
+              ></span>
+              <span
+                className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
+                  isMenuOpen ? "opacity-0" : "mb-1.5"
+                }`}
+              ></span>
+              <span
+                className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
+                  isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                }`}
+              ></span>
+            </div>
+          </button>
+        </nav>
+
+        {/* Spacer div to push content down - This is the key fix */}
+        <div className="h-16"></div>
+      </div>
 
       {/* Glass Morphism Overlay */}
       {isMenuOpen && (

@@ -1,10 +1,8 @@
 import { NavLink } from "react-router-dom";
 import menu from "./menu";
-import { useState } from "react";
 import MobileNavbar from "./MobileNavBar";
 
 const Layout = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
@@ -26,10 +24,7 @@ const Layout = ({ children }) => {
         ))}
       </nav>
 
-      {/* Overlay for mobile */}
-      {isSidebarOpen && (
-        <div className="lg:hidden fixed inset-0 bg-black/50 z-30" onClick={() => setIsSidebarOpen(false)} />
-      )}
+     
 
       {/* Main content */}
       <main className="lg:ml-64 flex-1 min-h-screen bg-gradient-to-br from-gray-50/95 via-gray-100/95 to-white/95 backdrop-blur-sm">
