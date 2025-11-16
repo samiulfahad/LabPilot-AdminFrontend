@@ -146,10 +146,10 @@ const MobileNavbar = () => {
           </button>
         </div>
 
-        {/* Scrollable Menu Area with Fixed Bottom Space for Logout */}
+        {/* Main Content Area - Menu and Fixed Logout */}
         <div className="flex flex-col h-full">
-          {/* Menu Items - Takes available space */}
-          <div className="flex-1 overflow-y-auto">
+          {/* Scrollable Menu Area */}
+          <div className="flex-1 overflow-y-auto" style={{ height: "calc(100% - 140px)" }}>
             <div className="space-y-1 p-4">
               {menu.map((item, index) => (
                 <NavLink
@@ -197,8 +197,8 @@ const MobileNavbar = () => {
             </div>
           </div>
 
-          {/* Fixed Logout Section - Always at bottom */}
-          <div className="flex-shrink-0 border-t border-gray-200/50 bg-white/80 backdrop-blur-sm p-4 mt-auto">
+          {/* Fixed Logout Section - Absolutely positioned at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200/50 bg-white/95 backdrop-blur-sm p-4">
             <button
               className="w-full flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-semibold hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 mb-2"
               onClick={handleMenuClick}
