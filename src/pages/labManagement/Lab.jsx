@@ -200,10 +200,10 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
             </div>
             <button
               onClick={() => onAddSupportAdmin(lab._id)}
-              className="w-full sm:w-auto px-6 py-2 bg-white text-amber-600 rounded-lg font-medium hover:bg-white/90 transition-colors border border-white shadow-sm flex items-center gap-2"
+              className="flex items-center justify-center w-10 h-10 bg-white text-amber-600 rounded-lg font-medium hover:bg-white/90 transition-colors border border-white shadow-sm hover:scale-105"
+              title="Add Support Admin"
             >
               <Icons.Add />
-              Add Support Admin
             </button>
           </div>
         </div>
@@ -227,10 +227,10 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
               onClick={() => {
                 setActiveModal("addAdmin", lab);
               }}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+              className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:scale-105"
+              title="Add Admin"
             >
               <Icons.Add />
-              Add Admin
             </button>
           </div>
           <div className="space-y-3">
@@ -299,10 +299,10 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
               onClick={() => {
                 setActiveModal("addStaff", lab);
               }}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+              className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:scale-105"
+              title="Add Staff"
             >
               <Icons.Add />
-              Add Staff
             </button>
           </div>
           <div className="space-y-2">
