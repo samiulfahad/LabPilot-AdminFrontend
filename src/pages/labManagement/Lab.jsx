@@ -74,6 +74,16 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
         <path d="M12 7v6h2V7h-2z" />
       </svg>
     ),
+    Deactivate: () => (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
     View: () => (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -162,7 +172,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
           <div className="flex gap-3">
             {lab.isActive ? (
               <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200 text-white shadow-lg hover:shadow-amber-500/25 text-sm">
-                <Icons.Pause />
+                <Icons.Deactivate />
                 Deactivate
               </button>
             ) : (
@@ -250,7 +260,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                       className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
                       title="Deactivate Admin"
                     >
-                      <Icons.PowerOff />
+                      <Icons.Deactivate />
                     </button>
                   ) : (
                     <button
@@ -322,7 +332,7 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                       className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
                       title="Deactivate Staff"
                     >
-                      <Icons.PowerOff />
+                      <Icons.Deactivate />
                     </button>
                   ) : (
                     <button
