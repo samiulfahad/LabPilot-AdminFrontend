@@ -1,7 +1,7 @@
 import useLabManagementStore from "./store";
 
 const Lab = ({ lab, onAddSupportAdmin }) => {
-  const { setActiveModal, deleteStaff, setPopup, setPopupMessage, setPopupData } = useLabManagementStore();
+  const { setActiveModal, setPopup, setPopupMessage, setPopupData } = useLabManagementStore();
 
   // Check if there's a support admin
   const hasSupportAdmin = lab.admins?.some((admin) => admin.username === "supportAdmin");
@@ -185,26 +185,19 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
         </div>
       </div>
 
-      {/* Support Admin Alert */}
+      {/* Support Admin Alert - Simplified */}
       {!hasSupportAdmin && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-amber-400 to-amber-500 rounded-xl border border-amber-300 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl border border-amber-200 shadow-sm">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+              <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
                 <span className="text-white text-lg">🛡️</span>
               </div>
               <div>
-                <p className="text-white font-semibold">No Support Admin</p>
-                <p className="text-white/90 text-sm">Add a support admin for customer support</p>
+                <p className="text-amber-800 font-semibold">Support Admin Required</p>
+                <p className="text-amber-600 text-sm">Add a support admin for customer support access</p>
               </div>
             </div>
-            <button
-              onClick={() => onAddSupportAdmin(lab._id)}
-              className="flex items-center justify-center w-10 h-10 bg-white text-amber-600 rounded-lg font-medium hover:bg-white/90 transition-colors border border-white shadow-sm hover:scale-105"
-              title="Add Support Admin"
-            >
-              <Icons.Add />
-            </button>
           </div>
         </div>
       )}
@@ -223,17 +216,31 @@ const Lab = ({ lab, onAddSupportAdmin }) => {
                 <p className="text-blue-600 text-sm">{lab.admins?.length || 0} administrators</p>
               </div>
             </div>
-            <button
-              onClick={() => {
-                setActiveModal("addAdmin", lab);
-              }}
-              className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:scale-105"
-              title="Add Admin"
-            >
-              <Icons.Add />
-            </button>
+            <div className="flex gap-2">
+              {/* Add Support Admin Button - Only show if no support admin exists */}
+              {!hasSupportAdmin && (
+                <button
+                  onClick={() => onAddSupportAdmin(lab._id)}
+                  className="flex items-center justify-center gap-2 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-medium transition-all duration-200 shadow-sm hover:scale-105 text-sm"
+                  title="Add Support Admin"
+                >
+                  <Icons.Add />
+                  <span className="sm:inline">Support</span>
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setActiveModal("addAdmin", lab);
+                }}
+                className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:scale-105"
+                title="Add Admin"
+              >
+                <Icons.Add />
+              </button>
+            </div>
           </div>
           <div className="space-y-3">
+            {/* Rest of the admin list remains the same */}
             {lab.admins.map((admin, index) => (
               <div
                 key={index}

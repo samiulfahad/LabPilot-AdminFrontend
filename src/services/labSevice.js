@@ -4,10 +4,7 @@ const labService = {
   getLabs: (params) => api.get("/lab/account/all", { params }),
   addLab: (data) => api.post("/lab/account/add", data),
   editLab: (data) => api.patch("/lab/account/edit", data),
-  deleteLab: (_id) => api.delete("/lab/account/delete", { data: { _id: _id } }),
-  addSubZone: (data) => api.post("/lab/zone/subzone/add", data),
-  editSubZone: (data) => api.patch("/lab/zone/subzone/edit", data),
-  deleteSubZone: (zoneId, subZoneId) => api.delete("/lab/zone/subzone/delete", { data: { zoneId, subZoneId } }),
+  deleteLab: (_id) => api.delete("/lab/account/delete", { data: { _id: _id } })
 };
 
 export default labService;
