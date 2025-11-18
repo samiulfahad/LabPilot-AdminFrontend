@@ -62,7 +62,7 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
               title="Add Support Admin"
             >
               <Icons.Add />
-              <span className="sm:inline">Support</span>
+              {/* <span className="sm:inline">Support</span> */}
             </button>
           )}
           <button
