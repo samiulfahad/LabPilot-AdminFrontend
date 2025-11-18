@@ -29,15 +29,14 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
     <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200 shadow-sm">
       {/* Support Admin Alert - Inside Admin Section */}
       {!hasSupportAdmin && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl border border-amber-200 shadow-sm">
+        <div className="mb-6 p-2 bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl border border-amber-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
                 <span className="text-white text-lg">🛡️</span>
               </div>
               <div>
-                <p className="text-amber-800 font-semibold">Support Admin Required</p>
-                <p className="text-amber-600 text-sm">Add a support admin for customer support access</p>
+                <p className="text-amber-800 text-sm font-semibold">No Support Admin for customer support</p>
               </div>
             </div>
           </div>

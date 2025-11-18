@@ -140,13 +140,13 @@ const AdminForm = () => {
         <div className="flex gap-3 pt-2">
           <button
             onClick={handleSubmit}
-            className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors text-sm bg-blue-600 hover:bg-blue-700 text-white"
+            className="flex-1 py-3 px-4 rounded-lg font-semibold transition-colors text-sm bg-blue-600 hover:bg-blue-700 text-white"
           >
             Add Admin
           </button>
           <button
             onClick={closeForm}
-            className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors text-sm bg-gray-500 hover:bg-gray-600 text-white"
+            className="flex-1 py-3 px-4 rounded-lg font-semibold transition-colors text-sm bg-gray-500 hover:bg-gray-600 text-white"
           >
             Cancel
           </button>
