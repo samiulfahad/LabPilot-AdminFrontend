@@ -13,4 +13,4 @@ Task 8: Add billing section
 Task 9: Lab management by lab search (search by lab ID, zone, subzone, phone number)
 
 
-// Check pbulic/ _redirects file before implementing to the server/production
+// Check public/ _redirects file before implementing to the server/production

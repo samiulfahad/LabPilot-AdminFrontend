@@ -11,8 +11,7 @@ export const createLabSlice = (set, get) => ({
       const response = await labService.getLabs({ isLabManagement: true });
       set({ labs: response.data.labs });
     } catch (error) {
-      get().setError("error.message");
-      console.log("Failed to load labs:", error);
+      set({ popup: "error", popupMessage: "Could not load labs", popupData: null });
     } finally {
       get().stopLoading();
     }
