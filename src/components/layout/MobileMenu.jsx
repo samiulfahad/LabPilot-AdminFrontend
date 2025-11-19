@@ -57,7 +57,7 @@ const MobileMenu = () => {
       <div className="lg:hidden">
         {/* Fixed Navbar */}
         <nav
-          className={`fixed top-0 left-0 right-0 z-50 flex justify-between items-center py-3 px-4 bg-white border-b border-gray-200 transition-all duration-300 ${
+          className={`fixed top-0 left-0 right-0 z-50 flex justify-between items-center py-3 px-4 bg-skyblue-200 border-b border-gray-200 transition-all duration-300 ${
             scrollDirection === "down"
               ? "-translate-y-full"
               : scrollDirection === "up"
