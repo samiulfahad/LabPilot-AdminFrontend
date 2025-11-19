@@ -19,9 +19,11 @@ const useLabManagementStore = create((set, get) => ({
       loading: false,
       popup: null,
       popupMessage: null,
+      popupData: null,
       activeModal: null,
       modalData: null,
-      selectedLab: null,
+      labs: [],
+      staffForm: {},
       adminForm: {},
     }),
 }));
