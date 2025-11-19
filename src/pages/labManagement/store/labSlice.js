@@ -1,6 +1,5 @@
 import labService from "../../../services/labSevice";
-
-export const createLabSlice = (set, get) => ({
+const labSlice = (set, get) => ({
   // State
   labs: [],
 
@@ -18,3 +17,6 @@ export const createLabSlice = (set, get) => ({
     }
   },
 });
+
+
+export default labSlice
