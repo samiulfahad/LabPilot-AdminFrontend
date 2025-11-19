@@ -36,7 +36,7 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
                 <span className="text-white text-lg">🛡️</span>
               </div>
               <div>
-                <p className="text-amber-800 text-sm font-semibold">No Support Admin for customer support</p>
+                <p className="text-amber-800 text-sm font-semibold">No Support Admin</p>
               </div>
             </div>
           </div>
