@@ -35,8 +35,8 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
               <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
                 <span className="text-white text-lg">🛡️</span>
               </div>
-              <div className="w-full mx-auto">
-                <p className="text-center text-amber-800 text-sm font-semibold">No Support Admin</p>
+              <div>
+                <p className="text-amber-800 text-sm font-semibold">No Support Admin</p>
               </div>
             </div>
           </div>
