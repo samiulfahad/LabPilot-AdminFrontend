@@ -1,4 +1,3 @@
-// components/LabDetails.js
 import Icons from "../../components/icons";
 import useLabManagementStore from "./store";
 

@@ -1,5 +1,3 @@
-// components/Lab.js
-import useLabManagementStore from "./store";
 import LabDetails from "./LabDetails";
 import AdminSection from "./AdminSection";
 import StaffSection from "./StaffSection";
