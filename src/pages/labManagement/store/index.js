@@ -23,10 +23,6 @@ const useLabManagementStore = create((set, get) => ({
       activeModal: null,
       modalData: null,
       labs: [],
-<<<<<<< HEAD
-=======
-      staffForm: {},
->>>>>>> b04299011e0948a16d8916aca77b45446c88612b
       adminForm: {},
       staffForm: {},
     }),
