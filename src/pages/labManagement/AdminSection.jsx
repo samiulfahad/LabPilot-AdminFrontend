@@ -31,12 +31,12 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
       {!hasSupportAdmin && (
         <div className="mb-6 p-2 bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl border border-amber-200 shadow-sm">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
                 <span className="text-white text-lg">🛡️</span>
               </div>
               <div>
-                <p className="text-amber-800 text-sm font-semibold">No Support Admin for customer support</p>
+                <p className="text-amber-800 text-sm font-semibold">No Support Admin</p>
               </div>
             </div>
           </div>
