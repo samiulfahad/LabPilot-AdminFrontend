@@ -12,22 +12,8 @@ const useLabManagementStore = create((set, get) => ({
   ...loadingSlice(set, get),
   ...modalSlice(set, get),
   ...popupSlice(set, get),
-
-  labs: [],
-
-  loadLabs: async () => {
-    try {
-      get().startLoading();
-      const response = await labService.getLabs({ isLabManagement: true });
-      set({ labs: response.data.labs });
-    } catch (e) {
-      get().setError("Failed to load labs");
-      console.log("Failed to load labs:", e);
-    } finally {
-      get().stopLoading();
-    }
-  },
-
+  ...labService(set,get),
+  
   clearState: () =>
     set({
       loading: false,
