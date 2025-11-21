@@ -162,7 +162,7 @@ const Tests = () => {
               setIsModalOpen(true);
               setForm({ type: "addCategory" });
             }}
-            className="add-btn flex !px-4 !py-2"
+            className="add-btn"
           >
             Add Test Category
           </button>

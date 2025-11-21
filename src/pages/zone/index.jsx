@@ -144,7 +144,7 @@ const Zones = () => {
               setIsModalOpen(true);
               setForm({ type: "addZone" });
             }}
-            className="add-btn flex"
+            className="add-btn"
           >
             Add New Zone
           </button>
