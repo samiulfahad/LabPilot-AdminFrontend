@@ -23,9 +23,10 @@ const DesktopMenu = () => {
           <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
             <span className="text-white font-bold text-lg">LP</span>
           </div>
-          <div>
+          <div className="text-start">
             <h1 className="text-gray-900 font-bold text-lg">LabPilot</h1>
-            <p className="text-gray-500 text-xs">Medical Platform</p>
+            <p className="text-gray-500 text-xs">Samiul Fahad (@sfahad) </p>
+            <p className="text-gray-500 text-xs">Admin</p>
           </div>
         </div>
       </div>
@@ -59,16 +60,6 @@ const DesktopMenu = () => {
 
       {/* Simple User & Logout */}
       <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3 mb-3 p-3 rounded-lg bg-gray-50">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs font-bold">SF</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-gray-900 text-sm font-medium truncate">Samiul Fahad</p>
-            <p className="text-gray-500 text-xs">Admin</p>
-          </div>
-        </div>
-
         <button className="w-full flex items-center space-x-2 p-3 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200">
           <span>🚪</span>
           <span className="text-sm font-medium">Logout</span>
