@@ -130,7 +130,7 @@ const Labs = () => {
         />
       )}
 
-      <div className="flex items-center justify-center mb-4">
+      <div className="flex items-center justify-center mt-4 md:mt-2 my-2 md:my-4">
         <button
           onClick={() => {
             setFormData({ ...initialData, type: "addLab" });
