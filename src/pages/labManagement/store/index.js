@@ -7,14 +7,14 @@ import modalSlice from "../../../store/common/modalSlice";
 import popupSlice from "../../../store/common/popupSlice";
 
 const useLabManagementStore = create((set, get) => ({
+  ...loadingSlice(set, get),
+  ...modalSlice(set, get),
+  ...popupSlice(set, get),
+
   // domain data after UI slices
   ...labSlice(set, get),
   ...adminSlice(set, get),
   ...staffSlice(set, get),
-
-  ...loadingSlice(set, get),
-  ...modalSlice(set, get),
-  ...popupSlice(set, get),
 
   clearState: () =>
     set({
