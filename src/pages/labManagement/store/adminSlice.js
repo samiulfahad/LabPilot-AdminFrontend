@@ -37,8 +37,8 @@ const adminSlice = (set, get) => ({
         }),
         // Clear form after success
         adminForm: { isActive: false },
-        popup: { type: "success", message: "Admin added successfully", action: null, data: null },
         modal: { view: null, data: null },
+        popup: { type: "success", message: "Admin added successfully", action: null, data: null },
       }));
     } catch (e) {
       let message = "Could not add admin. Please retry";
@@ -56,7 +56,7 @@ const adminSlice = (set, get) => ({
       get().startLoading();
 
       const { labId, adminId } = get().popup.data;
-      const response = await adminService.deleteAdmin(labId, adminId);
+      await adminService.deleteAdmin(labId, adminId);
 
       // Update local state by removing the deleted admin
       set((state) => ({

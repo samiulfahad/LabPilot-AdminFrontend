@@ -10,7 +10,7 @@ const labSlice = (set, get) => ({
       const response = await labService.getLabs({ isLabManagement: true });
       set({ labs: response.data });
     } catch (error) {
-      get().setPopup({ type: "error", message: "Could not load labs", action: null, data: null });
+      set({ popup: { type: "error", message: "Could not load labs", action: null, data: null } });
     } finally {
       get().stopLoading();
     }
@@ -25,12 +25,10 @@ const labSlice = (set, get) => ({
 
       set((state) => ({
         labs: state.labs.map((lab) => (lab._id === _id ? { ...lab, isActive: false } : lab)),
+        popup: { type: "success", message: "Lab deactivated successfully", action: null, data: null },
       }));
-
-      get().setPopup({ type: "success", message: "Lab deactivated successfully", action: null, data: null });
     } catch (e) {
-      console.log(e);
-      get().setPopup({ type: "error", message: "Could not deactivated lab", action: null, data: null });
+      set({ popup: { type: "error", message: "Could not deactivated lab. Plz retry", action: null, data: null } });
     } finally {
       get().stopLoading();
     }
@@ -43,11 +41,11 @@ const labSlice = (set, get) => ({
       await labService.activateLab(_id);
       set((state) => ({
         labs: state.labs.map((lab) => (lab._id === _id ? { ...lab, isActive: true } : lab)),
+        popup: { type: "success", message: "Lab activated successfully", action: null, data: null },
       }));
-      get().setPopup({ type: "success", message: "Lab activated successfully", action: null, data: null });
     } catch (e) {
       console.log(e);
-      get().setPopup({ type: "error", message: "Could not activated lab", action: null, data: null });
+      set({ popup: { type: "error", message: "Could not activated lab", action: null, data: null } });
     } finally {
       get().stopLoading();
     }

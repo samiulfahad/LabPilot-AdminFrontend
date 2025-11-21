@@ -43,9 +43,7 @@ const staffSlice = (set, get) => ({
       if (e.response.data.duplicate) {
         message = e.response.data.message;
       }
-      set({
-        popup: { type: "error", message: message, data: null, action: null },
-      });
+      set({ popup: { type: "error", message: message, data: null, action: null } });
     } finally {
       get().stopLoading();
     }
@@ -57,7 +55,6 @@ const staffSlice = (set, get) => ({
 
       const { labId, staffId } = get().popup.data;
       await staffService.deleteStaff(labId, staffId);
-
       // Update local state by removing the deleted staff
       set((state) => ({
         labs: state.labs.map((lab) => {
