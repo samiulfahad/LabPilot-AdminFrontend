@@ -2,10 +2,12 @@ Running Task:
 Task 1 
 
 
+Task 04 Done: Split lab component into different parts
+Task 10 Done: Activate/Deactivate Lab
+Task 11 Done: Delete staff/admin
 Task 1: Deactivate admin and staff
 Task 2: Add support admin and deactivate/delete support admin
 Task 3: Edit staff access
-Task 4 Done: Split lab component into different parts
 Task 5: Add warning section (Add Warning, View Warnings, Clear Warnings)
 Task 6: Add referrers section and implement add, edit, delete referrers
 Task 7: Edit invoice price and lab incentive for different lab
