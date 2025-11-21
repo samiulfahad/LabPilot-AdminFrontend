@@ -76,25 +76,25 @@ const MobileMenu = () => {
 
   return (
     <>
-      {/* Clean Mobile Navbar */}
+      {/* Modern Mobile Navbar */}
       <div className="lg:hidden">
         <nav
-          className={`fixed top-0 left-0 right-0 z-50 flex justify-between items-center py-4 px-5 bg-white border-b border-gray-200 transition-transform duration-300 ${
-            scrollDirection === "down" ? "-translate-y-full" : "translate-y-0"
+          className={`fixed top-0 left-0 right-0 z-50 flex justify-between items-center py-4 px-5 bg-white/95 backdrop-blur-sm border-b border-gray-100 transition-all duration-300 ${
+            scrollDirection === "down" ? "-translate-y-full" : "translate-y-0 shadow-sm"
           }`}
         >
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
               <span className="text-white font-bold text-sm">LP</span>
             </div>
             <span className="text-gray-900 font-bold text-lg">LabPilot</span>
           </Link>
 
-          {/* Hamburger Button */}
+          {/* Modern Hamburger Button */}
           <button
             onClick={toggleMenu}
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200 border border-gray-200"
           >
             <div className="flex flex-col items-center justify-center w-5 h-5">
               <span
@@ -120,30 +120,35 @@ const MobileMenu = () => {
         <div className="h-16"></div>
       </div>
 
-      {/* Overlay */}
-      {isMenuOpen && <div className="lg:hidden fixed inset-0 z-40 bg-black/20" onClick={toggleMenu} />}
+      {/* Modern Overlay */}
+      {isMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black/25 backdrop-blur-[1px] transition-all duration-300"
+          onClick={toggleMenu}
+        />
+      )}
 
-      {/* Clean Mobile Sidebar */}
+      {/* Modern Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed top-0 right-0 h-full w-80 bg-white border-l border-gray-200 z-50 transform transition-transform duration-300 ${
+        className={`lg:hidden fixed top-0 right-0 h-full w-80 bg-white/98 backdrop-blur-md border-l border-gray-100 z-50 transform transition-all duration-300 ease-out ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold">SF</span>
+            <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
+              <span className="text-white font-bold text-sm">SF</span>
             </div>
             <div>
-              <p className="text-gray-900 font-medium">Samiul Fahad</p>
-              <p className="text-gray-500 text-sm">Administrator</p>
+              <p className="text-gray-900 font-semibold">Samiul Fahad</p>
+              <p className="text-gray-500 text-sm mt-0.5">Administrator</p>
             </div>
           </div>
 
           <button
             onClick={toggleMenu}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-white hover:bg-gray-50 transition-all duration-200 border border-gray-200 shadow-sm"
           >
             <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -152,25 +157,28 @@ const MobileMenu = () => {
         </div>
 
         {/* Menu Items */}
-        <div className="flex-1 overflow-y-auto pb-24">
-          <div className="space-y-1 p-4">
+        <div className="flex-1 overflow-y-auto pb-28">
+          <div className="space-y-2 p-4">
             {menu.map((item, index) => (
               <NavLink
                 key={index}
                 to={item.path}
                 end={item.path === "/"}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 p-3 rounded-lg transition-colors ${
-                    isActive ? "bg-blue-50 text-blue-700 border border-blue-200" : "text-gray-600 hover:bg-gray-50"
+                  `flex items-center space-x-3 p-4 rounded-2xl transition-all duration-200 group ${
+                    isActive
+                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`
                 }
                 onClick={handleMenuClick}
               >
                 <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${({ isActive }) =>
-                    isActive ? "bg-blue-100" : "bg-gray-100"}`}
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${({
+                    isActive,
+                  }) => (isActive ? "bg-white/20" : "bg-gray-100 group-hover:bg-blue-100 group-hover:text-blue-600")}`}
                 >
-                  <span className="text-sm">{getIconForMenu(item.label)}</span>
+                  <span className="text-base">{getIconForMenu(item.label)}</span>
                 </div>
                 <span className="font-medium text-sm">{item.label}</span>
               </NavLink>
@@ -178,10 +186,10 @@ const MobileMenu = () => {
           </div>
         </div>
 
-        {/* Logout Section */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
+        {/* Modern Logout Section */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 border-t border-gray-100 bg-white/95 backdrop-blur-sm">
           <button
-            className="w-full flex items-center justify-center space-x-2 p-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            className="w-full flex items-center justify-center space-x-2 p-4 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md"
             onClick={handleMenuClick}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,7 +200,7 @@ const MobileMenu = () => {
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
-            <span className="text-sm">Logout</span>
+            <span className="text-sm font-medium">Logout</span>
           </button>
         </div>
       </div>
