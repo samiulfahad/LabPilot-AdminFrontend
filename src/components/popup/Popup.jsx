@@ -41,7 +41,8 @@ const Popup = ({
 
   const handleConfirm = () => {
     onConfirm?.();
-    // onClose?.(); // Disappears popup while loading starts
+    // Disappears popup while loading starts
+    onClose?.();
   };
 
   const handleBackdropClick = (e) => {
