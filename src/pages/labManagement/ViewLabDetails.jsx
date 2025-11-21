@@ -27,9 +27,6 @@ const ViewLabDetails = () => {
     updatedBy,
   } = lab;
 
-  // console.log("from ViewLabDetails");
-  console.log(lab);
-
   // Helper function to check if a value exists and should be displayed
   const shouldDisplay = (value) => {
     return value !== null && value !== undefined && value !== "";
@@ -126,41 +123,41 @@ const ViewLabDetails = () => {
           )}
         </div>
 
-        {/* Pricing Information */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Pricing Information - Now side by side on mobile */}
+        <div className="grid grid-cols-3 gap-2 mb-6">
           {shouldDisplay(invoicePrice) && (
-            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
+            <div className="p-2 bg-blue-50 rounded-lg border border-blue-200 text-center">
+              <div className="flex justify-center mb-1">
+                <div className="w-5 h-5 bg-blue-100 rounded flex items-center justify-center">
                   <span className="text-blue-600 text-xs">📄</span>
                 </div>
-                <p className="text-blue-800 text-sm font-medium">Invoice Price</p>
               </div>
-              <p className="text-gray-700 text-sm font-semibold">৳{invoicePrice}</p>
+              <p className="text-blue-800 text-xs font-medium mb-1">Invoice</p>
+              <p className="text-gray-700 text-xs font-semibold">৳{invoicePrice}</p>
             </div>
           )}
 
           {shouldDisplay(labIncentive) && (
-            <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center">
+            <div className="p-2 bg-green-50 rounded-lg border border-green-200 text-center">
+              <div className="flex justify-center mb-1">
+                <div className="w-5 h-5 bg-green-100 rounded flex items-center justify-center">
                   <span className="text-green-600 text-xs">🏥</span>
                 </div>
-                <p className="text-green-800 text-sm font-medium">Lab Gets</p>
               </div>
-              <p className="text-gray-700 text-sm font-semibold">৳{labIncentive}</p>
+              <p className="text-green-800 text-xs font-medium mb-1">Lab Gets</p>
+              <p className="text-gray-700 text-xs font-semibold">৳{labIncentive}</p>
             </div>
           )}
 
           {shouldDisplay(invoicePrice) && shouldDisplay(labIncentive) && (
-            <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-purple-100 rounded flex items-center justify-center">
+            <div className="p-2 bg-purple-50 rounded-lg border border-purple-200 text-center">
+              <div className="flex justify-center mb-1">
+                <div className="w-5 h-5 bg-purple-100 rounded flex items-center justify-center">
                   <span className="text-purple-600 text-xs">💻</span>
                 </div>
-                <p className="text-purple-800 text-sm font-medium">Software Gets</p>
               </div>
-              <p className="text-gray-700 text-sm font-semibold">৳{softwareGets}</p>
+              <p className="text-purple-800 text-xs font-medium mb-1">Software</p>
+              <p className="text-gray-700 text-xs font-semibold">৳{softwareGets}</p>
             </div>
           )}
         </div>
@@ -221,19 +218,19 @@ const ViewLabDetails = () => {
           )}
         </div>
 
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
-            <p className="text-gray-600 text-sm">Total Staff</p>
-            <p className="text-gray-900 text-lg font-semibold">{lab.staffs?.length || 0}</p>
+        {/* Statistics - Now side by side on mobile */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="p-2 bg-gray-50 rounded-lg border border-gray-200 text-center">
+            <p className="text-gray-600 text-xs mb-1">Staff</p>
+            <p className="text-gray-900 text-sm font-semibold">{lab.staffs?.length || 0}</p>
           </div>
-          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
-            <p className="text-gray-600 text-sm">Total Admins</p>
-            <p className="text-gray-900 text-lg font-semibold">{lab.admins?.length || 0}</p>
+          <div className="p-2 bg-gray-50 rounded-lg border border-gray-200 text-center">
+            <p className="text-gray-600 text-xs mb-1">Admins</p>
+            <p className="text-gray-900 text-sm font-semibold">{lab.admins?.length || 0}</p>
           </div>
-          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
-            <p className="text-gray-600 text-sm">Total Referrers</p>
-            <p className="text-gray-900 text-lg font-semibold">{lab.referrers?.length || 0}</p>
+          <div className="p-2 bg-gray-50 rounded-lg border border-gray-200 text-center">
+            <p className="text-gray-600 text-xs mb-1">Referrers</p>
+            <p className="text-gray-900 text-sm font-semibold">{lab.referrers?.length || 0}</p>
           </div>
         </div>
       </div>
