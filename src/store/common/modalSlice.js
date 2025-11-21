@@ -1,11 +1,18 @@
-const modalSlice = (set) => ({
-  // State
-  activeModal: null,
-  modalData: null, // Add separate data property for better organization
+const modalSlice = (set, get) => ({
+  modal: {
+    view: null,
+    data: null,
+  },
 
-  // Actions
-  setActiveModal: (modalType, data) => set({ activeModal: modalType, modalData: data }),
-  closeModal: () => set({ activeModal: null, modalData: null }),
+  setModal: (payload) => set({ modal: payload }),
+
+  closeModal: () =>
+    set({
+      modal: {
+        view: null,
+        data: null,
+      },
+    }),
 });
 
 export default modalSlice;

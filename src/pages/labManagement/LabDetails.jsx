@@ -2,7 +2,25 @@ import Icons from "../../components/icons";
 import useLabManagementStore from "./store";
 
 const LabDetails = ({ lab }) => {
-  const { setActiveModal } = useLabManagementStore();
+  const { setPopup, setModal } = useLabManagementStore();
+
+  const handleDeactivate = () => {
+    setPopup({
+      type: "confirmation",
+      action: "deactivateLab",
+      message: `Deactivate Lab ${lab.labName}?`,
+      data: { labId: lab._id },
+    });
+  };
+
+  const handleActivate = () => {
+    setPopup({
+      type: "confirmation",
+      action: "activateLab",
+      message: `Activate Lab ${lab.labName}?`,
+      data: { labId: lab._id },
+    });
+  };
 
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 mb-8">
@@ -32,7 +50,7 @@ const LabDetails = ({ lab }) => {
       <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-48">
         <button
           onClick={() => {
-            setActiveModal("viewLabDetails", lab);
+            setModal({view: "labDetails", data: lab});
           }}
           className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-white shadow-lg hover:shadow-blue-500/25"
         >
@@ -41,12 +59,18 @@ const LabDetails = ({ lab }) => {
         </button>
         <div className="flex gap-3">
           {lab.isActive ? (
-            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200 text-white shadow-lg hover:shadow-amber-500/25 text-sm">
+            <button
+              onClick={handleDeactivate}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200 text-white shadow-lg hover:shadow-amber-500/25 text-sm"
+            >
               <Icons.Deactivate />
               Deactivate
             </button>
           ) : (
-            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 text-white shadow-lg hover:shadow-emerald-500/25 text-sm">
+            <button
+              onClick={handleActivate}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 text-white shadow-lg hover:shadow-emerald-500/25 text-sm"
+            >
               <Icons.Play />
               Activate
             </button>

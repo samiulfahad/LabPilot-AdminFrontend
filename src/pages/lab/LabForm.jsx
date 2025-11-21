@@ -31,7 +31,6 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
             value={formData.labName || ""}
             onChange={(e) => onChange("labName", e.target.value)}
             className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base sm:text-sm"
-            placeholder="Enter lab name"
           />
         </div>
 
@@ -51,7 +50,6 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
                 ? "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed"
                 : "border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             }`}
-            placeholder="Enter lab ID"
           />
         </div>
       </div>
@@ -68,7 +66,6 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
           value={formData.address || ""}
           onChange={(e) => onChange("address", e.target.value)}
           className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base sm:text-sm"
-          placeholder="Enter full address"
         />
       </div>
 
@@ -85,7 +82,6 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
             value={formData.email || ""}
             onChange={(e) => onChange("email", e.target.value)}
             className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base sm:text-sm"
-            placeholder="Enter email address"
           />
         </div>
 
@@ -127,7 +123,6 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
             value={formData.contact1 || ""}
             onChange={(e) => onChange("contact1", e.target.value)}
             className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base sm:text-sm"
-            placeholder="Enter primary contact"
             maxLength={11}
           />
           <p className="text-xs text-gray-500 mt-1">Max 11 digits</p>
@@ -144,7 +139,6 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
             value={formData.contact2 || ""}
             onChange={(e) => onChange("contact2", e.target.value)}
             className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base sm:text-sm"
-            placeholder="Enter secondary contact"
             maxLength={11}
           />
           <p className="text-xs text-gray-500 mt-1">Max 11 digits</p>

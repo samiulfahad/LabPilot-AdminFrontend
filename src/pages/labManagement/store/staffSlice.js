@@ -1,9 +1,8 @@
-import labAdminService from "../../../services/adminService";
 import staffService from "../../../services/staffService";
 
 const staffSlice = (set, get) => ({
   // State
-  staffForm: {},
+  staffForm: { isActive: false },
 
   // Actions
   updateStaffForm: (field, value) =>
@@ -19,16 +18,15 @@ const staffSlice = (set, get) => ({
       get().startLoading();
 
       // 1. Add admin via API
-      const response = await staffService.addStaff({
-        _id: get().modalData._id,
-        ...get().staffForm,
-      });
+      const labId = get().modal.data._id;
+      // console.log(labId);
+      const response = await staffService.addStaff({ _id: labId, ...get().staffForm });
       const newStaff = response.data;
 
       // 2. Update local state - add to staffs array
       set((state) => ({
         labs: state.labs.map((lab) => {
-          if (lab._id === state.modalData?._id) {
+          if (lab._id === labId) {
             return {
               ...lab,
               staffs: [...(lab.staffs || []), newStaff],
@@ -36,20 +34,17 @@ const staffSlice = (set, get) => ({
           }
           return lab;
         }),
-        staffForm: {},
-        popup: "success",
-        popupMessage: "Staff added successfully",
-        activeModal: null,
-        modalData: null,
+        staffForm: { isActive: false },
+        popup: { type: "success", message: "New Staff added successfully", action: null, data: null },
+        modal: { view: null, data: null },
       }));
     } catch (e) {
-      let message = "Could not add staff. Please retry";
+      let message = "Could not add new staff. Please retry";
       if (e.response.data.duplicate) {
         message = e.response.data.message;
       }
       set({
-        popup: "error",
-        popupMessage: message,
+        popup: { type: "error", message: message, data: null, action: null },
       });
     } finally {
       get().stopLoading();
@@ -60,8 +55,8 @@ const staffSlice = (set, get) => ({
     try {
       get().startLoading();
 
-      const { labId, staffId } = get().popupData;
-      const response = await staffService.deleteStaff(labId, staffId);
+      const { labId, staffId } = get().popup.data;
+      await staffService.deleteStaff(labId, staffId);
 
       // Update local state by removing the deleted staff
       set((state) => ({
@@ -74,17 +69,10 @@ const staffSlice = (set, get) => ({
           }
           return lab;
         }),
-        popup: "success",
-        popupMessage: "Staff deleted successfully",
-        popupData: null,
+        popup: { type: "success", message: "Staff deleted successfully", action: null, data: null },
       }));
-
-      // console.log(response);
     } catch (e) {
-      set({
-        popup: "error",
-        popupMessage: "Could not delete staff. Please retry",
-      });
+      set({ popup: { type: "error", message: "Could not delete staff", action: null, data: null } });
     } finally {
       get().stopLoading();
     }
@@ -92,7 +80,7 @@ const staffSlice = (set, get) => ({
 
   clearStaffForm: () =>
     set({
-      staffForm: {},
+      staffForm: { isActive: false },
     }),
 });
 

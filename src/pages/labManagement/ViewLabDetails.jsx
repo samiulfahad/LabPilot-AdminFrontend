@@ -1,9 +1,9 @@
 import useLabManagementStore from "./store";
 
 const ViewLabDetails = () => {
-  const { modalData, closeModal } = useLabManagementStore();
+  const { modal, closeModal } = useLabManagementStore();
 
-  const lab = modalData;
+  const lab = modal.data;
 
   if (!lab) {
     return <div className="w-full p-8 text-center text-gray-500">No lab data available</div>;

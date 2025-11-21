@@ -2,26 +2,12 @@ import Icons from "../../components/icons";
 import useLabManagementStore from "./store";
 
 const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
-  const { setActiveModal, setPopup, setPopupMessage, setPopupData } = useLabManagementStore();
+  const { setModal, setPopup } = useLabManagementStore();
 
   const handleDeleteAdmin = (e, admin) => {
     e.preventDefault();
-    setPopup("deleteAdmin");
-    setPopupData({ labId: lab._id, adminId: admin._id });
-    const message = (
-      <div className="text-start">
-        <p>
-          Username: <span className="font-bold">{admin.username}</span>
-        </p>
-        <p>
-          Lab ID: <span className="font-bold">{lab.labId}</span>
-        </p>
-        <p>
-          Lab Name: <span className="font-bold">{lab.labName}</span>
-        </p>
-      </div>
-    );
-    setPopupMessage(message);
+    const message = `Deleting admin - ${admin.username} from ${lab.labName}?`;
+    setPopup({ type: "confirmation", message, action: "deleteAdmin", data: { labId: lab._id, adminId: admin._id } });
   };
 
   return (
@@ -66,7 +52,7 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
           )}
           <button
             onClick={() => {
-              setActiveModal("addAdmin", lab);
+              setModal({ view: "addAdminForm", data: lab });
             }}
             className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:scale-105"
             title="Add Admin"
@@ -91,7 +77,7 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
             {/* Admin Action Buttons */}
             <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
               <button
-                onClick={() => setActiveModal("viewAdmin", admin)}
+                onClick={() => setModal({ view: "admin", data: admin })}
                 className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
                 title="View Admin"
               >

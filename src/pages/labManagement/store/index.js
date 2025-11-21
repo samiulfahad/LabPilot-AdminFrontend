@@ -7,24 +7,21 @@ import modalSlice from "../../../store/common/modalSlice";
 import popupSlice from "../../../store/common/popupSlice";
 
 const useLabManagementStore = create((set, get) => ({
-  ...labSlice(set, get),
-  ...adminSlice(set, get),
-  ...staffSlice(set, get),
   ...loadingSlice(set, get),
   ...modalSlice(set, get),
   ...popupSlice(set, get),
 
+  // domain data after UI slices
+  ...labSlice(set, get),
+  ...adminSlice(set, get),
+  ...staffSlice(set, get),
+
   clearState: () =>
     set({
       loading: false,
-      popup: null,
-      popupMessage: null,
-      popupData: null,
-      activeModal: null,
-      modalData: null,
+      popup: { type: null, action: null, message: null, data: null },
+      modal: { view: null, data: null },
       labs: [],
-      adminForm: {},
-      staffForm: {},
     }),
 }));
 

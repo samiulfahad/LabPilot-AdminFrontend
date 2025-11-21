@@ -92,7 +92,7 @@ const Labs = () => {
     try {
       setLoading(true);
       const response = await labService.getLabs();
-      setLabs(response.data.labs);
+      setLabs(response.data);
     } catch (e) {
       setPopup({ type: "error", message: "Could not load labs" });
     } finally {

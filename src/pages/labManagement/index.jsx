@@ -1,24 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Lab from "./Lab";
 import Modal from "../../components/modal";
 import Popup from "../../components/popup/Popup";
-import AdminForm from "./AdminForm";
+import AddAdmin from "./AddAdmin";
+import AddStaff from "./AddStaff";
 import useLabManagementStore from "./store";
 import LoadingScreen from "../../components/loadingPage";
 import ViewAdmin from "./ViewAdmin";
 import ViewLabDetails from "./ViewLabDetails";
 import ViewStaff from "./ViewStaff";
-import StaffForm from "./StaffForm";
 
 const LabManagement = () => {
   const {
     loading,
     popup,
-    popupMessage,
+    modal,
     closePopup,
     labs,
     loadLabs,
-    activeModal,
+    deactivateLab,
+    activateLab,
     deleteStaff,
     deleteAdmin,
     clearState,
@@ -34,33 +35,44 @@ const LabManagement = () => {
   return (
     <section className="min-h-screen">
       {loading && <LoadingScreen />}
-      {popup === "error" && <Popup type="error" message={popupMessage} onClose={closePopup} />}
-      {popup === "deleteStaff" && (
-        <Popup type="deleteStaff" message={popupMessage} onConfirm={deleteStaff} onClose={closePopup} />
+
+      {popup && popup.type === "confirmation" && popup.action === "deleteAdmin" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={deleteAdmin} onClose={closePopup} />
       )}
 
-      {popup === "deleteAdmin" && (
-        <Popup type="deleteAdmin" message={popupMessage} onConfirm={deleteAdmin} onClose={closePopup} />
+      {popup && popup.type === "confirmation" && popup.action === "deleteStaff" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={deleteStaff} onClose={closePopup} />
       )}
-      {popup === "success" && <Popup type="success" message={popupMessage} onClose={closePopup} />}
-      <Modal isOpen={activeModal === "viewAdmin"}>
+
+      {popup && popup.type === "confirmation" && popup.action === "deactivateLab" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={deactivateLab} onClose={closePopup} />
+      )}
+
+      {popup && popup.type === "confirmation" && popup.action === "activateLab" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={activateLab} onClose={closePopup} />
+      )}
+
+      {popup && popup.type === "success" && <Popup type="success" message={popup.message} onClose={closePopup} />}
+      {popup && popup.type === "error" && <Popup type="error" message={popup.message} onClose={closePopup} />}
+
+      <Modal isOpen={modal.view === "admin"}>
         <ViewAdmin />
       </Modal>
 
-      <Modal isOpen={activeModal === "viewStaff"}>
+      <Modal isOpen={modal.view === "staff"}>
         <ViewStaff />
       </Modal>
 
-      <Modal isOpen={activeModal === "viewLabDetails"} size="lg">
+      <Modal isOpen={modal.view === "labDetails"} size="lg">
         <ViewLabDetails />
       </Modal>
 
-      <Modal isOpen={activeModal === "addAdmin"}>
-        <AdminForm />
+      <Modal isOpen={modal.view === "addAdminForm"}>
+        <AddAdmin />
       </Modal>
 
-      <Modal isOpen={activeModal === "addStaff"}>
-        <StaffForm />
+      <Modal isOpen={modal.view === "addStaffForm"}>
+        <AddStaff />
       </Modal>
 
       <div className="max-w-6xl mx-auto">

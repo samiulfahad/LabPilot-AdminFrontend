@@ -2,31 +2,12 @@ import Icons from "../../components/icons";
 import useLabManagementStore from "./store";
 
 const StaffSection = ({ lab }) => {
-  const { setActiveModal, setPopup, setPopupMessage, setPopupData } = useLabManagementStore();
+  const { setModal, setPopup } = useLabManagementStore();
 
   const handleDeleteStaff = (e, staff) => {
     e.preventDefault();
-    setPopup("deleteStaff");
-    setPopupData({ labId: lab._id, staffId: staff._id });
-
-    const message = (
-      <div className="text-start">
-        <p>
-          Username: <span className="font-bold">{staff.username}</span>
-        </p>
-        <p>
-          Access: <span className="font-bold">{staff.access}</span>
-        </p>
-        <p>
-          Lab ID: <span className="font-bold">{lab.labId}</span>
-        </p>
-        <p>
-          Lab Name: <span className="font-bold">{lab.labName}</span>
-        </p>
-      </div>
-    );
-
-    setPopupMessage(message);
+    const message = `Deleting staff - ${staff.username} from ${lab.labName}?`;
+    setPopup({ type: "confirmation", message, action: "deleteStaff", data: { staffId: staff._id, labId: lab._id } });
   };
 
   return (
@@ -43,7 +24,7 @@ const StaffSection = ({ lab }) => {
         </div>
         <button
           onClick={() => {
-            setActiveModal("addStaff", lab);
+            setModal({ view: "addStaffForm", data: lab });
           }}
           className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:scale-105"
           title="Add Staff"
@@ -67,7 +48,7 @@ const StaffSection = ({ lab }) => {
             {/* Staff Action Buttons */}
             <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
               <button
-                onClick={() => setActiveModal("viewStaff", staff)}
+                onClick={() => setModal({ view: "staff", data: staff })}
                 className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
                 title="View Staff"
               >

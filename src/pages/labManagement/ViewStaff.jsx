@@ -1,7 +1,7 @@
 import useLabManagementStore from "./store";
 
 const ViewStaff = () => {
-  const { modalData, closeModal } = useLabManagementStore();
+  const { modal, closeModal } = useLabManagementStore();
   const {
     name,
     username,
@@ -17,7 +17,7 @@ const ViewStaff = () => {
     activatedBy,
     updatedAt,
     updatedBy,
-  } = modalData;
+  } = modal.data;
 
   // Access options matching the add staff form
   const accessOptions = ["createInvoice", "readInvoice", "updateInvoice", "readCashmemo", "uploadReport"];

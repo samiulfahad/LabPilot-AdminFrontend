@@ -1,39 +1,9 @@
-// components/Popup.js
 import React from "react";
 import Portal from "../Portal";
+import Icons from "../../components/icons"; // Import the centralized icons
 
-// Icon components to avoid duplication
-const Icons = {
-  Success: () => (
-    <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-      <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-      </svg>
-    </div>
-  ),
-  Error: () => (
-    <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-      <svg className="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </div>
-  ),
-  Warning: () => (
-    <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
-      <svg className="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-        />
-      </svg>
-    </div>
-  ),
-};
-
-// Base configurations
-const BaseConfigs = {
+// Only three types: success, error, confirmation
+const typeConfig = {
   success: {
     icon: Icons.Success,
     title: "Success!",
@@ -48,35 +18,13 @@ const BaseConfigs = {
     buttonColor: "bg-red-600 hover:bg-red-700",
     singleButton: true,
   },
-  warning: {
+  confirmation: {
     icon: Icons.Warning,
+    title: "Are you sure?",
     titleColor: "text-yellow-600",
-    confirmButtonColor: "bg-red-600 hover:bg-red-700",
+    confirmButtonColor: "bg-yellow-600 hover:bg-yellow-700",
     cancelButtonColor: "bg-gray-500 hover:bg-gray-600",
     singleButton: false,
-  },
-};
-
-// Extended configurations using base configs
-const typeConfig = {
-  success: BaseConfigs.success,
-  error: BaseConfigs.error,
-  confirmation: {
-    ...BaseConfigs.warning,
-    title: "Are you sure?",
-  },
-  deleteStaff: {
-    ...BaseConfigs.warning,
-    title: "Delete Staff",
-  },
-  deleteAdmin: {
-    ...BaseConfigs.warning,
-    title: "Delete Admin?",
-  },
-  // Add more types easily by extending base configs
-  deleteLab: {
-    ...BaseConfigs.warning,
-    title: "Delete Lab?",
   },
 };
 
@@ -89,6 +37,7 @@ const Popup = ({
   cancelText = "Cancel",
 }) => {
   const config = typeConfig[type];
+  const IconComponent = config.icon;
 
   const handleConfirm = () => {
     onConfirm?.();
@@ -119,19 +68,17 @@ const Popup = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose, config.singleButton]);
 
-  const IconComponent = config.icon;
-
   return (
     <Portal>
       <div
         className="fixed inset-0 flex items-center justify-center backdrop-blur-[3px] z-[11] p-4"
         onClick={handleBackdropClick}
       >
-        <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-auto animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-6 text-center">
+        <div className="bg-gray-100 rounded-2xl shadow-xl max-w-sm w-full mx-auto animate-in fade-in zoom-in-95 duration-200">
+          <div className="px-12 py-8 text-center">
             <IconComponent />
             <h3 className={`text-xl font-semibold mb-2 ${config.titleColor}`}>{config.title}</h3>
-            <div className="text-gray-600 mb-6">{message}</div>
+            <div className="text-gray-600 mb-6 font-semibold text-black">{message}</div>
 
             {config.singleButton ? (
               <button

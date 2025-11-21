@@ -1,12 +1,14 @@
 import useLabManagementStore from "./store";
 
 const AdminForm = () => {
-  const { adminForm, updateAdminForm, addAdmin, clearAdminForm, setActiveModal, modalData } = useLabManagementStore();
+  const { adminForm, updateAdminForm, addAdmin, clearAdminForm, modal, closeModal } = useLabManagementStore();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     addAdmin();
   };
+
+  // console.log(adminForm);
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
@@ -19,7 +21,7 @@ const AdminForm = () => {
 
   const closeForm = () => {
     clearAdminForm();
-    setActiveModal(null, null);
+    closeModal()
   };
 
   return (
@@ -153,7 +155,7 @@ const AdminForm = () => {
         </div>
 
         {/* Debug info */}
-        {modalData && <div className="text-xs text-gray-500 mt-2">Adding admin to: {modalData.labName}</div>}
+        {modal.data && <div className="text-xs text-gray-500 mt-2">Adding admin to: {modal.data.labName}</div>}
       </div>
     </>
   );

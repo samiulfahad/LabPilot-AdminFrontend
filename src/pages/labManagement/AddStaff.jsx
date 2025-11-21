@@ -1,8 +1,7 @@
 import useLabManagementStore from "./store";
 
-const StaffForm = () => {
-  const { staffForm, updateStaffForm, addStaff, clearStaffForm, setActiveModal, modalData } =
-    useLabManagementStore();
+const AddStaff = () => {
+  const { staffForm, updateStaffForm, addStaff, clearStaffForm, modal, closeModal } = useLabManagementStore();
 
   const accessOptions = ["createInvoice", "readInvoice", "updateInvoice", "readCashmemo", "uploadReport"];
 
@@ -11,7 +10,7 @@ const StaffForm = () => {
     console.log(staffForm);
     addStaff();
   };
-
+  // console.log(staffForm);
   const handleFieldChange = (e) => {
     const { name, value, type, checked } = e.target;
     updateStaffForm(name, type === "checkbox" ? checked : value);
@@ -32,7 +31,7 @@ const StaffForm = () => {
 
   const closeForm = () => {
     clearStaffForm();
-    setActiveModal(null, null);
+    closeModal();
   };
 
   return (
@@ -187,10 +186,10 @@ const StaffForm = () => {
         </div>
 
         {/* Debug info */}
-        {modalData && <div className="text-xs text-gray-500 mt-2">Adding staff to: {modalData.labName}</div>}
+        {modal.data && <div className="text-xs text-gray-500 mt-2">Adding staff to: {modal.data.labName}</div>}
       </div>
     </>
   );
 };
 
-export default StaffForm;
+export default AddStaff;

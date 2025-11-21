@@ -2,7 +2,7 @@ import adminService from "../../../services/adminService";
 
 const adminSlice = (set, get) => ({
   // State
-  adminForm: {},
+  adminForm: { isActive: false },
 
   // Actions
   updateAdminForm: (field, value) =>
@@ -19,15 +19,15 @@ const adminSlice = (set, get) => ({
 
       // 1. Add admin via API
       // console.log(get().selectedLab._id);
-      const response = await adminService.addAdmin({ _id: get().modalData._id, ...get().adminForm });
+      const labId = get().modal.data._id;
+      const response = await adminService.addAdmin({ _id: labId, ...get().adminForm });
       const newAdmin = response.data; // The newly created admin
 
       // 2. Update local state - add to admins array
       set((state) => ({
         labs: state.labs.map((lab) => {
           // Find the lab where this admin should be added
-          // You might need to use get().selectedLab or another way to identify the target lab
-          if (lab._id === state.modalData?._id) {
+          if (lab._id === labId) {
             return {
               ...lab,
               admins: [...lab.admins, newAdmin],
@@ -36,18 +36,16 @@ const adminSlice = (set, get) => ({
           return lab;
         }),
         // Clear form after success
-        adminForm: {},
-        popup: "success",
-        popupMessage: "Admin Added successfully",
-        activeModal: null,
-        modalData: null,
+        adminForm: { isActive: false },
+        popup: { type: "success", message: "Admin added successfully", action: null, data: null },
+        modal: { view: null, data: null },
       }));
     } catch (e) {
       let message = "Could not add admin. Please retry";
-      if(e.response.data.duplicate){
-        message = e.response.data.message
+      if (e.response.data.duplicate) {
+        message = e.response.data.message;
       }
-      set({ popup: "error", popupMessage: message, popupData: null });
+      set({ popup: { type: "error", message: message, action: null, data: null } });
     } finally {
       get().stopLoading();
     }
@@ -57,7 +55,7 @@ const adminSlice = (set, get) => ({
     try {
       get().startLoading();
 
-      const { labId, adminId } = get().popupData;
+      const { labId, adminId } = get().popup.data;
       const response = await adminService.deleteAdmin(labId, adminId);
 
       // Update local state by removing the deleted admin
@@ -71,17 +69,10 @@ const adminSlice = (set, get) => ({
           }
           return lab;
         }),
-        popup: "success",
-        popupMessage: "Staff deleted successfully",
-        popupData: null,
+        popup: { type: "success", message: "Admin deleted successfully", action: null, data: null },
       }));
-
-      console.log(response);
     } catch (e) {
-      set({
-        popupType: "error",
-        popupMessage: "Could not delete staff. Please retry",
-      });
+      set({ popup: { type: "error", message: "Could not delete admin", action: null, data: null } });
     } finally {
       get().stopLoading();
     }
@@ -89,7 +80,7 @@ const adminSlice = (set, get) => ({
 
   clearAdminForm: () =>
     set({
-      adminForm: {},
+      adminForm: { isActive: false },
     }),
 });
 
