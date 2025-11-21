@@ -34,7 +34,7 @@ const Modal = ({
         className={`${sizeClasses[size]} bg-white rounded-2xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100 flex flex-col max-h-[90vh]`}
       >
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto p-8">
           {children}
         </div>
       </div>
