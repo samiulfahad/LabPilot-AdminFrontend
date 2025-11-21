@@ -49,6 +49,58 @@ const staffSlice = (set, get) => ({
     }
   },
 
+  activateStaff: async () => {
+    try {
+      get().startLoading();
+      const { labId, staffId } = get().popup.data;
+      await staffService.activateStaff(labId, staffId);
+
+      // Update local state by changing isActive: true
+      set((state) => ({
+        labs: state.labs.map((lab) => {
+          if (lab._id === labId) {
+            return {
+              ...lab,
+              staffs: lab.staffs.map((staff) => (staff._id === staffId ? { ...staff, isActive: true } : staff)),
+            };
+          }
+          return lab;
+        }),
+        popup: { type: "success", message: "Staff activated successfully", action: null, data: null },
+      }));
+    } catch (e) {
+      set({ popup: { type: "error", message: "Could not activate staff", action: null, data: null } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
+  deactivateStaff: async () => {
+    try {
+      get().startLoading();
+      const { labId, staffId } = get().popup.data;
+      await staffService.deactivateStaff(labId, staffId);
+
+      // Update local state by changing isActive: false
+      set((state) => ({
+        labs: state.labs.map((lab) => {
+          if (lab._id === labId) {
+            return {
+              ...lab,
+              staffs: lab.staffs.map((staff) => (staff._id === staffId ? { ...staff, isActive: false } : staff)),
+            };
+          }
+          return lab;
+        }),
+        popup: { type: "success", message: "Staff deactivated successfully", action: null, data: null },
+      }));
+    } catch (e) {
+      set({ popup: { type: "error", message: "Could not deactivate staff", action: null, data: null } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
   deleteStaff: async () => {
     try {
       get().startLoading();

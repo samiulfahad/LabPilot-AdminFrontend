@@ -21,7 +21,7 @@ const AdminForm = () => {
 
   const closeForm = () => {
     clearAdminForm();
-    closeModal()
+    closeModal();
   };
 
   return (

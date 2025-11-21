@@ -1,8 +1,35 @@
 import Icons from "../../components/icons";
 import useLabManagementStore from "./store";
 
-const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
+const AdminSection = ({ lab, hasSupportAdmin }) => {
   const { setModal, setPopup } = useLabManagementStore();
+
+  const handleAddAdmin = (e) => {
+    e.preventDefault();
+    setModal({ view: "addAdminForm", data: lab });
+  };
+
+  const handleAddSupportAdmin = (e) => {
+    e.preventDefault();
+    setModal({ view: "addSupportAdminForm", data: lab });
+  };
+
+  const handleActivateAdmin = (e, admin) => {
+    e.preventDefault();
+    const message = `Activate admin - ${admin.username} from ${lab.labName}?`;
+    setPopup({ type: "confirmation", message, action: "activateAdmin", data: { labId: lab._id, adminId: admin._id } });
+  };
+
+  const handleDeactivateAdmin = (e, admin) => {
+    e.preventDefault();
+    const message = `Deactivate admin - ${admin.username} from ${lab.labName}?`;
+    setPopup({
+      type: "confirmation",
+      message,
+      action: "deactivateAdmin",
+      data: { labId: lab._id, adminId: admin._id },
+    });
+  };
 
   const handleDeleteAdmin = (e, admin) => {
     e.preventDefault();
@@ -42,18 +69,15 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
           {/* Add Support Admin Button - Only show if no support admin exists */}
           {!hasSupportAdmin && (
             <button
-              onClick={() => onAddSupportAdmin(lab._id)}
+              onClick={handleAddSupportAdmin}
               className="flex items-center justify-center gap-2 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-medium transition-all duration-200 shadow-sm hover:scale-105 text-sm"
               title="Add Support Admin"
             >
               <Icons.Add />
-              {/* <span className="sm:inline">Support</span> */}
             </button>
           )}
           <button
-            onClick={() => {
-              setModal({ view: "addAdminForm", data: lab });
-            }}
+            onClick={handleAddAdmin}
             className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:scale-105"
             title="Add Admin"
           >
@@ -85,6 +109,7 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
               </button>
               {admin.isActive ? (
                 <button
+                  onClick={(e) => handleDeactivateAdmin(e, admin)}
                   className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
                   title="Deactivate Admin"
                 >
@@ -92,6 +117,7 @@ const AdminSection = ({ lab, hasSupportAdmin, onAddSupportAdmin }) => {
                 </button>
               ) : (
                 <button
+                  onClick={(e) => handleActivateAdmin(e, admin)}
                   className="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
                   title="Activate Admin"
                 >

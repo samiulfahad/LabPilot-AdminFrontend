@@ -51,6 +51,95 @@ const adminSlice = (set, get) => ({
     }
   },
 
+  activateAdmin: async () => {
+    try {
+      get().startLoading();
+      const { labId, adminId } = get().popup.data;
+      await adminService.activateAdmin(labId, adminId);
+
+      // Update local state by changing isActive: true
+      set((state) => ({
+        labs: state.labs.map((lab) => {
+          if (lab._id === labId) {
+            return {
+              ...lab,
+              admins: lab.admins.map((admin) => (admin._id === adminId ? { ...admin, isActive: true } : admin)),
+            };
+          }
+          return lab;
+        }),
+        popup: { type: "success", message: "Admin activated successfully", action: null, data: null },
+      }));
+    } catch (e) {
+      set({ popup: { type: "error", message: "Could not activate admin", action: null, data: null } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
+  deactivateAdmin: async () => {
+    try {
+      get().startLoading();
+      const { labId, adminId } = get().popup.data;
+      await adminService.deactivateAdmin(labId, adminId);
+
+      // Update local state by changing isActive: false
+      set((state) => ({
+        labs: state.labs.map((lab) => {
+          if (lab._id === labId) {
+            return {
+              ...lab,
+              admins: lab.admins.map((admin) => (admin._id === adminId ? { ...admin, isActive: false } : admin)),
+            };
+          }
+          return lab;
+        }),
+        popup: { type: "success", message: "Admin deactivated successfully", action: null, data: null },
+      }));
+    } catch (e) {
+      set({ popup: { type: "error", message: "Could not deactivate admin", action: null, data: null } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
+  addSupportAdmin: async (labId, password, isActive) => {
+    try {
+      get().startLoading();
+      const response = await adminService.addSupportAdmin(labId, password, isActive);
+      const supportAdmin = response.data; // The newly created admin
+
+      // 2. Update local state - add to admins array
+      set((state) => ({
+        labs: state.labs.map((lab) => {
+          // Find the lab where this admin should be added
+          if (lab._id === labId) {
+            return {
+              ...lab,
+              admins: [...lab.admins, supportAdmin],
+            };
+          }
+          return lab;
+        }),
+        modal: { view: null, data: null },
+        popup: {
+          type: "success",
+          message: "Support Admin added successfully",
+          action: null,
+          data: null,
+        },
+      }));
+    } catch (e) {
+      let message = "Could not add support admin. Please retry";
+      if (e.response.data.duplicate) {
+        message = e.response.data.message;
+      }
+      set({ popup: { type: "error", message: message, action: null, data: null }, modal: { view: null, data: null } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
   deleteAdmin: async () => {
     try {
       get().startLoading();

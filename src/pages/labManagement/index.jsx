@@ -9,19 +9,28 @@ import LoadingScreen from "../../components/loadingPage";
 import ViewAdmin from "./ViewAdmin";
 import ViewLabDetails from "./ViewLabDetails";
 import ViewStaff from "./ViewStaff";
+import AddSupportAdminForm from "./AddSupportAdmin";
 
 const LabManagement = () => {
   const {
+    modal,
     loading,
     popup,
-    modal,
     closePopup,
     labs,
     loadLabs,
-    deactivateLab,
+
     activateLab,
-    deleteStaff,
+    deactivateLab,
+
+    activateAdmin,
+    deactivateAdmin,
     deleteAdmin,
+
+    activateStaff,
+    deactivateStaff,
+    deleteStaff,
+
     clearState,
   } = useLabManagementStore();
 
@@ -35,21 +44,38 @@ const LabManagement = () => {
   return (
     <section className="min-h-screen">
       {loading && <LoadingScreen />}
-
+      {/* Deactivate Admin */}
+      {popup && popup.type === "confirmation" && popup.action === "deactivateAdmin" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={deactivateAdmin} onClose={closePopup} />
+      )}
+      {/* Activate Admin */}
+      {popup && popup.type === "confirmation" && popup.action === "activateAdmin" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={activateAdmin} onClose={closePopup} />
+      )}
+      {/* Delete Admin */}
       {popup && popup.type === "confirmation" && popup.action === "deleteAdmin" && (
         <Popup type="confirmation" message={popup.message} onConfirm={deleteAdmin} onClose={closePopup} />
       )}
 
+      {/* Deactivate Staff */}
+      {popup && popup.type === "confirmation" && popup.action === "deactivateStaff" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={deactivateStaff} onClose={closePopup} />
+      )}
+      {/* Activate Staff */}
+      {popup && popup.type === "confirmation" && popup.action === "activateStaff" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={activateStaff} onClose={closePopup} />
+      )}
+      {/* Delete Staff */}
       {popup && popup.type === "confirmation" && popup.action === "deleteStaff" && (
         <Popup type="confirmation" message={popup.message} onConfirm={deleteStaff} onClose={closePopup} />
       )}
 
-      {popup && popup.type === "confirmation" && popup.action === "deactivateLab" && (
-        <Popup type="confirmation" message={popup.message} onConfirm={deactivateLab} onClose={closePopup} />
-      )}
-
       {popup && popup.type === "confirmation" && popup.action === "activateLab" && (
         <Popup type="confirmation" message={popup.message} onConfirm={activateLab} onClose={closePopup} />
+      )}
+
+      {popup && popup.type === "confirmation" && popup.action === "deactivateLab" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={deactivateLab} onClose={closePopup} />
       )}
 
       {popup && popup.type === "success" && <Popup type="success" message={popup.message} onClose={closePopup} />}
@@ -69,6 +95,10 @@ const LabManagement = () => {
 
       <Modal isOpen={modal.view === "addAdminForm"}>
         <AddAdmin />
+      </Modal>
+
+      <Modal isOpen={modal.view === "addSupportAdminForm"}>
+        <AddSupportAdminForm />
       </Modal>
 
       <Modal isOpen={modal.view === "addStaffForm"}>

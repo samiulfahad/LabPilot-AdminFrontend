@@ -10,6 +10,23 @@ const StaffSection = ({ lab }) => {
     setPopup({ type: "confirmation", message, action: "deleteStaff", data: { staffId: staff._id, labId: lab._id } });
   };
 
+  const handleActivateStaff = (e, staff) => {
+    e.preventDefault();
+    const message = `Activating staff - ${staff.username} from ${lab.labName}?`;
+    setPopup({ type: "confirmation", message, action: "activateStaff", data: { staffId: staff._id, labId: lab._id } });
+  };
+
+  const handleDeactivateStaff = (e, staff) => {
+    e.preventDefault();
+    const message = `Deactivating staff - ${staff.username} from ${lab.labName}?`;
+    setPopup({
+      type: "confirmation",
+      message,
+      action: "deactivateStaff",
+      data: { staffId: staff._id, labId: lab._id },
+    });
+  };
+
   return (
     <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200 shadow-sm">
       <div className="flex items-center justify-between mb-5">
@@ -56,6 +73,7 @@ const StaffSection = ({ lab }) => {
               </button>
               {staff.isActive ? (
                 <button
+                  onClick={(e) => handleDeactivateStaff(e, staff)}
                   className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
                   title="Deactivate Staff"
                 >
@@ -63,18 +81,13 @@ const StaffSection = ({ lab }) => {
                 </button>
               ) : (
                 <button
+                  onClick={(e) => handleActivateStaff(e, staff)}
                   className="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
                   title="Activate Staff"
                 >
                   <Icons.PowerOn />
                 </button>
               )}
-              <button
-                className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
-                title="Edit Staff"
-              >
-                <Icons.Edit />
-              </button>
               <button
                 onClick={(e) => handleDeleteStaff(e, staff)}
                 className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
