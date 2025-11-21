@@ -165,7 +165,7 @@ const MobileMenu = () => {
                 to={item.path}
                 end={item.path === "/"}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 p-2 rounded-2xl transition-all duration-200 group ${
+                  `flex items-center space-x-3 p-4 rounded-2xl transition-all duration-200 group ${
                     isActive
                       ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -174,7 +174,7 @@ const MobileMenu = () => {
                 onClick={handleMenuClick}
               >
                 <div
-                  className={`w-6 h-6 rounded-xl flex items-center justify-center transition-all duration-200 ${({
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 ${({
                     isActive,
                   }) => (isActive ? "bg-white/20" : "bg-gray-100 group-hover:bg-blue-100 group-hover:text-blue-600")}`}
                 >
