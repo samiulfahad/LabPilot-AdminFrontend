@@ -165,7 +165,7 @@ const MobileMenu = () => {
                 to={item.path}
                 end={item.path === "/"}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 p-4 rounded-2xl transition-all duration-200 group ${
+                  `flex items-center space-x-3 p-2 rounded-2xl transition-all duration-200 group ${
                     isActive
                       ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -174,7 +174,7 @@ const MobileMenu = () => {
                 onClick={handleMenuClick}
               >
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${({
+                  className={`w-6 h-6 rounded-xl flex items-center justify-center transition-all duration-200 ${({
                     isActive,
                   }) => (isActive ? "bg-white/20" : "bg-gray-100 group-hover:bg-blue-100 group-hover:text-blue-600")}`}
                 >
@@ -189,7 +189,7 @@ const MobileMenu = () => {
         {/* Modern Logout Section */}
         <div className="absolute bottom-0 left-0 right-0 p-5 border-t border-gray-100 bg-white/95 backdrop-blur-sm">
           <button
-            className="w-full flex items-center justify-center space-x-2 p-4 bg-gray-900 text-white rounded-2xl font-medium hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="w-full flex items-center justify-center space-x-2 p-4 bg-red-700 text-white rounded-2xl font-medium hover:bg-red-500 transition-all duration-200 shadow-sm hover:shadow-md"
             onClick={handleMenuClick}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
