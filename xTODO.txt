@@ -11,6 +11,8 @@ Task 06: Edit invoice price, lab incentive, monthly fee for labs
 Task 07: Add warning section (Add Warning, View Warnings, Clear Warnings)
 Task 08: Lab management by lab search (search by lab ID, zone, subzone, phone number)
 Task 09: Add billing section
+Task 10: See Refferer list of labs
+Task 11: See Test list associated with a test
 
 
 // Check public/ _redirects file before implementing to the server/production
