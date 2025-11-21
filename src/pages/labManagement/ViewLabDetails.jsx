@@ -35,6 +35,10 @@ const ViewLabDetails = () => {
   // Calculate software gets
   const softwareGets = invoicePrice - labIncentive;
 
+  // Dummy data for new fields
+  const monthlyFee = 500;
+  const totalTests = 300;
+
   return (
     <div className="w-full">
       {/* Fixed Sticky Close Button at Top */}
@@ -123,8 +127,9 @@ const ViewLabDetails = () => {
           )}
         </div>
 
-        {/* Pricing Information - Now side by side on mobile */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
+        {/* Pricing Information - Now 5 items in 2 rows on mobile */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {/* First Row */}
           {shouldDisplay(invoicePrice) && (
             <div className="p-2 bg-blue-50 rounded-lg border border-blue-200 text-center">
               <div className="flex justify-center mb-1">
@@ -160,6 +165,29 @@ const ViewLabDetails = () => {
               <p className="text-gray-700 text-xs font-semibold">৳{softwareGets}</p>
             </div>
           )}
+        </div>
+
+        {/* Second Row for Monthly Fee and Total Tests */}
+        <div className="grid grid-cols-2 gap-2 mb-6">
+          <div className="p-2 bg-orange-50 rounded-lg border border-orange-200 text-center">
+            <div className="flex justify-center mb-1">
+              <div className="w-5 h-5 bg-orange-100 rounded flex items-center justify-center">
+                <span className="text-orange-600 text-xs">💰</span>
+              </div>
+            </div>
+            <p className="text-orange-800 text-xs font-medium mb-1">Monthly Fee</p>
+            <p className="text-gray-700 text-xs font-semibold">৳{monthlyFee}</p>
+          </div>
+
+          <div className="p-2 bg-indigo-50 rounded-lg border border-indigo-200 text-center">
+            <div className="flex justify-center mb-1">
+              <div className="w-5 h-5 bg-indigo-100 rounded flex items-center justify-center">
+                <span className="text-indigo-600 text-xs">🧪</span>
+              </div>
+            </div>
+            <p className="text-indigo-800 text-xs font-medium mb-1">Total Tests</p>
+            <p className="text-gray-700 text-xs font-semibold">{totalTests}</p>
+          </div>
         </div>
 
         {/* Warning Section */}
