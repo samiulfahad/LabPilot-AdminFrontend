@@ -138,3 +138,9 @@ nav {
 .scroll-up nav {
   filter: drop-shadow(0 -10px 20px #aaaaaa);
 }
+
+.add-btn {
+  
+    @apply w-64 px-6 py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-blue-700
+      shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none active:scale-95;
+}
