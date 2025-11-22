@@ -36,7 +36,7 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
         {/* Lab ID & Status in one line */}
         <div className="grid grid-cols-2 gap-3">
           <InputField
-            label="Lab ID"
+            label="ID"
             name="labId"
             value={formData.labId || ""}
             onChange={(e) => handleFieldChange("labId", e.target.value)}
