@@ -20,10 +20,10 @@ const Modal = ({
   if (!isOpen) return null;
 
   const sizeClasses = {
-    sm: 'max-w-md lg:max-w-sm',
-    md: 'max-w-md lg:max-w-lg',
-    lg: 'max-w-md lg:max-w-2xl',
-    xl: 'max-w-md lg:max-w-4xl'
+    sm: 'min-w-md lg:max-w-sm',
+    md: 'min-w-md lg:max-w-lg',
+    lg: 'min-w-md lg:max-w-2xl',
+    xl: 'min-w-md lg:max-w-4xl'
   };
 
   return createPortal(
