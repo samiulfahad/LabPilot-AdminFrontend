@@ -37,7 +37,7 @@ const LabDetails = ({ lab }) => {
   };
 
   // Calculate profit
-  const profit = lab.invoicePrice - lab.labIncentive;
+  const profit = lab.invoicePrice - lab.labCommission;
 
   return (
     <div className="flex flex-col gap-6 mb-8">
@@ -142,7 +142,7 @@ const LabDetails = ({ lab }) => {
                   <p className="text-sm text-gray-500">Partner share</p>
                 </div>
               </div>
-              <p className="text-xl font-bold text-blue-600">৳{lab.labIncentive || 0}</p>
+              <p className="text-xl font-bold text-blue-600">৳{lab.labCommission || 0}</p>
             </div>
 
             <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl">

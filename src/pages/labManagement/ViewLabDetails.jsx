@@ -17,7 +17,7 @@ const ViewLabDetails = () => {
     contact2,
     email,
     isActive,
-    labIncentive,
+    labCommission,
     invoicePrice,
     monthlyFee,
     hasWarning,
@@ -34,7 +34,7 @@ const ViewLabDetails = () => {
   };
 
   // Calculate software gets
-  const softwareGets = invoicePrice - labIncentive;
+  const softwareGets = invoicePrice - labCommission;
 
   // Dummy data for new fields
   const totalTests = 300;
@@ -142,7 +142,7 @@ const ViewLabDetails = () => {
             </div>
           )}
 
-          {shouldDisplay(labIncentive) && (
+          {shouldDisplay(labCommission) && (
             <div className="p-2 bg-green-50 rounded-lg border border-green-200 text-center">
               <div className="flex justify-center mb-1">
                 <div className="w-5 h-5 bg-green-100 rounded flex items-center justify-center">
@@ -150,11 +150,11 @@ const ViewLabDetails = () => {
                 </div>
               </div>
               <p className="text-green-800 text-xs font-medium mb-1">Lab Commission</p>
-              <p className="text-gray-700 text-xs font-semibold">৳{labIncentive}</p>
+              <p className="text-gray-700 text-xs font-semibold">৳{labCommission}</p>
             </div>
           )}
 
-          {shouldDisplay(invoicePrice) && shouldDisplay(labIncentive) && (
+          {shouldDisplay(invoicePrice) && shouldDisplay(labCommission) && (
             <div className="p-2 bg-purple-50 rounded-lg border border-purple-200 text-center">
               <div className="flex justify-center mb-1">
                 <div className="w-5 h-5 bg-purple-100 rounded flex items-center justify-center">

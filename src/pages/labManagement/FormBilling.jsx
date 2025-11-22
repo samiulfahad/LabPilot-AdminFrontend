@@ -6,14 +6,14 @@ const BillingForm = () => {
   const { billingForm, updateBillingForm, updateLabBilling, modal, closeModal } = useLabManagementStore();
 
   const current = modal.data || {};
-  const currentProfit = (current.invoicePrice || 0) - (current.labIncentive || 0);
+  const currentProfit = (current.invoicePrice || 0) - (current.labCommission || 0);
   const newProfit =
-    (billingForm.invoicePrice ?? current.invoicePrice ?? 0) - (billingForm.labIncentive ?? current.labIncentive ?? 0);
+    (billingForm.invoicePrice ?? current.invoicePrice ?? 0) - (billingForm.labCommission ?? current.labCommission ?? 0);
 
   useEffect(() => {
     if (modal.data) {
       updateBillingForm("invoicePrice", current.invoicePrice || 0);
-      updateBillingForm("labIncentive", current.labIncentive || 0);
+      updateBillingForm("labCommission", current.labCommission || 0);
       updateBillingForm("monthlyFee", current.monthlyFee || 0);
     }
   }, [modal.data]);
@@ -52,9 +52,9 @@ const BillingForm = () => {
 
       <InputField
         label="Commission"
-        name="labIncentive"
+        name="labCommission"
         type="number"
-        value={billingForm.labIncentive ?? current.labIncentive ?? ""}
+        value={billingForm.labCommission ?? current.labCommission ?? ""}
         onChange={handleFieldChange}
       />
 

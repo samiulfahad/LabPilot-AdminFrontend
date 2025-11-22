@@ -1,10 +1,10 @@
-import billingService from "../../../services/billingSlice";
+import billingService from "../../../services/billingService";
 
 const billingSlice = (set, get) => ({
   // State
   billingForm: {
     invoicePrice: 0,
-    labIncentive: 0,
+    labCommission: 0,
     monthlyFee: 0,
   },
 
@@ -23,10 +23,8 @@ const billingSlice = (set, get) => ({
 
       const labId = get().modal.data._id;
       const billingData = get().billingForm;
-
-      // 1. Update billing via API
-      const response = await billingService.updateBilling(labId, billingData);
-      const updatedLab = response.data; // The updated lab with new billing info
+      //   console.log(billingData);
+      await billingService.updateBilling(labId, billingData);
 
       // 2. Update local state - update lab's billing information
       set((state) => ({
@@ -34,9 +32,9 @@ const billingSlice = (set, get) => ({
           if (lab._id === labId) {
             return {
               ...lab,
-              invoicePrice: updatedLab.invoicePrice,
-              labIncentive: updatedLab.labIncentive,
-              monthlyFee: updatedLab.monthlyFee,
+              invoicePrice: billingData.invoicePrice,
+              labCommission: billingData.labCommission,
+              monthlyFee: billingData.monthlyFee,
             };
           }
           return lab;
@@ -44,7 +42,7 @@ const billingSlice = (set, get) => ({
         // Clear form after success
         billingForm: {
           invoicePrice: 0,
-          labIncentive: 0,
+          labCommission: 0,
           monthlyFee: 0,
         },
         modal: { view: null, data: null },
@@ -65,7 +63,7 @@ const billingSlice = (set, get) => ({
     set({
       billingForm: {
         invoicePrice: 0,
-        labIncentive: 0,
+        labCommission: 0,
         monthlyFee: 0,
       },
     }),
