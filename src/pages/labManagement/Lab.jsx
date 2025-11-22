@@ -1,6 +1,6 @@
-import LabDetails from "./LabDetails";
-import AdminSection from "./AdminSection";
-import StaffSection from "./StaffSection";
+import LabDetails from "./SectionLabDetails";
+import AdminSection from "./SectionAdmin";
+import StaffSection from "./SectionStaff";
 
 const Lab = ({ lab, onAddSupportAdmin }) => {
   // Check if there's a support admin

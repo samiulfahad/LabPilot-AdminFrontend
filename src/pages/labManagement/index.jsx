@@ -2,14 +2,14 @@ import { useEffect } from "react";
 import Lab from "./Lab";
 import Modal from "../../components/modal";
 import Popup from "../../components/popup/Popup";
-import AddAdmin from "./AddAdmin";
-import AddStaff from "./AddStaff";
+import AddAdmin from "./FormAddAdmin";
+import AddStaff from "./FormAddStaff";
 import useLabManagementStore from "./store";
 import LoadingScreen from "../../components/loadingPage";
 import ViewAdmin from "./ViewAdmin";
 import ViewLabDetails from "./ViewLabDetails";
 import ViewStaff from "./ViewStaff";
-import AddSupportAdminForm from "./AddSupportAdmin";
+import AddSupportAdminForm from "./FormAddSupportAdmin";
 
 const LabManagement = () => {
   const {

@@ -22,6 +22,16 @@ const LabDetails = ({ lab }) => {
     });
   };
 
+  const handleEditFinancials = () => {
+    setModal({
+      view: "editLabFinancials",
+      data: lab,
+    });
+  };
+
+  // Calculate profit
+  const profit = lab.invoicePrice - lab.labIncentive;
+
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 mb-8">
       <div className="flex-1">
@@ -44,19 +54,49 @@ const LabDetails = ({ lab }) => {
             <span>⚡ {lab.admins?.length || 0} Admins</span>
           </div>
         </div>
+
+        {/* Financial Information */}
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 font-medium">Invoice Price</p>
+            <p className="text-lg font-bold text-gray-900">${lab.invoicePrice || 0}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600 font-medium">Lab Commission</p>
+            <p className="text-lg font-bold text-blue-600">${lab.labIncentive || 0}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600 font-medium">Profit</p>
+            <p className="text-lg font-bold text-green-600">${profit || 0}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600 font-medium">Monthly Fee</p>
+            <p className="text-lg font-bold text-purple-600">${lab.monthlyFee || 0}</p>
+          </div>
+        </div>
       </div>
 
       {/* Action Buttons - Modern Stack */}
       <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-48">
         <button
           onClick={() => {
-            setModal({view: "labDetails", data: lab});
+            setModal({ view: "labDetails", data: lab });
           }}
           className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-white shadow-lg hover:shadow-blue-500/25"
         >
           <Icons.Details />
           Lab Details
         </button>
+
+        {/* Edit Financials Button */}
+        <button
+          onClick={handleEditFinancials}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition-all duration-200 text-white shadow-lg hover:shadow-gray-500/25"
+        >
+          <Icons.Edit />
+          Edit Financials
+        </button>
+
         <div className="flex gap-3">
           {lab.isActive ? (
             <button
