@@ -36,7 +36,6 @@ const ViewLabDetails = () => {
   const softwareGets = invoicePrice - labIncentive;
 
   // Dummy data for new fields
-  const monthlyFee = 500;
   const totalTests = 300;
 
   return (
@@ -176,7 +175,7 @@ const ViewLabDetails = () => {
               </div>
             </div>
             <p className="text-orange-800 text-xs font-medium mb-1">Monthly Fee</p>
-            <p className="text-gray-700 text-xs font-semibold">৳{monthlyFee}</p>
+            <p className="text-gray-700 text-xs font-semibold">৳{lab.monthlyFee}</p>
           </div>
 
           <div className="p-2 bg-indigo-50 rounded-lg border border-indigo-200 text-center">
