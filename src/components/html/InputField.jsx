@@ -14,7 +14,7 @@ const InputField = ({ label, name, value, onChange, type = "text", disabled = fa
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`flex-1 px-3 py-1.5 focus:outline-none transition-colors ${
+        className={`flex-1 px-3 py-2 focus:outline-none transition-colors ${
           disabled
             ? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-75"
             : "hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
