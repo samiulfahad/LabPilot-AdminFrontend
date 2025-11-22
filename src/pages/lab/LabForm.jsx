@@ -105,7 +105,7 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
               onChange={(e) => handleFieldChange("zoneId", e.target.value)}
               className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
             >
-              <option value="">Select Zone</option>
+              <option value="">-Select-</option>
               {zones.map((zone) => (
                 <option key={zone._id} value={zone._id}>
                   {zone.zoneName}
@@ -116,7 +116,7 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
 
           <div className="flex border border-gray-300 rounded-lg">
             <label className="w-24 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
-              Sub Zone
+              Subzone
             </label>
             <select
               value={formData.subZoneId || ""}
@@ -124,7 +124,7 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
               disabled={!formData.zoneId}
               className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
             >
-              <option value="">Select Sub Zone</option>
+              <option value="">-Select-</option>
               {subZones.map((subZone) => (
                 <option key={subZone._id} value={subZone._id}>
                   {subZone.subZoneName}
