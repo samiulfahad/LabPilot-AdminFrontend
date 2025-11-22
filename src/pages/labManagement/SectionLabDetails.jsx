@@ -22,9 +22,9 @@ const LabDetails = ({ lab }) => {
     });
   };
 
-  const handleEditFinancials = () => {
+  const handleEditBilling = () => {
     setModal({
-      view: "editLabFinancials",
+      view: "labBillingForm",
       data: lab,
     });
   };
@@ -108,7 +108,7 @@ const LabDetails = ({ lab }) => {
               <h3 className="text-xl font-bold text-gray-900">Billing Overview</h3>
             </div>
             <button
-              onClick={handleEditFinancials}
+              onClick={handleEditBilling}
               className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 text-blue-600 rounded-xl font-semibold hover:bg-blue-100 transition-all duration-200 text-sm whitespace-nowrap"
             >
               <Icons.Edit className="w-4 h-4" />

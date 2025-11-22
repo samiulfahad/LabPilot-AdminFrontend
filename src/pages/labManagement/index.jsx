@@ -10,6 +10,7 @@ import ViewAdmin from "./ViewAdmin";
 import ViewLabDetails from "./ViewLabDetails";
 import ViewStaff from "./ViewStaff";
 import AddSupportAdminForm from "./FormAddSupportAdmin";
+import BillingForm from "./FormBilling";
 
 const LabManagement = () => {
   const {
@@ -103,6 +104,10 @@ const LabManagement = () => {
 
       <Modal isOpen={modal.view === "addStaffForm"}>
         <AddStaff />
+      </Modal>
+
+      <Modal isOpen={modal.view === "labBillingForm"}>
+        <BillingForm />
       </Modal>
 
       <div className="max-w-6xl mx-auto">
