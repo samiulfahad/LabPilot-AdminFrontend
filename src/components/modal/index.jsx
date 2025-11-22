@@ -20,8 +20,8 @@ const Modal = ({
   if (!isOpen) return null;
 
   const sizeClasses = {
-    sm: 'min-w-md lg:max-w-sm',
-    md: 'min-w-lg lg:max-w-lg',
+    sm: 'min-w-sm lg:max-w-sm',
+    md: 'min-w-md lg:max-w-lg',
     lg: 'min-w-xl lg:max-w-2xl',
     xl: 'min-w-2xl lg:max-w-4xl'
   };
