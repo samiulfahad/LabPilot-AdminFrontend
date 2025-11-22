@@ -113,7 +113,7 @@ const LabDetails = ({ lab }) => {
               className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 text-blue-600 rounded-xl font-semibold hover:bg-blue-100 transition-all duration-200 text-sm whitespace-nowrap"
             >
               <Icons.Edit className="w-4 h-4" />
-              <span className="hidden sm:inline">Edit Financials</span>
+              <span className="hidden sm:inline">Edit Billing</span>
               <span className="sm:hidden">Edit</span>
             </button>
           </div>

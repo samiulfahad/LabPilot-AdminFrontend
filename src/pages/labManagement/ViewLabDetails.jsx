@@ -161,7 +161,7 @@ const ViewLabDetails = () => {
                   <span className="text-purple-600 text-xs">💻</span>
                 </div>
               </div>
-              <p className="text-purple-800 text-xs font-medium mb-1">Software</p>
+              <p className="text-purple-800 text-xs font-medium mb-1">Profit</p>
               <p className="text-gray-700 text-xs font-semibold">৳{softwareGets}</p>
             </div>
           )}
