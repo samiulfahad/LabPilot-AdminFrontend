@@ -7,7 +7,7 @@ Task 02 Done: Activate/Deactivate Lab
 Task 03 Done: Delete staff/admin
 Task 04 Done: Deactivate admin and staff
 Task 05 Done: Add support admin and deactivate/delete support admin
-Task 06: Edit invoice price, lab incentive, monthly fee for labs
+Task 06 Done: Edit invoice price, lab incentive, monthly fee for labs
 Task 07: Add warning section (Add Warning, View Warnings, Clear Warnings)
 Task 08: Lab management by lab search (search by lab ID, zone, subzone, phone number)
 Task 09 (Frontend Done): Add billing History section 
