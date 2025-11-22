@@ -103,10 +103,9 @@ const LabDetails = ({ lab }) => {
       <div className="space-y-4">
         {/* Billing Overview - Full Width */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <div className="flex flex-row items-center justify-between mb-6 gap-4">
+          <div className="flex flex-row items-center justify-between mb-4 gap-4">
             <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-900">Billing Overview</h3>
-              <p className="text-sm text-gray-500 mt-1">Current pricing and revenue structure</p>
             </div>
             <button
               onClick={handleEditFinancials}
