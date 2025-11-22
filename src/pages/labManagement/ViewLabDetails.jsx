@@ -137,7 +137,7 @@ const ViewLabDetails = () => {
                   <span className="text-blue-600 text-xs">📄</span>
                 </div>
               </div>
-              <p className="text-blue-800 text-xs font-medium mb-1">Invoice</p>
+              <p className="text-blue-800 text-xs font-medium mb-1">Price/Invoice</p>
               <p className="text-gray-700 text-xs font-semibold">৳{invoicePrice}</p>
             </div>
           )}
@@ -149,7 +149,7 @@ const ViewLabDetails = () => {
                   <span className="text-green-600 text-xs">🏥</span>
                 </div>
               </div>
-              <p className="text-green-800 text-xs font-medium mb-1">Lab Gets</p>
+              <p className="text-green-800 text-xs font-medium mb-1">Lab Commission</p>
               <p className="text-gray-700 text-xs font-semibold">৳{labIncentive}</p>
             </div>
           )}
