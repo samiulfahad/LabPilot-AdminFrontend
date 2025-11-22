@@ -77,7 +77,7 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
 
         {/* Contacts */}
         <InputField
-          label="Primary Contact"
+          label="Contact 1"
           name="contact1"
           type="tel"
           value={formData.contact1 || ""}
