@@ -1,8 +1,8 @@
 const InputField = ({ label, name, value, onChange, type = "text", disabled = false, ...props }) => {
   return (
-    <div className="flex border border-gray-300 rounded-lg">
+    <div className="flex border border-gray-300 rounded-lg overflow-hidden">
       <label
-        className={`w-32 px-3 py-1 text-sm font-medium border-r border-gray-300 rounded-l-lg flex items-center ${
+        className={`w-32 px-3 py-1 text-sm font-medium border-r border-gray-300 flex items-center ${
           disabled ? "bg-gray-100 text-gray-400" : "bg-gray-50 text-gray-700"
         }`}
       >
@@ -14,7 +14,7 @@ const InputField = ({ label, name, value, onChange, type = "text", disabled = fa
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`flex-1 px-3 py-1 rounded-r-lg focus:outline-none transition-colors ${
+        className={`flex-1 px-3 py-1 focus:outline-none transition-colors ${
           disabled
             ? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-75"
             : "hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
