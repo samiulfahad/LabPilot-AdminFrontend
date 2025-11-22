@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import useLabManagementStore from "./store";
+import InputField from "../../components/html/InputField";
 
 const BillingForm = () => {
   const { billingForm, updateBillingForm, updateLabBilling, modal, closeModal } = useLabManagementStore();
@@ -40,47 +41,30 @@ const BillingForm = () => {
         {modal.data && <p className="text-sm text-gray-600 mt-1">for {modal.data.labName}</p>}
       </div>
 
-      {/* Invoice Price Field */}
-      <div className="flex border border-gray-300 rounded-lg">
-        <label className="w-32 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
-          Invoice Price
-        </label>
-        <input
-          type="number"
-          name="invoicePrice"
-          value={billingForm.invoicePrice ?? current.invoicePrice ?? ""}
-          onChange={handleFieldChange}
-          className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
-        />
-      </div>
+      {/* Input Fields */}
+      <InputField
+        label="Invoice Price"
+        name="invoicePrice"
+        type="number"
+        value={billingForm.invoicePrice ?? current.invoicePrice ?? ""}
+        onChange={handleFieldChange}
+      />
 
-      {/* Lab Commission Field */}
-      <div className="flex border border-gray-300 rounded-lg">
-        <label className="w-32 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
-          Commission
-        </label>
-        <input
-          type="number"
-          name="labIncentive"
-          value={billingForm.labIncentive ?? current.labIncentive ?? ""}
-          onChange={handleFieldChange}
-          className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
-        />
-      </div>
+      <InputField
+        label="Commission"
+        name="labIncentive"
+        type="number"
+        value={billingForm.labIncentive ?? current.labIncentive ?? ""}
+        onChange={handleFieldChange}
+      />
 
-      {/* Monthly Fee Field */}
-      <div className="flex border border-gray-300 rounded-lg">
-        <label className="w-32 px-3 py-1 text-sm font-medium text-gray-700 border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
-          Monthly Fee
-        </label>
-        <input
-          type="number"
-          name="monthlyFee"
-          value={billingForm.monthlyFee ?? current.monthlyFee ?? ""}
-          onChange={handleFieldChange}
-          className="flex-1 px-3 py-1 rounded-r-lg focus:outline-none"
-        />
-      </div>
+      <InputField
+        label="Monthly Fee"
+        name="monthlyFee"
+        type="number"
+        value={billingForm.monthlyFee ?? current.monthlyFee ?? ""}
+        onChange={handleFieldChange}
+      />
 
       {/* Profit Comparison */}
       <div className="border border-gray-300 rounded-lg p-4">
