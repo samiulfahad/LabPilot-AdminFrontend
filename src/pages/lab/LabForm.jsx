@@ -1,6 +1,7 @@
 import InputField from "../../components/html/InputField";
 
 const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
+  console.log('opended add lab modal');
   // Get subzones for selected zone
   const selectedZone = zones.find((zone) => zone._id === formData.zoneId);
   const subZones = selectedZone?.subZones || [];

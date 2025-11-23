@@ -73,6 +73,8 @@ const Labs = () => {
     setFormData(initialData);
   };
 
+  // console.log(1111);
+
   const handleDelete = async () => {
     try {
       setLoading(true);
