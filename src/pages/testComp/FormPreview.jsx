@@ -67,8 +67,15 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
 
   const validateField = useCallback(
     (field, value) => {
-      if (field.required && (!value || value.toString().trim() === "")) {
-        return { type: "error", message: "This field is required" };
+      if (field.required) {
+        if (field.type === "checkbox") {
+          // For checkbox, check if at least one option is selected
+          if (!value || value.length === 0) {
+            return { type: "error", message: "This field is required" };
+          }
+        } else if (!value || value.toString().trim() === "") {
+          return { type: "error", message: "This field is required" };
+        }
       }
 
       if (field.type === "number" && value) {
@@ -148,8 +155,8 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
     [patientAge, patientGender, getStandardRangeText]
   );
 
-  // Effect to validate all fields when patient age or gender changes
-  useEffect(() => {
+  // Re-validate all fields when patient age or gender changes
+  const revalidateAllFields = useCallback(() => {
     const newErrors = {};
     const newValidationStates = {};
     let allFields = [];
@@ -165,16 +172,25 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
     }
 
     allFields.forEach((field) => {
-      const validation = validateField(field, formData[field.id]);
+      const value = formData[field.id];
+      const validation = validateField(field, value);
       if (validation) {
         newErrors[field.id] = validation;
         newValidationStates[field.id] = validation.type;
+      } else {
+        // Clear validation state if no validation result
+        newValidationStates[field.id] = null;
       }
     });
 
     setErrors(newErrors);
     setValidationStates(newValidationStates);
-  }, [patientAge, patientGender, schema, useSections, formData, validateField]);
+  }, [schema, useSections, formData, validateField]);
+
+  // Effect to re-validate all fields when patient age or gender changes
+  useEffect(() => {
+    revalidateAllFields();
+  }, [patientAge, patientGender, revalidateAllFields]);
 
   const handleInputChange = (fieldId, value) => {
     setFormData((prev) => ({
@@ -195,6 +211,22 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
         [fieldId]: validation ? validation.type : null,
       }));
     }
+  };
+
+  // Handle checkbox selection for multiple options
+  const handleCheckboxChange = (fieldId, optionValue, isChecked) => {
+    const currentValues = formData[fieldId] || [];
+    let newValues;
+
+    if (isChecked) {
+      // Add the option to selected values
+      newValues = [...currentValues, optionValue];
+    } else {
+      // Remove the option from selected values
+      newValues = currentValues.filter(value => value !== optionValue);
+    }
+
+    handleInputChange(fieldId, newValues);
   };
 
   const findFieldById = (fieldId) => {
@@ -237,7 +269,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
 
     allFields.forEach((field) => {
       const validation = validateField(field, formData[field.id]);
-      if (validation && validation.type === "error") {
+      if (validation) {
         newErrors[field.id] = validation;
         newValidationStates[field.id] = validation.type;
       }
@@ -495,17 +527,34 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
             >
               {getLabelText()}
             </label>
-            <div className="flex-1 px-3 py-2 sm:py-3 flex items-center justify-between">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={!!value}
-                  onChange={(e) => handleInputChange(field.id, e.target.checked)}
-                  className="text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Yes</span>
-              </label>
-              {field.unit && <span className="text-sm text-gray-500">{field.unit}</span>}
+            <div className="flex-1 px-3 py-2 sm:py-3">
+              <div className="space-y-2">
+                {field.options?.map((option, index) => {
+                  const isChecked = Array.isArray(value) && value.includes(option);
+                  return (
+                    <label key={index} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        value={option}
+                        checked={isChecked}
+                        onChange={(e) => handleCheckboxChange(field.id, option, e.target.checked)}
+                        className="text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">{option}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              {field.unit && (
+                <div className="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-500">Unit: {field.unit}</div>
+              )}
+              {Array.isArray(value) && value.length > 0 && (
+                <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
+                  <p className="text-sm text-blue-800">
+                    <strong>Selected:</strong> {value.join(", ")}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         );

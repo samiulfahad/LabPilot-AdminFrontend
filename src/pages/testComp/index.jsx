@@ -190,7 +190,8 @@ const SchemaBuilder = () => {
       return;
     }
 
-    if (["radio", "select"].includes(currentField.type) && currentField.options.length === 0) {
+    // Check for options for radio, select, and checkbox fields
+    if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length === 0) {
       alert(
         `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
       );
@@ -747,8 +748,8 @@ const SchemaBuilder = () => {
                   </div>
                 </div>
 
-                {/* Field Options for Radio/Select */}
-                {["radio", "select"].includes(currentField.type) && (
+                {/* Field Options for Radio/Select/Checkbox */}
+                {["radio", "select", "checkbox"].includes(currentField.type) && (
                   <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
                     <div className="flex flex-col sm:flex-row">
                       <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
@@ -972,14 +973,6 @@ const SchemaBuilder = () => {
           </div>
         </div>
 
-        {/* Schema Display Section */}
-        <SchemaDisplay
-          schema={schema}
-          useSections={useSections}
-          useStandardRange={useStandardRange}
-          testStandardRange={testStandardRange}
-        />
-
         {/* Form Preview Section */}
         <FormPreview
           schema={schema}
@@ -988,6 +981,14 @@ const SchemaBuilder = () => {
           testStandardRange={testStandardRange}
           removeField={removeField}
           getFieldsCount={getFieldsCount}
+        />
+
+        {/* Schema Display Section */}
+        <SchemaDisplay
+          schema={schema}
+          useSections={useSections}
+          useStandardRange={useStandardRange}
+          testStandardRange={testStandardRange}
         />
       </div>
     </div>
