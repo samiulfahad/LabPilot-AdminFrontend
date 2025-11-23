@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const SchemaDisplay = ({ schema, useSections }) => {
+const SchemaDisplay = ({ schema, useSections, useTestReference, testReference }) => {
   const [copied, setCopied] = useState(false);
 
   const cleanSchemaForDisplay = (schema) => {
@@ -39,6 +39,30 @@ const SchemaDisplay = ({ schema, useSections }) => {
       delete cleanedSchema.sections;
     }
 
+    // Add test reference if enabled and has data
+    if (useTestReference) {
+      const testRefData = { ...testReference };
+
+      // Clean up test reference data
+      if (testRefData.type === "options" && testRefData.options.length > 0) {
+        // Convert array to object for options type
+        const optionsObj = {};
+        testRefData.options.forEach((option) => {
+          optionsObj[option.key] = option.value;
+        });
+        testRefData.options = optionsObj;
+      } else if (testRefData.type === "text" && testRefData.text.trim()) {
+        // Keep text as is
+      } else {
+        // Don't include test reference if no valid data
+        delete cleanedSchema.testReference;
+      }
+
+      if (Object.keys(testRefData).length > 0) {
+        cleanedSchema.testReference = testRefData;
+      }
+    }
+
     return cleanedSchema;
   };
 
@@ -59,7 +83,7 @@ const SchemaDisplay = ({ schema, useSections }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
-      <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+      <div className="p-4 lg:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
         <h3 className="text-lg font-semibold text-gray-700">JSON Schema</h3>
         <button
           onClick={copyToClipboard}
@@ -68,7 +92,7 @@ const SchemaDisplay = ({ schema, useSections }) => {
           {copied ? "Copied!" : "Copy JSON"}
         </button>
       </div>
-      <div className="p-6">
+      <div className="p-4 lg:p-6">
         <div className="bg-gray-800 rounded-lg p-4">
           <pre className="text-sm font-mono text-gray-100 overflow-auto max-h-96">
             {JSON.stringify(cleanedSchema, null, 2)}
