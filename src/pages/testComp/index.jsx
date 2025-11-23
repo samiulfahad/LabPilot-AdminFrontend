@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import InputField from "./InputField";
 import SchemaDisplay from "./SchemaDisplay";
 import FormPreview from "./FormPreview";
@@ -11,7 +11,7 @@ const SchemaBuilder = () => {
   });
 
   const [useSections, setUseSections] = useState(false);
-  const [useTestReference, setUseTestReference] = useState(false);
+  const [useStandardRange, setUseStandardRange] = useState(false);
   const [currentSection, setCurrentSection] = useState({
     id: "",
     name: "",
@@ -24,29 +24,42 @@ const SchemaBuilder = () => {
     type: "text",
     required: false,
     unit: "",
-    reference: null,
+    standardRange: null,
     options: [],
     sectionId: "",
   });
 
-  const [testReference, setTestReference] = useState({
+  const [testStandardRange, setTestStandardRange] = useState({
     type: "options",
     options: [],
     text: "",
   });
 
   const [newOption, setNewOption] = useState("");
-  const [newReferenceOption, setNewReferenceOption] = useState("");
-  const [newTestReferenceKey, setNewTestReferenceKey] = useState("");
-  const [newTestReferenceValue, setNewTestReferenceValue] = useState("");
+  const [newTestStandardRangeKey, setNewTestStandardRangeKey] = useState("");
+  const [newTestStandardRangeValue, setNewTestStandardRangeValue] = useState("");
 
-  const fieldTypes = ["text", "number", "textarea", "select", "radio", "checkbox", "date", "datetime-local"];
+  // Updated field types - added "number" and kept others
+  const fieldTypes = ["text", "textarea", "number", "select", "radio", "checkbox"];
 
-  const referenceTypes = [
-    { value: "none", label: "No Reference" },
-    { value: "range", label: "Numerical Range" },
-    { value: "options", label: "Fixed Options" },
+  const standardRangeTypes = [
+    { value: "none", label: "No Standard Range" },
+    { value: "gender", label: "Gender Based Range" },
+    { value: "age", label: "Age Based Range" },
+    { value: "range", label: "Number Range Only" },
     { value: "text", label: "Text Reference" },
+  ];
+
+  const genderOptions = [
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+  ];
+
+  const ageGroupOptions = [
+    { value: "infant", label: "Infant (0-2 years)" },
+    { value: "child", label: "Child (3-12 years)" },
+    { value: "adult", label: "Adult (13-64 years)" },
+    { value: "old", label: "Old (65+ years)" },
   ];
 
   const commonUnits = [
@@ -68,21 +81,55 @@ const SchemaBuilder = () => {
     "°F",
   ];
 
-  // Update reference based on field type
-  useEffect(() => {
-    if (["radio", "select"].includes(currentField.type) && currentField.reference?.type !== "options") {
-      setCurrentField((prev) => ({
-        ...prev,
-        reference: {
-          type: "options",
-          value: "",
-          min: "",
-          max: "",
-          options: [],
-        },
-      }));
+  const initializeStandardRange = (type) => {
+    let initialData = { type };
+
+    if (type === "gender") {
+      initialData.ranges = {
+        male: { min: "", max: "" },
+        female: { min: "", max: "" },
+      };
+    } else if (type === "age") {
+      initialData.ranges = {
+        infant: { min: "", max: "" },
+        child: { min: "", max: "" },
+        adult: { min: "", max: "" },
+        old: { min: "", max: "" },
+      };
+    } else if (type === "range") {
+      initialData.min = "";
+      initialData.max = "";
+    } else if (type === "text") {
+      initialData.value = "";
     }
-  }, [currentField.type]);
+
+    setCurrentField((prev) => ({
+      ...prev,
+      standardRange: initialData,
+    }));
+  };
+
+  const handleStandardRangeChange = (path, value) => {
+    setCurrentField((prev) => {
+      const newStandardRange = { ...prev.standardRange };
+
+      if (path.includes(".")) {
+        const [parent, child, subChild] = path.split(".");
+        if (subChild) {
+          newStandardRange[parent][child][subChild] = value;
+        } else {
+          newStandardRange[parent][child] = value;
+        }
+      } else {
+        newStandardRange[path] = value;
+      }
+
+      return {
+        ...prev,
+        standardRange: newStandardRange,
+      };
+    });
+  };
 
   const addSection = () => {
     if (!currentSection.name.trim()) {
@@ -104,7 +151,6 @@ const SchemaBuilder = () => {
       sections: [...(prev.sections || []), newSection],
     }));
 
-    // Reset current section
     setCurrentSection({
       id: "",
       name: "",
@@ -119,20 +165,20 @@ const SchemaBuilder = () => {
     }));
   };
 
-  const addTestReferenceOption = () => {
-    if (!newTestReferenceKey.trim() || !newTestReferenceValue.trim()) return;
+  const addTestStandardRangeOption = () => {
+    if (!newTestStandardRangeKey.trim() || !newTestStandardRangeValue.trim()) return;
 
-    setTestReference((prev) => ({
+    setTestStandardRange((prev) => ({
       ...prev,
-      options: [...prev.options, { key: newTestReferenceKey.trim(), value: newTestReferenceValue.trim() }],
+      options: [...prev.options, { key: newTestStandardRangeKey.trim(), value: newTestStandardRangeValue.trim() }],
     }));
 
-    setNewTestReferenceKey("");
-    setNewTestReferenceValue("");
+    setNewTestStandardRangeKey("");
+    setNewTestStandardRangeValue("");
   };
 
-  const removeTestReferenceOption = (index) => {
-    setTestReference((prev) => ({
+  const removeTestStandardRangeOption = (index) => {
+    setTestStandardRange((prev) => ({
       ...prev,
       options: prev.options.filter((_, i) => i !== index),
     }));
@@ -144,7 +190,6 @@ const SchemaBuilder = () => {
       return;
     }
 
-    // Validate radio/select fields have options
     if (["radio", "select"].includes(currentField.type) && currentField.options.length === 0) {
       alert(
         `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
@@ -154,7 +199,6 @@ const SchemaBuilder = () => {
 
     const fieldId = currentField.id || currentField.label.toLowerCase().replace(/\s+/g, "_");
 
-    // Create field data
     const fieldData = {
       id: fieldId,
       label: currentField.label,
@@ -163,27 +207,41 @@ const SchemaBuilder = () => {
       options: currentField.options.length > 0 ? [...currentField.options] : undefined,
     };
 
-    // Only include unit if provided and not empty
     if (currentField.unit && currentField.unit.trim()) {
       fieldData.unit = currentField.unit;
     }
 
-    // Only include reference if it exists and is not 'none'
-    if (currentField.reference && currentField.reference.type !== "none") {
-      const referenceData = { ...currentField.reference };
-      // Remove empty values
-      Object.keys(referenceData).forEach((key) => {
-        if (referenceData[key] === "" || (Array.isArray(referenceData[key]) && referenceData[key].length === 0)) {
-          delete referenceData[key];
+    // Only include standard range for number fields
+    if (currentField.type === "number" && currentField.standardRange && currentField.standardRange.type !== "none") {
+      const standardRangeData = { ...currentField.standardRange };
+
+      Object.keys(standardRangeData).forEach((key) => {
+        if (
+          standardRangeData[key] === "" ||
+          (Array.isArray(standardRangeData[key]) && standardRangeData[key].length === 0)
+        ) {
+          delete standardRangeData[key];
         }
       });
-      if (Object.keys(referenceData).length > 0) {
-        fieldData.reference = referenceData;
+
+      if (standardRangeData.ranges) {
+        Object.keys(standardRangeData.ranges).forEach((rangeKey) => {
+          if (!standardRangeData.ranges[rangeKey].min && !standardRangeData.ranges[rangeKey].max) {
+            delete standardRangeData.ranges[rangeKey];
+          }
+        });
+
+        if (Object.keys(standardRangeData.ranges).length === 0) {
+          delete standardRangeData.ranges;
+        }
+      }
+
+      if (Object.keys(standardRangeData).length > 0) {
+        fieldData.standardRange = standardRangeData;
       }
     }
 
     if (useSections && currentField.sectionId) {
-      // Add field to the selected section
       setSchema((prev) => ({
         ...prev,
         sections: prev.sections.map((section) =>
@@ -191,26 +249,23 @@ const SchemaBuilder = () => {
         ),
       }));
     } else {
-      // Add field directly to form
       setSchema((prev) => ({
         ...prev,
         fields: [...prev.fields, fieldData],
       }));
     }
 
-    // Reset current field
     setCurrentField({
       id: "",
       label: "",
       type: "text",
       required: false,
       unit: "",
-      reference: null,
+      standardRange: null,
       options: [],
       sectionId: useSections ? currentField.sectionId : "",
     });
     setNewOption("");
-    setNewReferenceOption("");
   };
 
   const removeField = (sectionIndex, fieldIndex) => {
@@ -231,16 +286,6 @@ const SchemaBuilder = () => {
     }
   };
 
-  const handleReferenceChange = (key, value) => {
-    setCurrentField((prev) => ({
-      ...prev,
-      reference: {
-        ...prev.reference,
-        [key]: value,
-      },
-    }));
-  };
-
   const addFieldOption = () => {
     if (!newOption.trim()) return;
 
@@ -258,40 +303,15 @@ const SchemaBuilder = () => {
     }));
   };
 
-  const addReferenceOption = () => {
-    if (!newReferenceOption.trim()) return;
-
-    setCurrentField((prev) => ({
-      ...prev,
-      reference: {
-        ...prev.reference,
-        options: [...(prev.reference?.options || []), newReferenceOption.trim()],
-      },
-    }));
-    setNewReferenceOption("");
-  };
-
-  const removeReferenceOption = (index) => {
-    setCurrentField((prev) => ({
-      ...prev,
-      reference: {
-        ...prev.reference,
-        options: (prev.reference?.options || []).filter((_, i) => i !== index),
-      },
-    }));
-  };
-
   const exportSchema = () => {
-    // Clean up schema before export
     const cleanedSchema = {
       ...schema,
       fields: schema.fields
         ? schema.fields.map((field) => {
             const cleanedField = { ...field };
-            if (cleanedField.reference?.type === "none") {
-              delete cleanedField.reference;
+            if (cleanedField.standardRange?.type === "none") {
+              delete cleanedField.standardRange;
             }
-            // Remove unit if empty
             if (!cleanedField.unit || cleanedField.unit === "") {
               delete cleanedField.unit;
             }
@@ -303,10 +323,9 @@ const SchemaBuilder = () => {
             ...section,
             fields: section.fields.map((field) => {
               const cleanedField = { ...field };
-              if (cleanedField.reference?.type === "none") {
-                delete cleanedField.reference;
+              if (cleanedField.standardRange?.type === "none") {
+                delete cleanedField.standardRange;
               }
-              // Remove unit if empty
               if (!cleanedField.unit || cleanedField.unit === "") {
                 delete cleanedField.unit;
               }
@@ -316,32 +335,26 @@ const SchemaBuilder = () => {
         : undefined,
     };
 
-    // Remove sections if not using sections
     if (!useSections) {
       delete cleanedSchema.sections;
     }
 
-    // Add test reference if enabled and has data
-    if (useTestReference) {
-      const testRefData = { ...testReference };
+    if (useStandardRange) {
+      const testStandardRangeData = { ...testStandardRange };
 
-      // Clean up test reference data
-      if (testRefData.type === "options" && testRefData.options.length > 0) {
-        // Convert array to object for options type
+      if (testStandardRangeData.type === "options" && testStandardRangeData.options.length > 0) {
         const optionsObj = {};
-        testRefData.options.forEach((option) => {
+        testStandardRangeData.options.forEach((option) => {
           optionsObj[option.key] = option.value;
         });
-        testRefData.options = optionsObj;
-      } else if (testRefData.type === "text" && testRefData.text.trim()) {
-        // Keep text as is
+        testStandardRangeData.options = optionsObj;
+      } else if (testStandardRangeData.type === "text" && testStandardRangeData.text.trim()) {
       } else {
-        // Don't include test reference if no valid data
-        delete cleanedSchema.testReference;
+        delete cleanedSchema.testStandardRange;
       }
 
-      if (Object.keys(testRefData).length > 0) {
-        cleanedSchema.testReference = testRefData;
+      if (Object.keys(testStandardRangeData).length > 0) {
+        cleanedSchema.testStandardRange = testStandardRangeData;
       }
     }
 
@@ -363,28 +376,25 @@ const SchemaBuilder = () => {
     reader.onload = (e) => {
       try {
         const importedSchema = JSON.parse(e.target.result);
-        // Detect if schema uses sections
         if (importedSchema.sections && importedSchema.sections.length > 0) {
           setUseSections(true);
         }
-        // Detect if schema has test reference
-        if (importedSchema.testReference) {
-          setUseTestReference(true);
-          // Convert options object back to array for editing
+        if (importedSchema.testStandardRange) {
+          setUseStandardRange(true);
           if (
-            importedSchema.testReference.type === "options" &&
-            typeof importedSchema.testReference.options === "object"
+            importedSchema.testStandardRange.type === "options" &&
+            typeof importedSchema.testStandardRange.options === "object"
           ) {
-            const optionsArray = Object.entries(importedSchema.testReference.options).map(([key, value]) => ({
+            const optionsArray = Object.entries(importedSchema.testStandardRange.options).map(([key, value]) => ({
               key,
               value,
             }));
-            setTestReference({
-              ...importedSchema.testReference,
+            setTestStandardRange({
+              ...importedSchema.testStandardRange,
               options: optionsArray,
             });
           } else {
-            setTestReference(importedSchema.testReference);
+            setTestStandardRange(importedSchema.testStandardRange);
           }
         }
         setSchema(importedSchema);
@@ -395,23 +405,6 @@ const SchemaBuilder = () => {
     reader.readAsText(file);
   };
 
-  const initializeReference = (type) => {
-    if (!currentField.reference) {
-      setCurrentField((prev) => ({
-        ...prev,
-        reference: {
-          type: type,
-          value: "",
-          min: "",
-          max: "",
-          options: [],
-        },
-      }));
-    } else {
-      handleReferenceChange("type", type);
-    }
-  };
-
   const getFieldsCount = () => {
     if (useSections && schema.sections) {
       return schema.sections.reduce((total, section) => total + section.fields.length, 0);
@@ -420,19 +413,21 @@ const SchemaBuilder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 lg:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <h2 className="text-2xl font-bold text-gray-800">Lab Report Test Builder</h2>
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto space-y-3 sm:space-y-6">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
+          Lab Report Test Builder
+        </h2>
 
         {/* Schema Builder Section */}
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-700">Test Configuration</h3>
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Test Configuration</h3>
           </div>
 
-          <div className="p-4 lg:p-6 space-y-6">
+          <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
             {/* Test Configuration */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <InputField
                 label="Test Name"
                 name="testName"
@@ -447,77 +442,78 @@ const SchemaBuilder = () => {
               />
             </div>
 
-            {/* Test Reference Toggle */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-300 rounded-lg space-y-3 sm:space-y-0">
-              <div>
-                <h4 className="text-md font-semibold text-gray-700">Test Reference Values</h4>
-                <p className="text-sm text-gray-600">Add reference values for the entire test (optional)</p>
+            {/* Standard Range Toggle */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border border-gray-300 rounded-lg space-y-3 sm:space-y-0">
+              <div className="flex-1">
+                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Test Standard Range Values</h4>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  Add standard range values for the entire test (optional)
+                </p>
               </div>
               <label className="flex items-center cursor-pointer">
                 <div className="relative">
                   <input
                     type="checkbox"
                     className="sr-only"
-                    checked={useTestReference}
-                    onChange={(e) => setUseTestReference(e.target.checked)}
+                    checked={useStandardRange}
+                    onChange={(e) => setUseStandardRange(e.target.checked)}
                   />
                   <div
-                    className={`block w-14 h-8 rounded-full ${useTestReference ? "bg-blue-600" : "bg-gray-300"}`}
+                    className={`block w-12 h-6 sm:w-14 sm:h-8 rounded-full transition-colors ${
+                      useStandardRange ? "bg-blue-600" : "bg-gray-300"
+                    }`}
                   ></div>
                   <div
-                    className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${
-                      useTestReference ? "transform translate-x-6" : ""
+                    className={`absolute left-1 top-1 bg-white w-4 h-4 sm:w-6 sm:h-6 rounded-full transition-transform ${
+                      useStandardRange ? "transform translate-x-6 sm:translate-x-8" : ""
                     }`}
                   ></div>
                 </div>
-                <div className="ml-3 text-gray-700 font-medium text-sm">
-                  {useTestReference ? "Enabled" : "Disabled"}
+                <div className="ml-2 sm:ml-3 text-gray-700 font-medium text-sm">
+                  {useStandardRange ? "Enabled" : "Disabled"}
                 </div>
               </label>
             </div>
 
-            {/* Test Reference Builder */}
-            {useTestReference && (
-              <div className="space-y-4 p-4 border border-gray-300 rounded-lg">
-                <h4 className="text-md font-semibold text-gray-700">Test Reference Values</h4>
+            {/* Standard Range Builder */}
+            {useStandardRange && (
+              <div className="space-y-3 p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Test Standard Range Values</h4>
 
-                <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg">
-                  <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-t-lg sm:rounded-t-none sm:rounded-l-lg flex items-center">
-                    Reference Type
+                <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+                  <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
+                    Standard Range Type
                   </label>
                   <select
-                    value={testReference.type}
+                    value={testStandardRange.type}
                     onChange={(e) =>
-                      setTestReference((prev) => ({ ...prev, type: e.target.value, options: [], text: "" }))
+                      setTestStandardRange((prev) => ({ ...prev, type: e.target.value, options: [], text: "" }))
                     }
-                    className="flex-1 px-3 py-2 rounded-b-lg sm:rounded-b-none sm:rounded-r-lg focus:outline-none"
+                    className="flex-1 px-3 py-2 focus:outline-none bg-white"
                   >
                     <option value="options">Key-Value Options</option>
-                    <option value="text">Text Reference</option>
+                    <option value="text">Text Standard Range</option>
                   </select>
                 </div>
 
-                {testReference.type === "options" && (
-                  <div className="border border-gray-300 rounded-lg">
-                    <div className="flex border-b border-gray-300">
-                      <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-r border-gray-300 bg-gray-50 rounded-tl-lg flex items-center">
-                        Reference Values
+                {testStandardRange.type === "options" && (
+                  <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <div className="flex flex-col sm:flex-row">
+                      <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
+                        Standard Range Values
                       </label>
-                      <div className="flex-1 p-3 rounded-tr-lg">
-                        <div className="space-y-2 mb-3">
-                          {testReference.options.map((option, index) => (
-                            <div
-                              key={index}
-                              className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 p-2 rounded space-y-2 sm:space-y-0"
-                            >
-                              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <span className="text-sm font-medium text-gray-700">{option.key}:</span>
-                                <span className="text-sm text-gray-700">{option.value}</span>
+                      <div className="flex-1 p-3">
+                        <div className="space-y-2 mb-3 max-h-32 overflow-y-auto">
+                          {testStandardRange.options.map((option, index) => (
+                            <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm font-medium text-gray-700 block truncate">{option.key}: </span>
+                                <span className="text-sm text-gray-600 block truncate">{option.value}</span>
                               </div>
                               <button
                                 type="button"
-                                onClick={() => removeTestReferenceOption(index)}
-                                className="text-red-600 hover:text-red-800 text-lg font-bold"
+                                onClick={() => removeTestStandardRangeOption(index)}
+                                className="text-red-600 hover:text-red-800 text-lg font-bold ml-2 flex-shrink-0"
                               >
                                 ×
                               </button>
@@ -527,22 +523,22 @@ const SchemaBuilder = () => {
                         <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-2">
                           <input
                             type="text"
-                            value={newTestReferenceKey}
-                            onChange={(e) => setNewTestReferenceKey(e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none"
+                            value={newTestStandardRangeKey}
+                            onChange={(e) => setNewTestStandardRangeKey(e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none text-sm"
                             placeholder="Key (e.g., Male)"
                           />
                           <input
                             type="text"
-                            value={newTestReferenceValue}
-                            onChange={(e) => setNewTestReferenceValue(e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none"
+                            value={newTestStandardRangeValue}
+                            onChange={(e) => setNewTestStandardRangeValue(e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none text-sm"
                             placeholder="Value (e.g., 13.5-17.5 g/dL)"
                           />
                           <button
                             type="button"
-                            onClick={addTestReferenceOption}
-                            className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            onClick={addTestStandardRangeOption}
+                            className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm font-medium"
                           >
                             Add
                           </button>
@@ -552,17 +548,17 @@ const SchemaBuilder = () => {
                   </div>
                 )}
 
-                {testReference.type === "text" && (
-                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg">
-                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-t-lg sm:rounded-t-none sm:rounded-l-lg flex items-center">
-                      Reference Text
+                {testStandardRange.type === "text" && (
+                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
+                      Standard Range Text
                     </label>
                     <textarea
-                      value={testReference.text}
-                      onChange={(e) => setTestReference((prev) => ({ ...prev, text: e.target.value }))}
+                      value={testStandardRange.text}
+                      onChange={(e) => setTestStandardRange((prev) => ({ ...prev, text: e.target.value }))}
                       rows={3}
-                      className="flex-1 px-3 py-2 rounded-b-lg sm:rounded-b-none sm:rounded-r-lg focus:outline-none resize-none"
-                      placeholder="Enter reference text for the entire test..."
+                      className="flex-1 px-3 py-2 focus:outline-none resize-none text-sm bg-white"
+                      placeholder="Enter standard range text for the entire test..."
                     />
                   </div>
                 )}
@@ -570,10 +566,10 @@ const SchemaBuilder = () => {
             )}
 
             {/* Sections Toggle */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-300 rounded-lg space-y-3 sm:space-y-0">
-              <div>
-                <h4 className="text-md font-semibold text-gray-700">Test Sections</h4>
-                <p className="text-sm text-gray-600">Organize test fields into sections (optional)</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border border-gray-300 rounded-lg space-y-3 sm:space-y-0">
+              <div className="flex-1">
+                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Test Sections</h4>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">Organize test fields into sections (optional)</p>
               </div>
               <label className="flex items-center cursor-pointer">
                 <div className="relative">
@@ -583,24 +579,29 @@ const SchemaBuilder = () => {
                     checked={useSections}
                     onChange={(e) => setUseSections(e.target.checked)}
                   />
-                  <div className={`block w-14 h-8 rounded-full ${useSections ? "bg-blue-600" : "bg-gray-300"}`}></div>
                   <div
-                    className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${
-                      useSections ? "transform translate-x-6" : ""
+                    className={`block w-12 h-6 sm:w-14 sm:h-8 rounded-full transition-colors ${
+                      useSections ? "bg-blue-600" : "bg-gray-300"
+                    }`}
+                  ></div>
+                  <div
+                    className={`absolute left-1 top-1 bg-white w-4 h-4 sm:w-6 sm:h-6 rounded-full transition-transform ${
+                      useSections ? "transform translate-x-6 sm:translate-x-8" : ""
                     }`}
                   ></div>
                 </div>
-                <div className="ml-3 text-gray-700 font-medium text-sm">{useSections ? "Enabled" : "Disabled"}</div>
+                <div className="ml-2 sm:ml-3 text-gray-700 font-medium text-sm">
+                  {useSections ? "Enabled" : "Disabled"}
+                </div>
               </label>
             </div>
 
-            {/* Rest of the component remains the same but with updated terminology */}
             {/* Section Builder */}
             {useSections && (
-              <div className="space-y-4">
-                <h4 className="text-md font-semibold text-gray-700">Manage Test Sections</h4>
-                <div className="space-y-4 p-4 border border-gray-300 rounded-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Manage Test Sections</h4>
+                <div className="space-y-3 p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     <InputField
                       label="Section Name"
                       name="sectionName"
@@ -623,7 +624,7 @@ const SchemaBuilder = () => {
                   <button
                     type="button"
                     onClick={addSection}
-                    className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium"
+                    className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-sm sm:text-base transition-colors"
                   >
                     Add Section
                   </button>
@@ -631,27 +632,29 @@ const SchemaBuilder = () => {
 
                 {/* Existing Sections */}
                 <div>
-                  <h5 className="text-sm font-semibold text-gray-700 mb-3">Existing Sections</h5>
+                  <h5 className="text-sm font-semibold text-gray-700 mb-2">Existing Sections</h5>
                   {!schema.sections || schema.sections.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">No sections added yet</p>
+                    <p className="text-gray-500 text-center py-4 text-sm bg-gray-50 rounded-lg">
+                      No sections added yet
+                    </p>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {schema.sections.map((section, index) => (
-                        <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
-                            <div>
-                              <h6 className="font-medium text-gray-800">{section.name}</h6>
+                            <div className="flex-1">
+                              <h6 className="font-medium text-gray-800 text-sm sm:text-base">{section.name}</h6>
                               {section.description && (
-                                <p className="text-sm text-gray-600 mt-1">{section.description}</p>
+                                <p className="text-xs sm:text-sm text-gray-600 mt-1">{section.description}</p>
                               )}
                               <p className="text-xs text-gray-500 mt-1">{section.fields.length} field(s)</p>
                             </div>
                             <button
                               type="button"
                               onClick={() => removeSection(index)}
-                              className="text-red-600 hover:text-red-800 font-medium text-sm self-start"
+                              className="text-red-600 hover:text-red-800 font-medium text-sm self-start mt-2 sm:mt-0 transition-colors"
                             >
-                              Remove Section
+                              Remove
                             </button>
                           </div>
                         </div>
@@ -663,18 +666,18 @@ const SchemaBuilder = () => {
             )}
 
             {/* Field Builder */}
-            <div className="space-y-4">
-              <h4 className="text-md font-semibold text-gray-700">Add Test Field</h4>
-              <div className="space-y-4 p-4 border border-gray-300 rounded-lg">
+            <div className="space-y-3">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-700">Add Test Field</h4>
+              <div className="space-y-3 p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50">
                 {useSections && schema.sections && schema.sections.length > 0 && (
-                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg">
-                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-t-lg sm:rounded-t-none sm:rounded-l-lg flex items-center">
+                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
                       Section
                     </label>
                     <select
                       value={currentField.sectionId}
                       onChange={(e) => setCurrentField((prev) => ({ ...prev, sectionId: e.target.value }))}
-                      className="flex-1 px-3 py-2 rounded-b-lg sm:rounded-b-none sm:rounded-r-lg focus:outline-none"
+                      className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
                     >
                       <option value="">Choose a section</option>
                       {schema.sections.map((section, index) => (
@@ -686,7 +689,7 @@ const SchemaBuilder = () => {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   <InputField
                     label="Field Name"
                     name="fieldLabel"
@@ -701,15 +704,23 @@ const SchemaBuilder = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg">
-                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-t-lg sm:rounded-t-none sm:rounded-l-lg flex items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
                       Field Type
                     </label>
                     <select
                       value={currentField.type}
-                      onChange={(e) => setCurrentField((prev) => ({ ...prev, type: e.target.value }))}
-                      className="flex-1 px-3 py-2 rounded-b-lg sm:rounded-b-none sm:rounded-r-lg focus:outline-none"
+                      onChange={(e) => {
+                        const newType = e.target.value;
+                        setCurrentField((prev) => ({
+                          ...prev,
+                          type: newType,
+                          // Reset standard range when switching to non-number type
+                          standardRange: newType === "number" ? prev.standardRange : null,
+                        }));
+                      }}
+                      className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
                     >
                       {fieldTypes.map((type) => (
                         <option key={type} value={type}>
@@ -718,14 +729,14 @@ const SchemaBuilder = () => {
                       ))}
                     </select>
                   </div>
-                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg">
-                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-t-lg sm:rounded-t-none sm:rounded-l-lg flex items-center">
+                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
                       Unit
                     </label>
                     <select
                       value={currentField.unit}
                       onChange={(e) => setCurrentField((prev) => ({ ...prev, unit: e.target.value }))}
-                      className="flex-1 px-3 py-2 rounded-b-lg sm:rounded-b-none sm:rounded-r-lg focus:outline-none"
+                      className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
                     >
                       {commonUnits.map((unit) => (
                         <option key={unit} value={unit}>
@@ -738,20 +749,20 @@ const SchemaBuilder = () => {
 
                 {/* Field Options for Radio/Select */}
                 {["radio", "select"].includes(currentField.type) && (
-                  <div className="border border-gray-300 rounded-lg">
-                    <div className="flex flex-col sm:flex-row border-b border-gray-300">
-                      <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-tl-lg flex items-center">
+                  <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <div className="flex flex-col sm:flex-row">
+                      <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
                         Options
                       </label>
-                      <div className="flex-1 p-3 rounded-tr-lg">
-                        <div className="space-y-2 mb-3">
+                      <div className="flex-1 p-3">
+                        <div className="space-y-2 mb-3 max-h-32 overflow-y-auto">
                           {currentField.options.map((option, index) => (
                             <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
-                              <span className="text-sm text-gray-700">{option}</span>
+                              <span className="text-sm text-gray-700 break-words flex-1">{option}</span>
                               <button
                                 type="button"
                                 onClick={() => removeFieldOption(index)}
-                                className="text-red-600 hover:text-red-800 text-lg font-bold"
+                                className="text-red-600 hover:text-red-800 text-lg font-bold flex-shrink-0 ml-2 transition-colors"
                               >
                                 ×
                               </button>
@@ -764,12 +775,13 @@ const SchemaBuilder = () => {
                             value={newOption}
                             onChange={(e) => setNewOption(e.target.value)}
                             onKeyPress={(e) => e.key === "Enter" && addFieldOption()}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none text-sm"
+                            placeholder="Enter option"
                           />
                           <button
                             type="button"
                             onClick={addFieldOption}
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm font-medium transition-colors"
                           >
                             Add
                           </button>
@@ -779,11 +791,11 @@ const SchemaBuilder = () => {
                   </div>
                 )}
 
-                <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg">
-                  <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-l-lg flex items-center">
+                <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+                  <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
                     Required
                   </label>
-                  <div className="flex-1 px-3 py-2 rounded-r-lg flex items-center">
+                  <div className="flex-1 px-3 py-2 flex items-center bg-white">
                     <input
                       type="checkbox"
                       id="required-field"
@@ -797,115 +809,146 @@ const SchemaBuilder = () => {
                   </div>
                 </div>
 
-                {/* Field Reference Values Section */}
-                <div className="border border-gray-300 rounded-lg">
-                  <div className="flex flex-col sm:flex-row border-b border-gray-300">
-                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-tl-lg flex items-center">
-                      Field Reference
-                    </label>
-                    <div className="flex-1 p-3 rounded-tr-lg space-y-4">
-                      <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg">
-                        <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-t-lg sm:rounded-t-none sm:rounded-l-lg flex items-center">
-                          Type
-                        </label>
-                        <select
-                          value={currentField.reference?.type || "none"}
-                          onChange={(e) => {
-                            if (e.target.value === "none") {
-                              setCurrentField((prev) => ({ ...prev, reference: null }));
-                            } else {
-                              initializeReference(e.target.value);
-                            }
-                          }}
-                          className="flex-1 px-3 py-2 rounded-b-lg sm:rounded-b-none sm:rounded-r-lg focus:outline-none"
-                        >
-                          {referenceTypes.map((ref) => (
-                            <option key={ref.value} value={ref.value}>
-                              {ref.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {currentField.reference?.type === "range" && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <InputField
-                            label="Min Value"
-                            name="minValue"
-                            type="number"
-                            value={currentField.reference.min}
-                            onChange={(e) => handleReferenceChange("min", e.target.value)}
-                          />
-                          <InputField
-                            label="Max Value"
-                            name="maxValue"
-                            type="number"
-                            value={currentField.reference.max}
-                            onChange={(e) => handleReferenceChange("max", e.target.value)}
-                          />
+                {/* Field Standard Range Values Section - Only show for number fields */}
+                {currentField.type === "number" && (
+                  <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <div className="flex flex-col sm:flex-row border-b border-gray-300">
+                      <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
+                        Field Standard Range
+                      </label>
+                      <div className="flex-1 p-3 space-y-4">
+                        <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden">
+                          <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
+                            Type
+                          </label>
+                          <select
+                            value={currentField.standardRange?.type || "none"}
+                            onChange={(e) => {
+                              if (e.target.value === "none") {
+                                setCurrentField((prev) => ({ ...prev, standardRange: null }));
+                              } else {
+                                initializeStandardRange(e.target.value);
+                              }
+                            }}
+                            className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
+                          >
+                            {standardRangeTypes.map((ref) => (
+                              <option key={ref.value} value={ref.value}>
+                                {ref.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                      )}
 
-                      {currentField.reference?.type === "options" && (
-                        <div className="space-y-2">
-                          <div className="space-y-2 mb-3">
-                            {currentField.reference.options.map((option, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded"
-                              >
-                                <span className="text-sm text-gray-700">{option}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => removeReferenceOption(index)}
-                                  className="text-red-600 hover:text-red-800 text-lg font-bold"
-                                >
-                                  ×
-                                </button>
+                        {/* Gender Based Standard Range */}
+                        {currentField.standardRange?.type === "gender" && (
+                          <div className="space-y-3">
+                            {genderOptions.map((gender) => (
+                              <div key={gender.value} className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 capitalize block">
+                                  {gender.label}:
+                                </label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  <InputField
+                                    label="Min value"
+                                    name={`${gender.value}Min`}
+                                    type="number"
+                                    value={currentField.standardRange?.ranges?.[gender.value]?.min || ""}
+                                    onChange={(e) =>
+                                      handleStandardRangeChange(`ranges.${gender.value}.min`, e.target.value)
+                                    }
+                                  />
+                                  <InputField
+                                    label="Max value"
+                                    name={`${gender.value}Max`}
+                                    type="number"
+                                    value={currentField.standardRange?.ranges?.[gender.value]?.max || ""}
+                                    onChange={(e) =>
+                                      handleStandardRangeChange(`ranges.${gender.value}.max`, e.target.value)
+                                    }
+                                  />
+                                </div>
                               </div>
                             ))}
                           </div>
-                          <div className="flex flex-col sm:flex-row gap-2">
-                            <input
-                              type="text"
-                              value={newReferenceOption}
-                              onChange={(e) => setNewReferenceOption(e.target.value)}
-                              onKeyPress={(e) => e.key === "Enter" && addReferenceOption()}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none"
-                            />
-                            <button
-                              type="button"
-                              onClick={addReferenceOption}
-                              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            >
-                              Add
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                        )}
 
-                      {currentField.reference?.type === "text" && (
-                        <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg">
-                          <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 rounded-t-lg sm:rounded-t-none sm:rounded-l-lg flex items-center">
-                            Reference Text
-                          </label>
-                          <textarea
-                            value={currentField.reference.value}
-                            onChange={(e) => handleReferenceChange("value", e.target.value)}
-                            rows={3}
-                            className="flex-1 px-3 py-2 rounded-b-lg sm:rounded-b-none sm:rounded-r-lg focus:outline-none resize-none"
-                          />
-                        </div>
-                      )}
+                        {/* Age Based Standard Range */}
+                        {currentField.standardRange?.type === "age" && (
+                          <div className="space-y-3">
+                            {ageGroupOptions.map((ageGroup) => (
+                              <div key={ageGroup.value} className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 block">{ageGroup.label}:</label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  <InputField
+                                    label="Min value"
+                                    name={`${ageGroup.value}Min`}
+                                    type="number"
+                                    value={currentField.standardRange?.ranges?.[ageGroup.value]?.min || ""}
+                                    onChange={(e) =>
+                                      handleStandardRangeChange(`ranges.${ageGroup.value}.min`, e.target.value)
+                                    }
+                                  />
+                                  <InputField
+                                    label="Max value"
+                                    name={`${ageGroup.value}Max`}
+                                    type="number"
+                                    value={currentField.standardRange?.ranges?.[ageGroup.value]?.max || ""}
+                                    onChange={(e) =>
+                                      handleStandardRangeChange(`ranges.${ageGroup.value}.max`, e.target.value)
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Number Range Only */}
+                        {currentField.standardRange?.type === "range" && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <InputField
+                              label="Min value"
+                              name="rangeMin"
+                              type="number"
+                              value={currentField.standardRange?.min || ""}
+                              onChange={(e) => handleStandardRangeChange("min", e.target.value)}
+                            />
+                            <InputField
+                              label="Max value"
+                              name="rangeMax"
+                              type="number"
+                              value={currentField.standardRange?.max || ""}
+                              onChange={(e) => handleStandardRangeChange("max", e.target.value)}
+                            />
+                          </div>
+                        )}
+
+                        {/* Textarea Standard Range */}
+                        {currentField.standardRange?.type === "text" && (
+                          <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden">
+                            <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
+                              Standard Range Text
+                            </label>
+                            <textarea
+                              value={currentField.standardRange.value || ""}
+                              onChange={(e) => handleStandardRangeChange("value", e.target.value)}
+                              rows={3}
+                              className="flex-1 px-3 py-2 focus:outline-none resize-none text-sm bg-white"
+                              placeholder="Enter standard range text..."
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <button
                   type="button"
                   onClick={addField}
                   disabled={useSections && !currentField.sectionId}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
                   Add Field {useSections ? "to Section" : "to Test"}
                 </button>
@@ -913,15 +956,15 @@ const SchemaBuilder = () => {
             </div>
 
             {/* Import/Export */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={exportSchema}
-                className="bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium"
+                className="bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-sm sm:text-base transition-colors"
               >
                 Export Test Schema
               </button>
-              <label className="bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium text-center cursor-pointer">
+              <label className="bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium text-center cursor-pointer text-sm sm:text-base transition-colors">
                 Import Test Schema
                 <input type="file" accept=".json" onChange={importSchema} className="hidden" />
               </label>
@@ -933,16 +976,16 @@ const SchemaBuilder = () => {
         <SchemaDisplay
           schema={schema}
           useSections={useSections}
-          useTestReference={useTestReference}
-          testReference={testReference}
+          useStandardRange={useStandardRange}
+          testStandardRange={testStandardRange}
         />
 
         {/* Form Preview Section */}
         <FormPreview
           schema={schema}
           useSections={useSections}
-          useTestReference={useTestReference}
-          testReference={testReference}
+          useStandardRange={useStandardRange}
+          testStandardRange={testStandardRange}
           removeField={removeField}
           getFieldsCount={getFieldsCount}
         />

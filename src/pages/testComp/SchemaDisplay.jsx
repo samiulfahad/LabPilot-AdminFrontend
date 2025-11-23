@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const SchemaDisplay = ({ schema, useSections, useTestReference, testReference }) => {
+const SchemaDisplay = ({ schema, useSections, useStandardRange, testStandardRange }) => {
   const [copied, setCopied] = useState(false);
 
   const cleanSchemaForDisplay = (schema) => {
@@ -9,8 +9,8 @@ const SchemaDisplay = ({ schema, useSections, useTestReference, testReference })
       fields: schema.fields
         ? schema.fields.map((field) => {
             const cleanedField = { ...field };
-            if (cleanedField.reference?.type === "none") {
-              delete cleanedField.reference;
+            if (cleanedField.standardRange?.type === "none") {
+              delete cleanedField.standardRange;
             }
             if (!cleanedField.unit || cleanedField.unit === "") {
               delete cleanedField.unit;
@@ -23,8 +23,8 @@ const SchemaDisplay = ({ schema, useSections, useTestReference, testReference })
             ...section,
             fields: section.fields.map((field) => {
               const cleanedField = { ...field };
-              if (cleanedField.reference?.type === "none") {
-                delete cleanedField.reference;
+              if (cleanedField.standardRange?.type === "none") {
+                delete cleanedField.standardRange;
               }
               if (!cleanedField.unit || cleanedField.unit === "") {
                 delete cleanedField.unit;
@@ -39,27 +39,22 @@ const SchemaDisplay = ({ schema, useSections, useTestReference, testReference })
       delete cleanedSchema.sections;
     }
 
-    // Add test reference if enabled and has data
-    if (useTestReference) {
-      const testRefData = { ...testReference };
+    if (useStandardRange) {
+      const testStandardRangeData = { ...testStandardRange };
 
-      // Clean up test reference data
-      if (testRefData.type === "options" && testRefData.options.length > 0) {
-        // Convert array to object for options type
+      if (testStandardRangeData.type === "options" && testStandardRangeData.options.length > 0) {
         const optionsObj = {};
-        testRefData.options.forEach((option) => {
+        testStandardRangeData.options.forEach((option) => {
           optionsObj[option.key] = option.value;
         });
-        testRefData.options = optionsObj;
-      } else if (testRefData.type === "text" && testRefData.text.trim()) {
-        // Keep text as is
+        testStandardRangeData.options = optionsObj;
+      } else if (testStandardRangeData.type === "text" && testStandardRangeData.text.trim()) {
       } else {
-        // Don't include test reference if no valid data
-        delete cleanedSchema.testReference;
+        delete cleanedSchema.testStandardRange;
       }
 
-      if (Object.keys(testRefData).length > 0) {
-        cleanedSchema.testReference = testRefData;
+      if (Object.keys(testStandardRangeData).length > 0) {
+        cleanedSchema.testStandardRange = testStandardRangeData;
       }
     }
 
@@ -82,19 +77,19 @@ const SchemaDisplay = ({ schema, useSections, useTestReference, testReference })
   const cleanedSchema = cleanSchemaForDisplay(schema);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      <div className="p-4 lg:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-        <h3 className="text-lg font-semibold text-gray-700">JSON Schema</h3>
+    <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+      <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-700">JSON Schema</h3>
         <button
           onClick={copyToClipboard}
-          className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm"
+          className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
         >
           {copied ? "Copied!" : "Copy JSON"}
         </button>
       </div>
-      <div className="p-4 lg:p-6">
-        <div className="bg-gray-800 rounded-lg p-4">
-          <pre className="text-sm font-mono text-gray-100 overflow-auto max-h-96">
+      <div className="p-3 sm:p-4 lg:p-6">
+        <div className="bg-gray-800 rounded-lg p-3 sm:p-4">
+          <pre className="text-xs sm:text-sm font-mono text-gray-100 overflow-auto max-h-96 leading-relaxed">
             {JSON.stringify(cleanedSchema, null, 2)}
           </pre>
         </div>
