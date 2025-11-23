@@ -13,6 +13,7 @@ Task 08: Lab management by lab search (search by lab ID, zone, subzone, phone nu
 Task 09 (Frontend Done): Add billing History section 
 Task 10: See Refferer list of labs
 Task 11: See Test list associated with a test
+Task 12 Done: Create a react component to generate schema for forms
 
 
 // Check public/ _redirects file before implementing to the server/production
