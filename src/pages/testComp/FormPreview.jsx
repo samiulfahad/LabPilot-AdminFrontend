@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import  { useState, useEffect, useCallback } from "react";
 
 const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange, removeField, getFieldsCount }) => {
   const [formData, setFormData] = useState({});
@@ -6,16 +6,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
   const [validationStates, setValidationStates] = useState({});
   const [patientAge, setPatientAge] = useState("");
   const [patientGender, setPatientGender] = useState("");
-
-  const getAgeGroup = (age) => {
-    const ageNum = parseFloat(age);
-    if (isNaN(ageNum)) return null;
-
-    if (ageNum <= 2) return "infant";
-    if (ageNum <= 12) return "child";
-    if (ageNum <= 64) return "adult";
-    return "old";
-  };
+  const [touchedFields, setTouchedFields] = useState({}); // Track touched fields
 
   const getStandardRangeText = useCallback(
     (field) => {
@@ -23,28 +14,40 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
 
       const { type, ranges, min, max } = field.standardRange;
 
-      if (type === "range" && min && max) {
+      if (type === "numberRange" && min && max) {
         return `Standard range: ${min} - ${max}`;
       }
 
-      if (type === "age" && ranges && patientAge) {
-        const ageGroup = getAgeGroup(patientAge);
-        if (ageGroup && ranges[ageGroup]) {
-          const range = ranges[ageGroup];
-          const hasMin = range.min && range.min !== "";
-          const hasMax = range.max && range.max !== "";
+      if (type === "ageBased" && ranges && patientAge) {
+        const ageNum = parseFloat(patientAge);
+        if (!isNaN(ageNum)) {
+          // Find the age range that matches the patient's age
+          const matchingRange = ranges.find((range) => {
+            const minAge = range.ageMin ? parseFloat(range.ageMin) : -Infinity;
+            const maxAge = range.ageMax ? parseFloat(range.ageMax) : Infinity;
+            return ageNum >= minAge && ageNum <= maxAge;
+          });
 
-          if (hasMin && hasMax) {
-            return `Standard range for ${ageGroup} (age ${patientAge}): ${range.min} - ${range.max}`;
-          } else if (hasMin) {
-            return `Standard range for ${ageGroup} (age ${patientAge}): ≥ ${range.min}`;
-          } else if (hasMax) {
-            return `Standard range for ${ageGroup} (age ${patientAge}): ≤ ${range.max}`;
+          if (matchingRange) {
+            const hasMin = matchingRange.min && matchingRange.min !== "";
+            const hasMax = matchingRange.max && matchingRange.max !== "";
+
+            const ageRangeText = matchingRange.ageMax
+              ? `age ${matchingRange.ageMin}-${matchingRange.ageMax}`
+              : `age ${matchingRange.ageMin}+`;
+
+            if (hasMin && hasMax) {
+              return `Standard range (${ageRangeText}): ${matchingRange.min} - ${matchingRange.max}`;
+            } else if (hasMin) {
+              return `Standard range (${ageRangeText}): ≥ ${matchingRange.min}`;
+            } else if (hasMax) {
+              return `Standard range (${ageRangeText}): ≤ ${matchingRange.max}`;
+            }
           }
         }
       }
 
-      if (type === "gender" && ranges && patientGender) {
+      if (type === "genderBased" && ranges && patientGender) {
         if (ranges[patientGender]) {
           const range = ranges[patientGender];
           const hasMin = range.min && range.min !== "";
@@ -60,6 +63,39 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
         }
       }
 
+      // Handle genderWithAgeBased type
+      if (type === "genderWithAgeBased" && ranges && patientGender && patientAge) {
+        const genderRanges = ranges[patientGender];
+        if (genderRanges && genderRanges.length > 0) {
+          const ageNum = parseFloat(patientAge);
+          if (!isNaN(ageNum)) {
+            // Find the age range that matches the patient's age
+            const matchingRange = genderRanges.find((range) => {
+              const minAge = range.ageMin ? parseFloat(range.ageMin) : -Infinity;
+              const maxAge = range.ageMax ? parseFloat(range.ageMax) : Infinity;
+              return ageNum >= minAge && ageNum <= maxAge;
+            });
+
+            if (matchingRange) {
+              const hasMin = matchingRange.min && matchingRange.min !== "";
+              const hasMax = matchingRange.max && matchingRange.max !== "";
+
+              const ageRangeText = matchingRange.ageMax
+                ? `age ${matchingRange.ageMin}-${matchingRange.ageMax}`
+                : `age ${matchingRange.ageMin}+`;
+
+              if (hasMin && hasMax) {
+                return `Standard range for ${patientGender} (${ageRangeText}): ${matchingRange.min} - ${matchingRange.max}`;
+              } else if (hasMin) {
+                return `Standard range for ${patientGender} (${ageRangeText}): ≥ ${matchingRange.min}`;
+              } else if (hasMax) {
+                return `Standard range for ${patientGender} (${ageRangeText}): ≤ ${matchingRange.max}`;
+              }
+            }
+          }
+        }
+      }
+
       return null;
     },
     [patientAge, patientGender]
@@ -67,6 +103,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
 
   const validateField = useCallback(
     (field, value) => {
+      // Note: The required field in the schema is now stored as boolean (converted from "yes"/"no")
       if (field.required) {
         if (field.type === "checkbox") {
           // For checkbox, check if at least one option is selected
@@ -88,7 +125,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
         if (field.standardRange) {
           const { type, ranges, min, max } = field.standardRange;
 
-          if (type === "range" && min !== undefined && max !== undefined) {
+          if (type === "numberRange" && min !== undefined && max !== undefined) {
             if (numValue < parseFloat(min)) {
               const rangeText = `Standard range: ${min} - ${max}`;
               return { type: "below", message: `Value is below standard range (${rangeText})` };
@@ -104,30 +141,40 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
           }
 
           // Validate age-based ranges using patient age
-          if (type === "age" && ranges && patientAge) {
-            const ageGroup = getAgeGroup(patientAge);
-            if (ageGroup && ranges[ageGroup]) {
-              const range = ranges[ageGroup];
-              const hasMin = range.min !== undefined && range.min !== "";
-              const hasMax = range.max !== undefined && range.max !== "";
+          if (type === "ageBased" && ranges && patientAge) {
+            const ageNum = parseFloat(patientAge);
+            if (!isNaN(ageNum)) {
+              const matchingRange = ranges.find((range) => {
+                const minAge = range.ageMin ? parseFloat(range.ageMin) : -Infinity;
+                const maxAge = range.ageMax ? parseFloat(range.ageMax) : Infinity;
+                return ageNum >= minAge && ageNum <= maxAge;
+              });
 
-              if (hasMin && numValue < parseFloat(range.min)) {
-                const rangeText = getStandardRangeText(field);
-                return { type: "below", message: `Value is below standard range (${rangeText})` };
-              }
-              if (hasMax && numValue > parseFloat(range.max)) {
-                const rangeText = getStandardRangeText(field);
-                return { type: "above", message: `Value is above standard range (${rangeText})` };
-              }
-              if ((!hasMin || numValue >= parseFloat(range.min)) && (!hasMax || numValue <= parseFloat(range.max))) {
-                const rangeText = getStandardRangeText(field);
-                return { type: "within", message: `Value is within standard range (${rangeText})` };
+              if (matchingRange) {
+                const hasMin = matchingRange.min !== undefined && matchingRange.min !== "";
+                const hasMax = matchingRange.max !== undefined && matchingRange.max !== "";
+
+                if (hasMin && numValue < parseFloat(matchingRange.min)) {
+                  const rangeText = getStandardRangeText(field);
+                  return { type: "below", message: `Value is below standard range (${rangeText})` };
+                }
+                if (hasMax && numValue > parseFloat(matchingRange.max)) {
+                  const rangeText = getStandardRangeText(field);
+                  return { type: "above", message: `Value is above standard range (${rangeText})` };
+                }
+                if (
+                  (!hasMin || numValue >= parseFloat(matchingRange.min)) &&
+                  (!hasMax || numValue <= parseFloat(matchingRange.max))
+                ) {
+                  const rangeText = getStandardRangeText(field);
+                  return { type: "within", message: `Value is within standard range (${rangeText})` };
+                }
               }
             }
           }
 
           // Validate gender-based ranges using patient gender
-          if (type === "gender" && ranges && patientGender) {
+          if (type === "genderBased" && ranges && patientGender) {
             if (ranges[patientGender]) {
               const range = ranges[patientGender];
               const hasMin = range.min !== undefined && range.min !== "";
@@ -144,6 +191,43 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
               if ((!hasMin || numValue >= parseFloat(range.min)) && (!hasMax || numValue <= parseFloat(range.max))) {
                 const rangeText = getStandardRangeText(field);
                 return { type: "within", message: `Value is within standard range (${rangeText})` };
+              }
+            }
+          }
+
+          // Validate genderWithAge-based ranges
+          if (type === "genderWithAgeBased" && ranges && patientGender && patientAge) {
+            const genderRanges = ranges[patientGender];
+            if (genderRanges && genderRanges.length > 0) {
+              const ageNum = parseFloat(patientAge);
+              if (!isNaN(ageNum)) {
+                // Find the age range that matches the patient's age
+                const matchingRange = genderRanges.find((range) => {
+                  const minAge = range.ageMin ? parseFloat(range.ageMin) : -Infinity;
+                  const maxAge = range.ageMax ? parseFloat(range.ageMax) : Infinity;
+                  return ageNum >= minAge && ageNum <= maxAge;
+                });
+
+                if (matchingRange) {
+                  const hasMin = matchingRange.min !== undefined && matchingRange.min !== "";
+                  const hasMax = matchingRange.max !== undefined && matchingRange.max !== "";
+
+                  if (hasMin && numValue < parseFloat(matchingRange.min)) {
+                    const rangeText = getStandardRangeText(field);
+                    return { type: "below", message: `Value is below standard range (${rangeText})` };
+                  }
+                  if (hasMax && numValue > parseFloat(matchingRange.max)) {
+                    const rangeText = getStandardRangeText(field);
+                    return { type: "above", message: `Value is above standard range (${rangeText})` };
+                  }
+                  if (
+                    (!hasMin || numValue >= parseFloat(matchingRange.min)) &&
+                    (!hasMax || numValue <= parseFloat(matchingRange.max))
+                  ) {
+                    const rangeText = getStandardRangeText(field);
+                    return { type: "within", message: `Value is within standard range (${rangeText})` };
+                  }
+                }
               }
             }
           }
@@ -198,6 +282,12 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
       [fieldId]: value,
     }));
 
+    // Mark field as touched
+    setTouchedFields((prev) => ({
+      ...prev,
+      [fieldId]: true,
+    }));
+
     // Validate the field immediately
     const field = findFieldById(fieldId);
     if (field) {
@@ -223,8 +313,14 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
       newValues = [...currentValues, optionValue];
     } else {
       // Remove the option from selected values
-      newValues = currentValues.filter(value => value !== optionValue);
+      newValues = currentValues.filter((value) => value !== optionValue);
     }
+
+    // Mark field as touched
+    setTouchedFields((prev) => ({
+      ...prev,
+      [fieldId]: true,
+    }));
 
     handleInputChange(fieldId, newValues);
   };
@@ -248,24 +344,28 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate all fields
-    const newErrors = {};
-    const newValidationStates = {};
+    // Mark all fields as touched on submit
+    const allTouched = {};
     let allFields = [];
-
-    if (!schema) {
-      setErrors({});
-      setValidationStates({});
-      return;
-    }
 
     if (useSections && schema.sections) {
       schema.sections.forEach((section) => {
+        section.fields.forEach((field) => {
+          allTouched[field.id] = true;
+        });
         allFields = [...allFields, ...(section.fields || [])];
       });
     } else {
+      schema.fields.forEach((field) => {
+        allTouched[field.id] = true;
+      });
       allFields = schema.fields || [];
     }
+    setTouchedFields(allTouched);
+
+    // Validate all fields
+    const newErrors = {};
+    const newValidationStates = {};
 
     allFields.forEach((field) => {
       const validation = validateField(field, formData[field.id]);
@@ -292,6 +392,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
     const value = formData[field.id] || "";
     const validation = errors[field.id];
     const validationState = validationStates[field.id];
+    const isTouched = touchedFields[field.id];
 
     const getLabelText = () => {
       return (
@@ -302,7 +403,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
       );
     };
 
-    // Dynamic styling based on validation state
+    // Dynamic styling based on validation state - only apply error styles if touched
     const getInputStyles = () => {
       switch (validationState) {
         case "within":
@@ -321,12 +422,16 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
             label: "border-red-300 bg-red-100 text-red-800",
           };
         case "error":
-          return {
-            container: "border-red-500 bg-red-50",
-            input: "text-red-700 bg-red-50",
-            unit: "text-red-700 border-red-300 bg-red-100",
-            label: "border-red-300 bg-red-100 text-red-800",
-          };
+          // Only show red styling if field is touched
+          if (isTouched) {
+            return {
+              container: "border-red-500 bg-red-50",
+              input: "text-red-700 bg-red-50",
+              unit: "text-red-700 border-red-300 bg-red-100",
+              label: "border-red-300 bg-red-100 text-red-800",
+            };
+          }
+        // Fall through to default if not touched
         default:
           return {
             container: "border-gray-300 bg-white",
@@ -621,12 +726,14 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
     if (!field || !field.id) return null;
 
     const validation = errors[field.id];
+    const isTouched = touchedFields[field.id];
 
     return (
       <div key={field.id} className="space-y-2">
         {renderInputField(field)}
 
-        {validation && validation.type === "error" && (
+        {/* Only show required error if field is touched */}
+        {validation && validation.type === "error" && isTouched && (
           <p className="text-sm p-2 rounded border text-red-800 bg-red-50 border-red-200">❌ {validation.message}</p>
         )}
 
@@ -704,7 +811,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
             <div className="mt-3 p-3 bg-green-50 rounded border border-green-200">
               <p className="text-sm text-green-800">
                 <strong>Current Selection:</strong>
-                {patientAge && ` Age: ${patientAge} years (${getAgeGroup(patientAge) || "Unknown age group"})`}
+                {patientAge && ` Age: ${patientAge} years`}
                 {patientGender && ` Gender: ${patientGender}`}
               </p>
             </div>
@@ -742,6 +849,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
                   setFormData({});
                   setErrors({});
                   setValidationStates({});
+                  setTouchedFields({});
                   setPatientAge("");
                   setPatientGender("");
                 }}
