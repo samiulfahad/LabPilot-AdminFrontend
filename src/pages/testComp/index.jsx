@@ -803,7 +803,7 @@ const SchemaBuilderForLabTest = () => {
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
       <div className="max-w-7xl mx-auto space-y-3 sm:space-y-6">
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
-          Lab Report Test Builder
+          Lab Test Builder
         </h2>
 
         {/* Editing Banner */}
