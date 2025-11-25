@@ -21,7 +21,7 @@ const SchemaBuilderForLabTest = () => {
     id: "",
     label: "",
     type: "text",
-    required: "no", // Changed from boolean to string
+    required: "no",
     unit: "",
     standardRange: null,
     options: [],
@@ -40,6 +40,10 @@ const SchemaBuilderForLabTest = () => {
 
   // Add a ref to track if we're currently adding a range
   const [isAddingRange, setIsAddingRange] = useState(false);
+
+  // Editing states
+  const [editingSectionIndex, setEditingSectionIndex] = useState(null);
+  const [editingFieldId, setEditingFieldId] = useState(null);
 
   // Updated field types
   const fieldTypes = ["text", "textarea", "number", "select", "radio", "checkbox"];
@@ -77,6 +81,201 @@ const SchemaBuilderForLabTest = () => {
     "°F",
   ];
 
+  // ========== EDITING FUNCTIONS ==========
+
+  // Start editing a section
+  const startEditingSection = (sectionIndex) => {
+    const section = schema.sections[sectionIndex];
+    setCurrentSection({
+      name: section.name,
+      description: section.description || "",
+    });
+    setEditingSectionIndex(sectionIndex);
+  };
+
+  // Update a section
+  const updateSection = () => {
+    if (!currentSection.name.trim()) {
+      alert("Section name is required");
+      return;
+    }
+
+    setSchema((prev) => ({
+      ...prev,
+      sections: prev.sections.map((section, index) =>
+        index === editingSectionIndex
+          ? {
+              ...section,
+              name: currentSection.name,
+              description: currentSection.description,
+            }
+          : section
+      ),
+    }));
+
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
+    setEditingSectionIndex(null);
+  };
+
+  // Cancel section editing
+  const cancelEditingSection = () => {
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
+    setEditingSectionIndex(null);
+  };
+
+  // Start editing a field
+  const startEditingField = (field, sectionIndex = null) => {
+    // Convert required from boolean back to string for the form
+    const requiredString = field.required ? "yes" : "no";
+
+    setCurrentField({
+      id: field.id,
+      label: field.label,
+      type: field.type,
+      required: requiredString,
+      unit: field.unit || "",
+      standardRange: field.standardRange || null,
+      options: field.options || [],
+      sectionId: sectionIndex !== null ? schema.sections[sectionIndex]?.id || "" : "",
+    });
+
+    setEditingFieldId(field.id);
+  };
+
+  // Update a field
+  const updateField = () => {
+    if (!currentField.label.trim()) {
+      alert("Field label is required");
+      return;
+    }
+
+    // Check for options for radio, select, and checkbox fields
+    if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length === 0) {
+      alert(
+        `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
+      );
+      return;
+    }
+
+    // Convert required from string to boolean for schema
+    const isRequired = currentField.required === "yes";
+
+    const fieldData = {
+      id: currentField.id, // Keep the same ID
+      label: currentField.label,
+      type: currentField.type,
+      required: isRequired,
+      options: currentField.options.length > 0 ? [...currentField.options] : undefined,
+    };
+
+    if (currentField.unit && currentField.unit.trim()) {
+      fieldData.unit = currentField.unit;
+    }
+
+    // Only include standard range for number fields
+    if (currentField.type === "number" && currentField.standardRange && currentField.standardRange.type !== "none") {
+      const standardRangeData = { ...currentField.standardRange };
+
+      // Clean up empty values for age and genderAge types
+      if (standardRangeData.type === "ageBased" && standardRangeData.ranges) {
+        standardRangeData.ranges = standardRangeData.ranges.filter((range) => range.min !== "" || range.max !== "");
+      } else if (standardRangeData.type === "genderWithAgeBased") {
+        Object.keys(standardRangeData.ranges).forEach((gender) => {
+          standardRangeData.ranges[gender] = standardRangeData.ranges[gender].filter(
+            (range) => range.min !== "" || range.max !== ""
+          );
+        });
+      } else {
+        // Existing cleanup logic for other types
+        Object.keys(standardRangeData).forEach((key) => {
+          if (
+            standardRangeData[key] === "" ||
+            (Array.isArray(standardRangeData[key]) && standardRangeData[key].length === 0)
+          ) {
+            delete standardRangeData[key];
+          }
+        });
+
+        if (standardRangeData.ranges) {
+          Object.keys(standardRangeData.ranges).forEach((rangeKey) => {
+            if (!standardRangeData.ranges[rangeKey].min && !standardRangeData.ranges[rangeKey].max) {
+              delete standardRangeData.ranges[rangeKey];
+            }
+          });
+
+          if (Object.keys(standardRangeData.ranges).length === 0) {
+            delete standardRangeData.ranges;
+          }
+        }
+      }
+
+      if (Object.keys(standardRangeData).length > 0) {
+        fieldData.standardRange = standardRangeData;
+      }
+    }
+
+    setSchema((prev) => {
+      if (useSections && currentField.sectionId) {
+        // Update field in section
+        return {
+          ...prev,
+          sections: prev.sections.map((section) =>
+            section.id === currentField.sectionId
+              ? {
+                  ...section,
+                  fields: section.fields.map((field) => (field.id === editingFieldId ? fieldData : field)),
+                }
+              : section
+          ),
+        };
+      } else {
+        // Update field in root fields
+        return {
+          ...prev,
+          fields: prev.fields.map((field) => (field.id === editingFieldId ? fieldData : field)),
+        };
+      }
+    });
+
+    // Reset form
+    setCurrentField({
+      id: "",
+      label: "",
+      type: "text",
+      required: "no",
+      unit: "",
+      standardRange: null,
+      options: [],
+      sectionId: useSections ? currentField.sectionId : "",
+    });
+    setEditingFieldId(null);
+    setNewOption("");
+  };
+
+  // Cancel field editing
+  const cancelEditingField = () => {
+    setCurrentField({
+      id: "",
+      label: "",
+      type: "text",
+      required: "no",
+      unit: "",
+      standardRange: null,
+      options: [],
+      sectionId: useSections ? currentField.sectionId : "",
+    });
+    setEditingFieldId(null);
+    setNewOption("");
+  };
+
+  // ========== EXISTING FUNCTIONS (with minor updates) ==========
+
   const initializeStandardRange = (type) => {
     let initialData = { type };
 
@@ -86,7 +285,7 @@ const SchemaBuilderForLabTest = () => {
         female: { min: "", max: "" },
       };
     } else if (type === "ageBased") {
-      initialData.ranges = []; // Start with empty array for age ranges
+      initialData.ranges = [];
     } else if (type === "genderWithAgeBased") {
       initialData.ranges = {
         male: [],
@@ -127,21 +326,18 @@ const SchemaBuilderForLabTest = () => {
     });
   };
 
-  // Fixed: Add new age range for age-based standard range with proper state tracking
   const addAgeRange = () => {
-    if (isAddingRange) return; // Prevent multiple simultaneous calls
+    if (isAddingRange) return;
 
     setIsAddingRange(true);
 
     setCurrentField((prev) => {
       const newStandardRange = { ...prev.standardRange };
 
-      // Ensure ranges array exists
       if (!newStandardRange.ranges) {
         newStandardRange.ranges = [];
       }
 
-      // Add only ONE new range
       const newRange = {
         ageMin: "",
         ageMax: "",
@@ -149,7 +345,6 @@ const SchemaBuilderForLabTest = () => {
         max: "",
       };
 
-      // Use functional update to ensure we're working with the latest state
       return {
         ...prev,
         standardRange: {
@@ -159,11 +354,9 @@ const SchemaBuilderForLabTest = () => {
       };
     });
 
-    // Reset the flag after a short delay
     setTimeout(() => setIsAddingRange(false), 100);
   };
 
-  // Fixed: Remove age range for age-based standard range
   const removeAgeRange = (index) => {
     setCurrentField((prev) => {
       const newStandardRange = { ...prev.standardRange };
@@ -182,7 +375,6 @@ const SchemaBuilderForLabTest = () => {
     });
   };
 
-  // Fixed: Handle age range changes
   const handleAgeRangeChange = (index, field, value) => {
     setCurrentField((prev) => {
       const newStandardRange = { ...prev.standardRange };
@@ -204,21 +396,18 @@ const SchemaBuilderForLabTest = () => {
     });
   };
 
-  // Fixed: Add custom age range for gender-age based standard range with proper state tracking
   const addGenderAgeRange = (gender) => {
-    if (isAddingRange) return; // Prevent multiple simultaneous calls
+    if (isAddingRange) return;
 
     setIsAddingRange(true);
 
     setCurrentField((prev) => {
       const newStandardRange = { ...prev.standardRange };
 
-      // Ensure the gender array exists
       if (!newStandardRange.ranges[gender]) {
         newStandardRange.ranges[gender] = [];
       }
 
-      // Add only ONE new range
       const newRange = {
         ageMin: "",
         ageMax: "",
@@ -226,7 +415,6 @@ const SchemaBuilderForLabTest = () => {
         max: "",
       };
 
-      // Use functional update to ensure we're working with the latest state
       return {
         ...prev,
         standardRange: {
@@ -239,11 +427,9 @@ const SchemaBuilderForLabTest = () => {
       };
     });
 
-    // Reset the flag after a short delay
     setTimeout(() => setIsAddingRange(false), 100);
   };
 
-  // Fixed: Remove age range for gender-age based standard range
   const removeGenderAgeRange = (gender, index) => {
     setCurrentField((prev) => {
       const newStandardRange = { ...prev.standardRange };
@@ -265,7 +451,6 @@ const SchemaBuilderForLabTest = () => {
     });
   };
 
-  // Fixed: Handle gender-age range changes
   const handleGenderAgeRangeChange = (gender, index, field, value) => {
     setCurrentField((prev) => {
       const newStandardRange = { ...prev.standardRange };
@@ -289,8 +474,6 @@ const SchemaBuilderForLabTest = () => {
       return prev;
     });
   };
-
-  // ... rest of your existing functions remain the same (addSection, removeSection, etc.)
 
   const addSection = () => {
     if (!currentSection.name.trim()) {
@@ -324,6 +507,10 @@ const SchemaBuilderForLabTest = () => {
       ...prev,
       sections: prev.sections.filter((_, i) => i !== index),
     }));
+    // If we're editing this section, cancel editing
+    if (editingSectionIndex === index) {
+      cancelEditingSection();
+    }
   };
 
   const addTestStandardRangeOption = () => {
@@ -448,6 +635,8 @@ const SchemaBuilderForLabTest = () => {
 
   const removeField = (sectionIndex, fieldIndex) => {
     if (useSections) {
+      const fieldId = schema.sections[sectionIndex].fields[fieldIndex].id;
+
       setSchema((prev) => ({
         ...prev,
         sections: prev.sections.map((section, sIndex) =>
@@ -456,11 +645,23 @@ const SchemaBuilderForLabTest = () => {
             : section
         ),
       }));
+
+      // If we're editing this field, cancel editing
+      if (editingFieldId === fieldId) {
+        cancelEditingField();
+      }
     } else {
+      const fieldId = schema.fields[fieldIndex].id;
+
       setSchema((prev) => ({
         ...prev,
         fields: prev.fields.filter((_, fIndex) => fIndex !== fieldIndex),
       }));
+
+      // If we're editing this field, cancel editing
+      if (editingFieldId === fieldId) {
+        cancelEditingField();
+      }
     }
   };
 
@@ -576,6 +777,9 @@ const SchemaBuilderForLabTest = () => {
           }
         }
         setSchema(importedSchema);
+        // Reset editing states when importing new schema
+        setEditingSectionIndex(null);
+        setEditingFieldId(null);
       } catch (error) {
         alert("Invalid schema file");
       }
@@ -590,12 +794,50 @@ const SchemaBuilderForLabTest = () => {
     return schema.fields.length;
   };
 
+  // Helper function to check if we're currently editing
+  const isEditing = () => {
+    return editingSectionIndex !== null || editingFieldId !== null;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
       <div className="max-w-7xl mx-auto space-y-3 sm:space-y-6">
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
           Lab Report Test Builder
         </h2>
+
+        {/* Editing Banner */}
+        {isEditing() && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-yellow-400">⚠️</span>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">
+                  {editingSectionIndex !== null ? "Editing Section" : "Editing Field"}
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>
+                    You are currently in edit mode.{" "}
+                    {editingSectionIndex !== null
+                      ? "Make your changes to the section and click 'Update Section' to save."
+                      : "Make your changes to the field and click 'Update Field' to save."}
+                  </p>
+                </div>
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={editingSectionIndex !== null ? cancelEditingSection : cancelEditingField}
+                    className="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                  >
+                    Cancel Editing
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Schema Builder Section */}
         <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
@@ -604,7 +846,7 @@ const SchemaBuilderForLabTest = () => {
           </div>
 
           <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
-            {/* Test Configuration - Updated to be in one row for desktop */}
+            {/* Test Configuration */}
             <div className="space-y-3">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <InputField
@@ -793,13 +1035,28 @@ const SchemaBuilderForLabTest = () => {
                       onChange={(e) => setCurrentSection((prev) => ({ ...prev, description: e.target.value }))}
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={addSection}
-                    className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-sm sm:text-base transition-colors"
-                  >
-                    Add Section
-                  </button>
+                  <div className="flex space-x-3">
+                    <button
+                      type="button"
+                      onClick={editingSectionIndex !== null ? updateSection : addSection}
+                      className={`flex-1 ${
+                        editingSectionIndex !== null
+                          ? "bg-yellow-600 hover:bg-yellow-700"
+                          : "bg-green-600 hover:bg-green-700"
+                      } text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium text-sm sm:text-base transition-colors`}
+                    >
+                      {editingSectionIndex !== null ? "Update Section" : "Add Section"}
+                    </button>
+                    {editingSectionIndex !== null && (
+                      <button
+                        type="button"
+                        onClick={cancelEditingSection}
+                        className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 font-medium text-sm sm:text-base transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Existing Sections - Updated layout */}
@@ -827,13 +1084,22 @@ const SchemaBuilderForLabTest = () => {
                                 <p className="text-xs text-gray-500 mt-1">{section.fields.length} field(s)</p>
                               </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => removeSection(index)}
-                              className="text-red-600 hover:text-red-800 font-medium text-sm self-start lg:self-center transition-colors lg:ml-4"
-                            >
-                              Remove
-                            </button>
+                            <div className="flex space-x-2 self-start lg:self-center lg:ml-4">
+                              <button
+                                type="button"
+                                onClick={() => startEditingSection(index)}
+                                className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors px-2 py-1 rounded hover:bg-blue-50"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeSection(index)}
+                                className="text-red-600 hover:text-red-800 font-medium text-sm transition-colors px-2 py-1 rounded hover:bg-red-50"
+                              >
+                                Remove
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -845,7 +1111,9 @@ const SchemaBuilderForLabTest = () => {
 
             {/* Field Builder */}
             <div className="space-y-3">
-              <h4 className="text-base sm:text-lg font-semibold text-gray-700">Add Test Field</h4>
+              <h4 className="text-base sm:text-lg font-semibold text-gray-700">
+                {editingFieldId ? "Edit Test Field" : "Add Test Field"}
+              </h4>
               <div className="space-y-3 p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50">
                 {useSections && schema.sections && schema.sections.length > 0 && (
                   <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
@@ -1238,14 +1506,27 @@ const SchemaBuilderForLabTest = () => {
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  onClick={addField}
-                  disabled={useSections && !currentField.sectionId}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                >
-                  Add Field {useSections ? "to Section" : "to Test"}
-                </button>
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={editingFieldId ? updateField : addField}
+                    disabled={useSections && !currentField.sectionId}
+                    className={`flex-1 ${
+                      editingFieldId ? "bg-yellow-600 hover:bg-yellow-700" : "bg-blue-600 hover:bg-blue-700"
+                    } text-white py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors`}
+                  >
+                    {editingFieldId ? "Update Field" : `Add Field ${useSections ? "to Section" : "to Test"}`}
+                  </button>
+                  {editingFieldId && (
+                    <button
+                      type="button"
+                      onClick={cancelEditingField}
+                      className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 font-medium text-sm sm:text-base transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -1266,7 +1547,7 @@ const SchemaBuilderForLabTest = () => {
           </div>
         </div>
 
-        {/* Form Preview Section */}
+        {/* Form Preview Section - Updated to pass editing functions */}
         <FormPreview
           schema={schema}
           useSections={useSections}
@@ -1274,6 +1555,7 @@ const SchemaBuilderForLabTest = () => {
           testStandardRange={testStandardRange}
           removeField={removeField}
           getFieldsCount={getFieldsCount}
+          startEditingField={startEditingField}
         />
 
         {/* Schema Display Section */}

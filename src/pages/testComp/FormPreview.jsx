@@ -1,6 +1,14 @@
-import  { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
-const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange, removeField, getFieldsCount }) => {
+const FormPreview = ({
+  schema,
+  useSections,
+  useStandardRange,
+  testStandardRange,
+  removeField,
+  getFieldsCount,
+  startEditingField,
+}) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [validationStates, setValidationStates] = useState({});
@@ -403,8 +411,11 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
       );
     };
 
-    // Dynamic styling based on validation state - only apply error styles if touched
+    // Dynamic styling based on validation state - only apply error styles if touched AND there's an error
     const getInputStyles = () => {
+      // For required field errors, only show red if field is touched AND empty
+      const showRequiredError = validationState === "error" && isTouched;
+
       switch (validationState) {
         case "within":
           return {
@@ -416,14 +427,14 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
         case "below":
         case "above":
           return {
-            container: "border-red-500 bg-red-50",
-            input: "text-red-700 bg-red-50",
-            unit: "text-red-700 border-red-300 bg-red-100",
-            label: "border-red-300 bg-red-100 text-red-800",
+            container: "border-yellow-500 bg-yellow-50",
+            input: "text-yellow-700 bg-yellow-50",
+            unit: "text-yellow-700 border-yellow-300 bg-yellow-100",
+            label: "border-yellow-300 bg-yellow-100 text-yellow-800",
           };
         case "error":
-          // Only show red styling if field is touched
-          if (isTouched) {
+          // Only show red styling if field is touched AND has error
+          if (showRequiredError) {
             return {
               container: "border-red-500 bg-red-50",
               input: "text-red-700 bg-red-50",
@@ -431,7 +442,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
               label: "border-red-300 bg-red-100 text-red-800",
             };
           }
-        // Fall through to default if not touched
+        // Fall through to default if not touched or no error
         default:
           return {
             container: "border-gray-300 bg-white",
@@ -448,7 +459,7 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
           return "text-green-800 bg-green-50 border-green-200";
         case "below":
         case "above":
-          return "text-red-800 bg-red-50 border-red-200";
+          return "text-yellow-800 bg-yellow-50 border-yellow-200";
         case "error":
           return "text-red-800 bg-red-50 border-red-200";
         default:
@@ -475,48 +486,73 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
     // Get standard range text for display (always show when available)
     const standardRangeText = getStandardRangeText(field);
 
+    // Only show required error message if field is touched AND empty
+    const showRequiredError = validationState === "error" && isTouched;
+
     switch (field.type) {
       case "text":
         return (
-          <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-            <label
-              className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-            >
-              {getLabelText()}
-            </label>
-            <div className="flex-1 flex items-center">
-              <input
-                type="text"
-                value={value}
-                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
-                required={field.required}
-              />
-              {field.unit && (
-                <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
-              )}
+          <div className="space-y-2">
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
+              >
+                {getLabelText()}
+              </label>
+              <div className="flex-1 flex items-center">
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
+                  required={field.required}
+                />
+                {field.unit && (
+                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
+                )}
+              </div>
             </div>
+
+            {/* Show required error only when touched and empty */}
+            {showRequiredError && (
+              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
+                <div className="text-sm">
+                  {getMessageIcon()} {validation.message}
+                </div>
+              </div>
+            )}
           </div>
         );
 
       case "textarea":
         return (
-          <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-            <label
-              className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-            >
-              {getLabelText()}
-            </label>
-            <div className="flex-1 flex flex-col">
-              <textarea
-                rows={3}
-                value={value}
-                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm resize-none border-0 ${styles.input}`}
-                required={field.required}
-              />
-              {field.unit && <div className={`px-3 py-2 text-sm border-t ${styles.unit}`}>Unit: {field.unit}</div>}
+          <div className="space-y-2">
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
+              >
+                {getLabelText()}
+              </label>
+              <div className="flex-1 flex flex-col">
+                <textarea
+                  rows={3}
+                  value={value}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm resize-none border-0 ${styles.input}`}
+                  required={field.required}
+                />
+                {field.unit && <div className={`px-3 py-2 text-sm border-t ${styles.unit}`}>Unit: {field.unit}</div>}
+              </div>
             </div>
+
+            {/* Show required error only when touched and empty */}
+            {showRequiredError && (
+              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
+                <div className="text-sm">
+                  {getMessageIcon()} {validation.message}
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -553,8 +589,17 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
               </div>
             )}
 
-            {/* Show validation message when value is entered */}
-            {validation && value && (
+            {/* Show validation message when value is entered or required error when touched and empty */}
+            {validation && value && validationState !== "error" && (
+              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
+                <div className="text-sm">
+                  {getMessageIcon()} {validation.message}
+                </div>
+              </div>
+            )}
+
+            {/* Show required error only when touched and empty */}
+            {showRequiredError && (
               <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
                 <div className="text-sm">
                   {getMessageIcon()} {validation.message}
@@ -566,124 +611,168 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
 
       case "select":
         return (
-          <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-            <label
-              className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-            >
-              {getLabelText()}
-            </label>
-            <div className="flex-1 flex items-center">
-              <select
-                value={value}
-                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
-                required={field.required}
+          <div className="space-y-2">
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
               >
-                <option value="">Select an option</option>
-                {field.options?.map((option, index) => (
-                  <option key={index} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              {field.unit && (
-                <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
-              )}
+                {getLabelText()}
+              </label>
+              <div className="flex-1 flex items-center">
+                <select
+                  value={value}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
+                  required={field.required}
+                >
+                  <option value="">Select an option</option>
+                  {field.options?.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                {field.unit && (
+                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
+                )}
+              </div>
             </div>
+
+            {/* Show required error only when touched and empty */}
+            {showRequiredError && (
+              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
+                <div className="text-sm">
+                  {getMessageIcon()} {validation.message}
+                </div>
+              </div>
+            )}
           </div>
         );
 
       case "radio":
         return (
-          <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-            <label
-              className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-            >
-              {getLabelText()}
-            </label>
-            <div className="flex-1 px-3 py-2 sm:py-3">
-              <div className="space-y-2">
-                {field.options?.map((option, index) => (
-                  <label key={index} className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name={field.id}
-                      value={option}
-                      checked={value === option}
-                      onChange={(e) => handleInputChange(field.id, e.target.value)}
-                      className="text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">{option}</span>
-                  </label>
-                ))}
+          <div className="space-y-2">
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
+              >
+                {getLabelText()}
+              </label>
+              <div className="flex-1 px-3 py-2 sm:py-3">
+                <div className="space-y-2">
+                  {field.options?.map((option, index) => (
+                    <label key={index} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name={field.id}
+                        value={option}
+                        checked={value === option}
+                        onChange={(e) => handleInputChange(field.id, e.target.value)}
+                        className="text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">{option}</span>
+                    </label>
+                  ))}
+                </div>
+                {field.unit && (
+                  <div className="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-500">Unit: {field.unit}</div>
+                )}
               </div>
-              {field.unit && (
-                <div className="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-500">Unit: {field.unit}</div>
-              )}
             </div>
+
+            {/* Show required error only when touched and empty */}
+            {showRequiredError && (
+              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
+                <div className="text-sm">
+                  {getMessageIcon()} {validation.message}
+                </div>
+              </div>
+            )}
           </div>
         );
 
       case "checkbox":
         return (
-          <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-            <label
-              className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-            >
-              {getLabelText()}
-            </label>
-            <div className="flex-1 px-3 py-2 sm:py-3">
-              <div className="space-y-2">
-                {field.options?.map((option, index) => {
-                  const isChecked = Array.isArray(value) && value.includes(option);
-                  return (
-                    <label key={index} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        value={option}
-                        checked={isChecked}
-                        onChange={(e) => handleCheckboxChange(field.id, option, e.target.checked)}
-                        className="text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">{option}</span>
-                    </label>
-                  );
-                })}
-              </div>
-              {field.unit && (
-                <div className="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-500">Unit: {field.unit}</div>
-              )}
-              {Array.isArray(value) && value.length > 0 && (
-                <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
-                  <p className="text-sm text-blue-800">
-                    <strong>Selected:</strong> {value.join(", ")}
-                  </p>
+          <div className="space-y-2">
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
+              >
+                {getLabelText()}
+              </label>
+              <div className="flex-1 px-3 py-2 sm:py-3">
+                <div className="space-y-2">
+                  {field.options?.map((option, index) => {
+                    const isChecked = Array.isArray(value) && value.includes(option);
+                    return (
+                      <label key={index} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          value={option}
+                          checked={isChecked}
+                          onChange={(e) => handleCheckboxChange(field.id, option, e.target.checked)}
+                          className="text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">{option}</span>
+                      </label>
+                    );
+                  })}
                 </div>
-              )}
+                {field.unit && (
+                  <div className="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-500">Unit: {field.unit}</div>
+                )}
+                {Array.isArray(value) && value.length > 0 && (
+                  <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
+                    <p className="text-sm text-blue-800">
+                      <strong>Selected:</strong> {value.join(", ")}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
+
+            {/* Show required error only when touched and empty */}
+            {showRequiredError && (
+              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
+                <div className="text-sm">
+                  {getMessageIcon()} {validation.message}
+                </div>
+              </div>
+            )}
           </div>
         );
 
       default:
         return (
-          <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-            <label
-              className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-            >
-              {getLabelText()}
-            </label>
-            <div className="flex-1 flex items-center">
-              <input
-                type="text"
-                value={value}
-                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
-                required={field.required}
-              />
-              {field.unit && (
-                <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
-              )}
+          <div className="space-y-2">
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
+              >
+                {getLabelText()}
+              </label>
+              <div className="flex-1 flex items-center">
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
+                  required={field.required}
+                />
+                {field.unit && (
+                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
+                )}
+              </div>
             </div>
+
+            {/* Show required error only when touched and empty */}
+            {showRequiredError && (
+              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
+                <div className="text-sm">
+                  {getMessageIcon()} {validation.message}
+                </div>
+              </div>
+            )}
           </div>
         );
     }
@@ -732,12 +821,14 @@ const FormPreview = ({ schema, useSections, useStandardRange, testStandardRange,
       <div key={field.id} className="space-y-2">
         {renderInputField(field)}
 
-        {/* Only show required error if field is touched */}
-        {validation && validation.type === "error" && isTouched && (
-          <p className="text-sm p-2 rounded border text-red-800 bg-red-50 border-red-200">❌ {validation.message}</p>
-        )}
-
-        <div className="flex justify-end">
+        <div className="flex justify-end space-x-2">
+          <button
+            type="button"
+            onClick={() => startEditingField(field, sectionIndex)}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors px-3 py-1 rounded hover:bg-blue-50 border border-blue-200"
+          >
+            Edit Field
+          </button>
           <button
             type="button"
             onClick={() => removeField(sectionIndex, fieldIndex)}
