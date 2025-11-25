@@ -136,11 +136,11 @@ const FormPreview = ({
           if (type === "numberRange" && min !== undefined && max !== undefined) {
             if (numValue < parseFloat(min)) {
               const rangeText = `Standard range: ${min} - ${max}`;
-              return { type: "below", message: `Value is below standard range (${rangeText})` };
+              return { type: "outOfRange", message: `Value is below standard range (${rangeText})` };
             }
             if (numValue > parseFloat(max)) {
               const rangeText = `Standard range: ${min} - ${max}`;
-              return { type: "above", message: `Value is above standard range (${rangeText})` };
+              return { type: "outOfRange", message: `Value is above standard range (${rangeText})` };
             }
             if (numValue >= parseFloat(min) && numValue <= parseFloat(max)) {
               const rangeText = `Standard range: ${min} - ${max}`;
@@ -164,11 +164,11 @@ const FormPreview = ({
 
                 if (hasMin && numValue < parseFloat(matchingRange.min)) {
                   const rangeText = getStandardRangeText(field);
-                  return { type: "below", message: `Value is below standard range (${rangeText})` };
+                  return { type: "outOfRange", message: `Value is below standard range (${rangeText})` };
                 }
                 if (hasMax && numValue > parseFloat(matchingRange.max)) {
                   const rangeText = getStandardRangeText(field);
-                  return { type: "above", message: `Value is above standard range (${rangeText})` };
+                  return { type: "outOfRange", message: `Value is above standard range (${rangeText})` };
                 }
                 if (
                   (!hasMin || numValue >= parseFloat(matchingRange.min)) &&
@@ -190,11 +190,11 @@ const FormPreview = ({
 
               if (hasMin && numValue < parseFloat(range.min)) {
                 const rangeText = getStandardRangeText(field);
-                return { type: "below", message: `Value is below standard range (${rangeText})` };
+                return { type: "outOfRange", message: `Value is below standard range (${rangeText})` };
               }
               if (hasMax && numValue > parseFloat(range.max)) {
                 const rangeText = getStandardRangeText(field);
-                return { type: "above", message: `Value is above standard range (${rangeText})` };
+                return { type: "outOfRange", message: `Value is above standard range (${rangeText})` };
               }
               if ((!hasMin || numValue >= parseFloat(range.min)) && (!hasMax || numValue <= parseFloat(range.max))) {
                 const rangeText = getStandardRangeText(field);
@@ -222,11 +222,11 @@ const FormPreview = ({
 
                   if (hasMin && numValue < parseFloat(matchingRange.min)) {
                     const rangeText = getStandardRangeText(field);
-                    return { type: "below", message: `Value is below standard range (${rangeText})` };
+                    return { type: "outOfRange", message: `Value is below standard range (${rangeText})` };
                   }
                   if (hasMax && numValue > parseFloat(matchingRange.max)) {
                     const rangeText = getStandardRangeText(field);
-                    return { type: "above", message: `Value is above standard range (${rangeText})` };
+                    return { type: "outOfRange", message: `Value is above standard range (${rangeText})` };
                   }
                   if (
                     (!hasMin || numValue >= parseFloat(matchingRange.min)) &&
@@ -416,6 +416,9 @@ const FormPreview = ({
       // For required field errors, only show red if field is touched AND empty
       const showRequiredError = validationState === "error" && isTouched;
 
+      // For standard range validation (outOfRange), always show the styling regardless of touch state
+      const showRangeValidation = validationState && validationState === "outOfRange";
+
       switch (validationState) {
         case "within":
           return {
@@ -424,13 +427,12 @@ const FormPreview = ({
             unit: "text-green-700 border-green-300 bg-green-100",
             label: "border-green-300 bg-green-100 text-green-800",
           };
-        case "below":
-        case "above":
+        case "outOfRange":
           return {
-            container: "border-yellow-500 bg-yellow-50",
-            input: "text-yellow-700 bg-yellow-50",
-            unit: "text-yellow-700 border-yellow-300 bg-yellow-100",
-            label: "border-yellow-300 bg-yellow-100 text-yellow-800",
+            container: "border-red-500 bg-red-50",
+            input: "text-red-700 bg-red-50",
+            unit: "text-red-700 border-red-300 bg-red-100",
+            label: "border-red-300 bg-red-100 text-red-800",
           };
         case "error":
           // Only show red styling if field is touched AND has error
@@ -454,28 +456,38 @@ const FormPreview = ({
     };
 
     const getMessageStyles = () => {
+      const showRequiredError = validationState === "error" && isTouched;
+
       switch (validationState) {
         case "within":
           return "text-green-800 bg-green-50 border-green-200";
-        case "below":
-        case "above":
-          return "text-yellow-800 bg-yellow-50 border-yellow-200";
-        case "error":
+        case "outOfRange":
           return "text-red-800 bg-red-50 border-red-200";
+        case "error":
+          // Only show red for required errors if field is touched
+          if (showRequiredError) {
+            return "text-red-800 bg-red-50 border-red-200";
+          }
+        // Fall through to default for untouched required fields
         default:
           return "text-blue-800 bg-blue-50 border-blue-200";
       }
     };
 
     const getMessageIcon = () => {
+      const showRequiredError = validationState === "error" && isTouched;
+
       switch (validationState) {
         case "within":
           return "✅";
-        case "below":
-        case "above":
-          return "⚠️";
-        case "error":
+        case "outOfRange":
           return "❌";
+        case "error":
+          // Only show error icon for required fields if touched
+          if (showRequiredError) {
+            return "❌";
+          }
+        // Fall through to info for untouched required fields
         default:
           return "ℹ️";
       }
@@ -580,7 +592,7 @@ const FormPreview = ({
               </div>
             </div>
 
-            {/* Always show standard range info when available */}
+            {/* Show standard range info when available - only as info if not touched */}
             {standardRangeText && !value && (
               <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
                 <div className="text-sm">
@@ -589,8 +601,8 @@ const FormPreview = ({
               </div>
             )}
 
-            {/* Show validation message when value is entered or required error when touched and empty */}
-            {validation && value && validationState !== "error" && (
+            {/* Show validation message when value is entered (always show range validation) */}
+            {validation && value && (
               <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
                 <div className="text-sm">
                   {getMessageIcon()} {validation.message}
