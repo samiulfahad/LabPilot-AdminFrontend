@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}
+
+
 
 .btn {
     @apply px-4 py-2 text-white bg-gradient-to-r from-green-500 to-emerald-600 rounded-md hover:bg-white hover:text-slate-500 duration-200 font-bold text-lg;
