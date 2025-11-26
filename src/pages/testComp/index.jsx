@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import testSchemaService from "../../services/testSchemaService";
+import testService from "../../services/testService";
 import InputField from "./InputField";
 import SchemaDisplay from "./SchemaDisplay";
 import FormPreview from "./FormPreview";
+import Popup from "../../components/popup/Popup";
+import LoadingScreen from "../../components/loadingPage";
 
 const SchemaBuilderForLabTest = () => {
   const [schema, setSchema] = useState({
@@ -45,6 +49,17 @@ const SchemaBuilderForLabTest = () => {
   const [editingSectionIndex, setEditingSectionIndex] = useState(null);
   const [editingFieldId, setEditingFieldId] = useState(null);
 
+  // Loading and success states for save operation
+  const [isSaving, setIsSaving] = useState(false);
+  const [popup, setPopup] = useState(null);
+
+  // NEW: Test category and test selection states
+  const [testCategories, setTestCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedTest, setSelectedTest] = useState("");
+  const [testsLoading, setTestsLoading] = useState(true);
+  const [availableTests, setAvailableTests] = useState([]);
+
   // Updated field types
   const fieldTypes = ["text", "textarea", "number", "select", "radio", "checkbox"];
 
@@ -81,200 +96,69 @@ const SchemaBuilderForLabTest = () => {
     "°F",
   ];
 
-  // ========== EDITING FUNCTIONS ==========
+  // ========== NEW: FETCH TEST CATEGORIES AND TESTS ==========
 
-  // Start editing a section
-  const startEditingSection = (sectionIndex) => {
-    const section = schema.sections[sectionIndex];
-    setCurrentSection({
-      name: section.name,
-      description: section.description || "",
-    });
-    setEditingSectionIndex(sectionIndex);
-  };
-
-  // Update a section
-  const updateSection = () => {
-    if (!currentSection.name.trim()) {
-      alert("Section name is required");
-      return;
-    }
-
-    setSchema((prev) => ({
-      ...prev,
-      sections: prev.sections.map((section, index) =>
-        index === editingSectionIndex
-          ? {
-              ...section,
-              name: currentSection.name,
-              description: currentSection.description,
-            }
-          : section
-      ),
-    }));
-
-    setCurrentSection({
-      name: "",
-      description: "",
-    });
-    setEditingSectionIndex(null);
-  };
-
-  // Cancel section editing
-  const cancelEditingSection = () => {
-    setCurrentSection({
-      name: "",
-      description: "",
-    });
-    setEditingSectionIndex(null);
-  };
-
-  // Start editing a field
-  const startEditingField = (field, sectionIndex = null) => {
-    // Convert required from boolean back to string for the form
-    const requiredString = field.required ? "yes" : "no";
-
-    setCurrentField({
-      id: field.id,
-      label: field.label,
-      type: field.type,
-      required: requiredString,
-      unit: field.unit || "",
-      standardRange: field.standardRange || null,
-      options: field.options || [],
-      sectionId: sectionIndex !== null ? schema.sections[sectionIndex]?.id || "" : "",
-    });
-
-    setEditingFieldId(field.id);
-  };
-
-  // Update a field
-  const updateField = () => {
-    if (!currentField.label.trim()) {
-      alert("Field label is required");
-      return;
-    }
-
-    // Check for options for radio, select, and checkbox fields
-    if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length === 0) {
-      alert(
-        `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
-      );
-      return;
-    }
-
-    // Convert required from string to boolean for schema
-    const isRequired = currentField.required === "yes";
-
-    const fieldData = {
-      id: currentField.id, // Keep the same ID
-      label: currentField.label,
-      type: currentField.type,
-      required: isRequired,
-      options: currentField.options.length > 0 ? [...currentField.options] : undefined,
+  useEffect(() => {
+    const fetchTestCategories = async () => {
+      try {
+        setTestsLoading(true);
+        const response = await testService.getAllTests();
+        setTestCategories(response.data || []);
+      } catch (error) {
+        console.error("Error fetching test categories:", error);
+        setPopup({ type: "error", message: "Failed to load test categories" });
+      } finally {
+        setTestsLoading(false);
+      }
     };
 
-    if (currentField.unit && currentField.unit.trim()) {
-      fieldData.unit = currentField.unit;
+    fetchTestCategories();
+  }, []);
+
+  // Update available tests when category selection changes
+  useEffect(() => {
+    if (selectedCategory) {
+      const category = testCategories.find((cat) => cat._id === selectedCategory);
+      setAvailableTests(category?.tests || []);
+    } else {
+      setAvailableTests([]);
     }
+    setSelectedTest(""); // Reset test selection when category changes
+  }, [selectedCategory, testCategories]);
 
-    // Only include standard range for number fields
-    if (currentField.type === "number" && currentField.standardRange && currentField.standardRange.type !== "none") {
-      const standardRangeData = { ...currentField.standardRange };
+  // ========== HELPER FUNCTIONS ==========
 
-      // Clean up empty values for age and genderAge types
-      if (standardRangeData.type === "ageBased" && standardRangeData.ranges) {
-        standardRangeData.ranges = standardRangeData.ranges.filter((range) => range.min !== "" || range.max !== "");
-      } else if (standardRangeData.type === "genderWithAgeBased") {
-        Object.keys(standardRangeData.ranges).forEach((gender) => {
-          standardRangeData.ranges[gender] = standardRangeData.ranges[gender].filter(
-            (range) => range.min !== "" || range.max !== ""
-          );
-        });
-      } else {
-        // Existing cleanup logic for other types
-        Object.keys(standardRangeData).forEach((key) => {
-          if (
-            standardRangeData[key] === "" ||
-            (Array.isArray(standardRangeData[key]) && standardRangeData[key].length === 0)
-          ) {
-            delete standardRangeData[key];
-          }
-        });
-
-        if (standardRangeData.ranges) {
-          Object.keys(standardRangeData.ranges).forEach((rangeKey) => {
-            if (!standardRangeData.ranges[rangeKey].min && !standardRangeData.ranges[rangeKey].max) {
-              delete standardRangeData.ranges[rangeKey];
-            }
-          });
-
-          if (Object.keys(standardRangeData.ranges).length === 0) {
-            delete standardRangeData.ranges;
-          }
-        }
-      }
-
-      if (Object.keys(standardRangeData).length > 0) {
-        fieldData.standardRange = standardRangeData;
-      }
+  const getFieldsCount = () => {
+    if (useSections && schema.sections) {
+      return schema.sections.reduce((total, section) => total + section.fields.length, 0);
     }
+    return schema.fields.length;
+  };
 
-    setSchema((prev) => {
-      if (useSections && currentField.sectionId) {
-        // Update field in section
-        return {
-          ...prev,
-          sections: prev.sections.map((section) =>
-            section.id === currentField.sectionId
-              ? {
-                  ...section,
-                  fields: section.fields.map((field) => (field.id === editingFieldId ? fieldData : field)),
-                }
-              : section
-          ),
-        };
-      } else {
-        // Update field in root fields
-        return {
-          ...prev,
-          fields: prev.fields.map((field) => (field.id === editingFieldId ? fieldData : field)),
-        };
-      }
-    });
+  const isEditing = () => {
+    return editingSectionIndex !== null || editingFieldId !== null;
+  };
 
-    // Reset form
-    setCurrentField({
-      id: "",
-      label: "",
-      type: "text",
-      required: "no",
-      unit: "",
-      standardRange: null,
-      options: [],
-      sectionId: useSections ? currentField.sectionId : "",
-    });
-    setEditingFieldId(null);
+  // ========== FIELD OPTIONS MANAGEMENT ==========
+
+  const addFieldOption = () => {
+    if (!newOption.trim()) return;
+
+    setCurrentField((prev) => ({
+      ...prev,
+      options: [...prev.options, newOption.trim()],
+    }));
     setNewOption("");
   };
 
-  // Cancel field editing
-  const cancelEditingField = () => {
-    setCurrentField({
-      id: "",
-      label: "",
-      type: "text",
-      required: "no",
-      unit: "",
-      standardRange: null,
-      options: [],
-      sectionId: useSections ? currentField.sectionId : "",
-    });
-    setEditingFieldId(null);
-    setNewOption("");
+  const removeFieldOption = (index) => {
+    setCurrentField((prev) => ({
+      ...prev,
+      options: prev.options.filter((_, i) => i !== index),
+    }));
   };
 
-  // ========== EXISTING FUNCTIONS (with minor updates) ==========
+  // ========== STANDARD RANGE MANAGEMENT ==========
 
   const initializeStandardRange = (type) => {
     let initialData = { type };
@@ -475,6 +359,29 @@ const SchemaBuilderForLabTest = () => {
     });
   };
 
+  // ========== TEST STANDARD RANGE MANAGEMENT ==========
+
+  const addTestStandardRangeOption = () => {
+    if (!newTestStandardRangeKey.trim() || !newTestStandardRangeValue.trim()) return;
+
+    setTestStandardRange((prev) => ({
+      ...prev,
+      options: [...prev.options, { key: newTestStandardRangeKey.trim(), value: newTestStandardRangeValue.trim() }],
+    }));
+
+    setNewTestStandardRangeKey("");
+    setNewTestStandardRangeValue("");
+  };
+
+  const removeTestStandardRangeOption = (index) => {
+    setTestStandardRange((prev) => ({
+      ...prev,
+      options: prev.options.filter((_, i) => i !== index),
+    }));
+  };
+
+  // ========== SECTION MANAGEMENT ==========
+
   const addSection = () => {
     if (!currentSection.name.trim()) {
       alert("Section name is required");
@@ -513,53 +420,88 @@ const SchemaBuilderForLabTest = () => {
     }
   };
 
-  const addTestStandardRangeOption = () => {
-    if (!newTestStandardRangeKey.trim() || !newTestStandardRangeValue.trim()) return;
+  // ========== EDITING FUNCTIONS ==========
 
-    setTestStandardRange((prev) => ({
-      ...prev,
-      options: [...prev.options, { key: newTestStandardRangeKey.trim(), value: newTestStandardRangeValue.trim() }],
-    }));
-
-    setNewTestStandardRangeKey("");
-    setNewTestStandardRangeValue("");
+  const startEditingSection = (sectionIndex) => {
+    const section = schema.sections[sectionIndex];
+    setCurrentSection({
+      name: section.name,
+      description: section.description || "",
+    });
+    setEditingSectionIndex(sectionIndex);
   };
 
-  const removeTestStandardRangeOption = (index) => {
-    setTestStandardRange((prev) => ({
-      ...prev,
-      options: prev.options.filter((_, i) => i !== index),
-    }));
-  };
-
-  const addField = () => {
-    if (!currentField.label.trim()) {
-      alert("Field label is required");
+  const updateSection = () => {
+    if (!currentSection.name.trim()) {
+      alert("Section name is required");
       return;
     }
 
-    // Check for options for radio, select, and checkbox fields
-    if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length === 0) {
-      alert(
-        `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
-      );
-      return;
-    }
+    setSchema((prev) => ({
+      ...prev,
+      sections: prev.sections.map((section, index) =>
+        index === editingSectionIndex
+          ? {
+              ...section,
+              name: currentSection.name,
+              description: currentSection.description,
+            }
+          : section
+      ),
+    }));
 
-    // Generate unique field ID automatically
-    const fieldId = currentField.label.toLowerCase().replace(/\s+/g, "_") + "_" + Date.now();
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
+    setEditingSectionIndex(null);
+  };
 
+  const cancelEditingSection = () => {
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
+    setEditingSectionIndex(null);
+  };
+
+  const startEditingField = (field, sectionIndex = null) => {
+    // Convert required from boolean back to string for the form
+    const requiredString = field.required ? "yes" : "no";
+
+    setCurrentField({
+      id: field.id,
+      label: field.label,
+      type: field.type,
+      required: requiredString,
+      unit: field.unit || "",
+      standardRange: field.standardRange || null,
+      options: field.options || [],
+      sectionId: sectionIndex !== null ? schema.sections[sectionIndex]?.id || "" : "",
+    });
+
+    setEditingFieldId(field.id);
+  };
+
+  // ========== FIELD MANAGEMENT ==========
+
+  const createFieldData = () => {
     // Convert required from string to boolean for schema
     const isRequired = currentField.required === "yes";
 
     const fieldData = {
-      id: fieldId,
+      id: currentField.id || currentField.label.toLowerCase().replace(/\s+/g, "_") + "_" + Date.now(),
       label: currentField.label,
       type: currentField.type,
       required: isRequired,
-      options: currentField.options.length > 0 ? [...currentField.options] : undefined,
     };
 
+    // Only include options for field types that actually use them
+    if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length > 0) {
+      fieldData.options = [...currentField.options];
+    }
+
+    // Only include unit if provided
     if (currentField.unit && currentField.unit.trim()) {
       fieldData.unit = currentField.unit;
     }
@@ -578,7 +520,7 @@ const SchemaBuilderForLabTest = () => {
           );
         });
       } else {
-        // Existing cleanup logic for other types
+        // Cleanup logic for other types
         Object.keys(standardRangeData).forEach((key) => {
           if (
             standardRangeData[key] === "" ||
@@ -606,6 +548,25 @@ const SchemaBuilderForLabTest = () => {
       }
     }
 
+    return fieldData;
+  };
+
+  const addField = () => {
+    if (!currentField.label.trim()) {
+      alert("Field label is required");
+      return;
+    }
+
+    // Check for options for radio, select, and checkbox fields
+    if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length === 0) {
+      alert(
+        `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
+      );
+      return;
+    }
+
+    const fieldData = createFieldData();
+
     if (useSections && currentField.sectionId) {
       setSchema((prev) => ({
         ...prev,
@@ -620,6 +581,53 @@ const SchemaBuilderForLabTest = () => {
       }));
     }
 
+    resetFieldForm();
+  };
+
+  const updateField = () => {
+    if (!currentField.label.trim()) {
+      alert("Field label is required");
+      return;
+    }
+
+    // Check for options for radio, select, and checkbox fields
+    if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length === 0) {
+      alert(
+        `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
+      );
+      return;
+    }
+
+    const fieldData = createFieldData();
+
+    setSchema((prev) => {
+      if (useSections && currentField.sectionId) {
+        // Update field in section
+        return {
+          ...prev,
+          sections: prev.sections.map((section) =>
+            section.id === currentField.sectionId
+              ? {
+                  ...section,
+                  fields: section.fields.map((field) => (field.id === editingFieldId ? fieldData : field)),
+                }
+              : section
+          ),
+        };
+      } else {
+        // Update field in root fields
+        return {
+          ...prev,
+          fields: prev.fields.map((field) => (field.id === editingFieldId ? fieldData : field)),
+        };
+      }
+    });
+
+    resetFieldForm();
+    setEditingFieldId(null);
+  };
+
+  const resetFieldForm = () => {
     setCurrentField({
       id: "",
       label: "",
@@ -631,6 +639,11 @@ const SchemaBuilderForLabTest = () => {
       sectionId: useSections ? currentField.sectionId : "",
     });
     setNewOption("");
+  };
+
+  const cancelEditingField = () => {
+    resetFieldForm();
+    setEditingFieldId(null);
   };
 
   const removeField = (sectionIndex, fieldIndex) => {
@@ -665,146 +678,252 @@ const SchemaBuilderForLabTest = () => {
     }
   };
 
-  const addFieldOption = () => {
-    if (!newOption.trim()) return;
+  // ========== SCHEMA CLEANING AND SAVING ==========
 
-    setCurrentField((prev) => ({
-      ...prev,
-      options: [...prev.options, newOption.trim()],
-    }));
-    setNewOption("");
-  };
+  const cleanFieldData = (field) => {
+    const cleanedField = { ...field };
 
-  const removeFieldOption = (index) => {
-    setCurrentField((prev) => ({
-      ...prev,
-      options: prev.options.filter((_, i) => i !== index),
-    }));
-  };
-
-  const exportSchema = () => {
-    const cleanedSchema = {
-      ...schema,
-      fields: schema.fields
-        ? schema.fields.map((field) => {
-            const cleanedField = { ...field };
-            if (cleanedField.standardRange?.type === "none") {
-              delete cleanedField.standardRange;
-            }
-            if (!cleanedField.unit || cleanedField.unit === "") {
-              delete cleanedField.unit;
-            }
-            return cleanedField;
-          })
-        : undefined,
-      sections: schema.sections
-        ? schema.sections.map((section) => ({
-            ...section,
-            fields: section.fields.map((field) => {
-              const cleanedField = { ...field };
-              if (cleanedField.standardRange?.type === "none") {
-                delete cleanedField.standardRange;
-              }
-              if (!cleanedField.unit || cleanedField.unit === "") {
-                delete cleanedField.unit;
-              }
-              return cleanedField;
-            }),
-          }))
-        : undefined,
-    };
-
-    if (!useSections) {
-      delete cleanedSchema.sections;
+    // Remove standardRange if type is "none" or if it's empty
+    if (
+      cleanedField.standardRange?.type === "none" ||
+      (cleanedField.standardRange && Object.keys(cleanedField.standardRange).length === 0)
+    ) {
+      delete cleanedField.standardRange;
     }
 
+    // Remove unit if empty
+    if (!cleanedField.unit || cleanedField.unit === "") {
+      delete cleanedField.unit;
+    }
+
+    // Remove options if empty or if field type doesn't use options
+    if (
+      cleanedField.options &&
+      (cleanedField.options.length === 0 || !["radio", "select", "checkbox"].includes(cleanedField.type))
+    ) {
+      delete cleanedField.options;
+    }
+
+    return cleanedField;
+  };
+
+  const prepareSchemaForSave = () => {
+    const cleanedSchema = {
+      testName: schema.testName.trim(),
+      testDescription: schema.testDescription ? schema.testDescription.trim() : "",
+      testId: selectedTest, // NEW: Add the selected test ID
+      categoryId: selectedCategory, // NEW: Add the selected category ID
+    };
+
+    // Clean and add fields
+    if (schema.fields && schema.fields.length > 0) {
+      cleanedSchema.fields = schema.fields.map(cleanFieldData);
+    }
+
+    // Clean and add sections if using sections
+    if (useSections && schema.sections && schema.sections.length > 0) {
+      cleanedSchema.sections = schema.sections.map((section) => ({
+        ...section,
+        fields: section.fields.map(cleanFieldData),
+      }));
+    }
+
+    // Add test standard range if enabled and valid
     if (useStandardRange) {
       const testStandardRangeData = { ...testStandardRange };
 
+      // Convert options array to object for "options" type
       if (testStandardRangeData.type === "options" && testStandardRangeData.options.length > 0) {
         const optionsObj = {};
         testStandardRangeData.options.forEach((option) => {
           optionsObj[option.key] = option.value;
         });
         testStandardRangeData.options = optionsObj;
-      } else if (testStandardRangeData.type === "text" && testStandardRangeData.text.trim()) {
-      } else {
-        delete cleanedSchema.testStandardRange;
+      }
+      // Remove empty text for "text" type
+      else if (
+        testStandardRangeData.type === "text" &&
+        (!testStandardRangeData.text || !testStandardRangeData.text.trim())
+      ) {
+        delete testStandardRangeData.text;
       }
 
-      if (Object.keys(testStandardRangeData).length > 0) {
+      // Only include testStandardRange if it has valid data
+      if (
+        Object.keys(testStandardRangeData).length > 1 || // More than just "type"
+        (testStandardRangeData.type === "text" && testStandardRangeData.text) ||
+        (testStandardRangeData.type === "options" && testStandardRangeData.options)
+      ) {
         cleanedSchema.testStandardRange = testStandardRangeData;
       }
     }
 
-    const schemaData = JSON.stringify(cleanedSchema, null, 2);
-    const blob = new Blob([schemaData], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${schema.testName || "lab_test"}_schema.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    return cleanedSchema;
   };
 
-  const importSchema = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const importedSchema = JSON.parse(e.target.result);
-        if (importedSchema.sections && importedSchema.sections.length > 0) {
-          setUseSections(true);
-        }
-        if (importedSchema.testStandardRange) {
-          setUseStandardRange(true);
-          if (
-            importedSchema.testStandardRange.type === "options" &&
-            typeof importedSchema.testStandardRange.options === "object"
-          ) {
-            const optionsArray = Object.entries(importedSchema.testStandardRange.options).map(([key, value]) => ({
-              key,
-              value,
-            }));
-            setTestStandardRange({
-              ...importedSchema.testStandardRange,
-              options: optionsArray,
-            });
-          } else {
-            setTestStandardRange(importedSchema.testStandardRange);
-          }
-        }
-        setSchema(importedSchema);
-        // Reset editing states when importing new schema
-        setEditingSectionIndex(null);
-        setEditingFieldId(null);
-      } catch (error) {
-        alert("Invalid schema file");
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  const getFieldsCount = () => {
-    if (useSections && schema.sections) {
-      return schema.sections.reduce((total, section) => total + section.fields.length, 0);
+  const saveSchema = async () => {
+    if (!schema.testName.trim()) {
+      setPopup({ type: "error", message: "Test name is required" });
+      return;
     }
-    return schema.fields.length;
+
+    if (!selectedCategory) {
+      setPopup({ type: "error", message: "Please select a category" });
+      return;
+    }
+
+    if (!selectedTest) {
+      setPopup({ type: "error", message: "Please select a test" });
+      return;
+    }
+
+    if (getFieldsCount() === 0) {
+      setPopup({ type: "error", message: "At least one field is required" });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const cleanedSchema = prepareSchemaForSave();
+
+      console.log("Saving schema:", cleanedSchema);
+
+      // Call the backend service to save the schema
+      await testSchemaService.addNew(cleanedSchema);
+      setPopup({ type: "success", message: "Test schema saved successfully!" });
+      // Optional: Reset the form after successful save
+      resetForm();
+    } catch (error) {
+      console.error("Error saving schema:", error);
+      setPopup({
+        type: "error",
+        message: "Error saving test schema. Please try again.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  // Helper function to check if we're currently editing
-  const isEditing = () => {
-    return editingSectionIndex !== null || editingFieldId !== null;
+  // Updated: Reset form function to clear category and test selection
+  const resetForm = () => {
+    setSchema({
+      testName: "",
+      testDescription: "",
+      fields: [],
+    });
+    setUseSections(false);
+    setUseStandardRange(false);
+    setTestStandardRange({
+      type: "options",
+      options: [],
+      text: "",
+    });
+    resetFieldForm();
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
+    setEditingSectionIndex(null);
+    setEditingFieldId(null);
+    // NEW: Reset category and test selection
+    setSelectedCategory("");
+    setSelectedTest("");
   };
+
+  // Show loading screen while tests are loading
+  if (testsLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
+      {/* Loading Screen */}
+      {isSaving && <LoadingScreen />}
+
+      {/* Popup Component */}
+      {popup && (
+        <Popup
+          type={popup.type}
+          message={popup.message}
+          onClose={() => setPopup(null)}
+          onConfirm={popup.type === "confirmation" ? handleDelete : null}
+        />
+      )}
+
       <div className="max-w-7xl mx-auto space-y-3 sm:space-y-6">
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
           Lab Test Builder
         </h2>
+
+        {/* NEW: Test Category and Test Selection */}
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Test Selection</h3>
+          </div>
+          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Test Category Selection */}
+              <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+                <label className="w-full sm:w-40 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
+                  Test Category
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="flex-1 px-3 py-2 focus:outline-none bg-white"
+                >
+                  <option value="">Select a category</option>
+                  {testCategories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.categoryName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Test Selection */}
+              <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+                <label className="w-full sm:w-40 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
+                  Test
+                </label>
+                <select
+                  value={selectedTest}
+                  onChange={(e) => setSelectedTest(e.target.value)}
+                  disabled={!selectedCategory}
+                  className="flex-1 px-3 py-2 focus:outline-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  <option value="">Select a test</option>
+                  {availableTests.map((test) => (
+                    <option key={test._id} value={test._id}>
+                      {test.testName} {test.isOnline && "(Online)"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Selected Test Info */}
+            {selectedTest && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <span className="text-blue-400">ℹ️</span>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-blue-800">Selected Test</h3>
+                    <div className="mt-1 text-sm text-blue-700">
+                      <p>
+                        Schema will be attached to:{" "}
+                        <strong>{availableTests.find((test) => test._id === selectedTest)?.testName}</strong>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Editing Banner */}
         {isEditing() && (
@@ -1159,6 +1278,8 @@ const SchemaBuilderForLabTest = () => {
                             type: newType,
                             // Reset standard range when switching to non-number type
                             standardRange: newType === "number" ? prev.standardRange : null,
+                            // Reset options when switching to non-option types
+                            options: ["radio", "select", "checkbox"].includes(newType) ? prev.options : [],
                           }));
                         }}
                         className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
@@ -1530,19 +1651,18 @@ const SchemaBuilderForLabTest = () => {
               </div>
             </div>
 
-            {/* Import/Export */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Save Schema Button */}
+            <div className="flex justify-center">
               <button
                 type="button"
-                onClick={exportSchema}
-                className="bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-sm sm:text-base transition-colors"
+                onClick={saveSchema}
+                disabled={
+                  isSaving || !schema.testName.trim() || !selectedCategory || !selectedTest || getFieldsCount() === 0
+                }
+                className="w-full sm:w-64 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                Export Test Schema
+                {isSaving ? "Saving..." : "Save Schema"}
               </button>
-              <label className="bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium text-center cursor-pointer text-sm sm:text-base transition-colors">
-                Import Test Schema
-                <input type="file" accept=".json" onChange={importSchema} className="hidden" />
-              </label>
             </div>
           </div>
         </div>
