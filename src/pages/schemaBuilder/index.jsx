@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import testSchemaService from "../../services/testSchemaService";
+import { useParams, useNavigate } from "react-router-dom";
+import testSchemaService from "../../services/schemaService";
 import testService from "../../services/testService";
 import InputField from "./InputField";
 import SchemaDisplay from "./SchemaDisplay";
@@ -7,7 +8,12 @@ import FormPreview from "./FormPreview";
 import Popup from "../../components/popup/Popup";
 import LoadingScreen from "../../components/loadingPage";
 
-const SchemaBuilderForLabTest = () => {
+const SchemaBuilder = () => {
+  const { schemaId } = useParams();
+  const navigate = useNavigate();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [schema, setSchema] = useState({
     testName: "",
     testDescription: "",
@@ -42,25 +48,22 @@ const SchemaBuilderForLabTest = () => {
   const [newTestStandardRangeKey, setNewTestStandardRangeKey] = useState("");
   const [newTestStandardRangeValue, setNewTestStandardRangeValue] = useState("");
 
-  // Add a ref to track if we're currently adding a range
   const [isAddingRange, setIsAddingRange] = useState(false);
-
-  // Editing states
   const [editingSectionIndex, setEditingSectionIndex] = useState(null);
   const [editingFieldId, setEditingFieldId] = useState(null);
-
-  // Loading and success states for save operation
   const [isSaving, setIsSaving] = useState(false);
   const [popup, setPopup] = useState(null);
 
-  // NEW: Test category and test selection states
   const [testCategories, setTestCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedTest, setSelectedTest] = useState("");
   const [testsLoading, setTestsLoading] = useState(true);
   const [availableTests, setAvailableTests] = useState([]);
+  const [isActive, setIsActive] = useState(true);
 
-  // Updated field types
+  // New state to track initial schema data for edit mode
+  const [initialSchemaData, setInitialSchemaData] = useState(null);
+
   const fieldTypes = ["text", "textarea", "number", "select", "radio", "checkbox"];
 
   const standardRangeTypes = [
@@ -96,14 +99,107 @@ const SchemaBuilderForLabTest = () => {
     "°F",
   ];
 
-  // ========== NEW: FETCH TEST CATEGORIES AND TESTS ==========
+  // Fetch existing schema when in edit mode
+  useEffect(() => {
+    const fetchExistingSchema = async () => {
+      if (schemaId) {
+        setIsLoading(true);
+        try {
+          const response = await testSchemaService.getById(schemaId);
+          const existingSchema = response.data;
 
+          // Store initial schema data for later use
+          setInitialSchemaData({
+            categoryId: existingSchema.categoryId || "",
+            testId: existingSchema.testId || "",
+          });
+
+          // Populate form with existing schema data
+          setSchema({
+            testName: existingSchema.testName || "",
+            testDescription: existingSchema.testDescription || "",
+            fields: existingSchema.fields || [],
+            sections: existingSchema.sections || [],
+          });
+
+          setUseSections(!!(existingSchema.sections && existingSchema.sections.length > 0));
+          setUseStandardRange(!!existingSchema.testStandardRange);
+          setIsActive(existingSchema.isActive !== false);
+
+          // Set test standard range if exists
+          if (existingSchema.testStandardRange) {
+            const testRange = existingSchema.testStandardRange;
+            if (testRange.type === "options") {
+              const optionsArray = Object.entries(testRange.options || {}).map(([key, value]) => ({
+                key,
+                value,
+              }));
+              setTestStandardRange({
+                type: testRange.type,
+                options: optionsArray,
+                text: "",
+              });
+            } else if (testRange.type === "text") {
+              setTestStandardRange({
+                type: testRange.type,
+                options: [],
+                text: testRange.text || "",
+              });
+            }
+          }
+
+          setIsEditMode(true);
+        } catch (error) {
+          console.error("Error fetching schema:", error);
+          setPopup({ type: "error", message: "Failed to load schema for editing" });
+          navigate("/schema-list");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchExistingSchema();
+  }, [schemaId, navigate]);
+
+  // Fetch test categories and handle edit mode data synchronization
   useEffect(() => {
     const fetchTestCategories = async () => {
       try {
         setTestsLoading(true);
         const response = await testService.getAllTests();
-        setTestCategories(response.data || []);
+        const categories = response.data || [];
+        setTestCategories(categories);
+
+        // If in edit mode and we have initial schema data, set the selected category and test
+        if (isEditMode && initialSchemaData) {
+          const { categoryId, testId } = initialSchemaData;
+
+          if (categoryId && testId) {
+            // Find the category that contains the test
+            let targetCategory = null;
+            let targetTest = null;
+
+            for (const category of categories) {
+              const test = category.tests?.find((t) => t._id === testId);
+              if (test) {
+                targetCategory = category;
+                targetTest = test;
+                break;
+              }
+            }
+
+            if (targetCategory && targetTest) {
+              setSelectedCategory(targetCategory._id);
+              // Set available tests for the category first
+              setAvailableTests(targetCategory.tests || []);
+              // Then set the selected test after a brief delay to ensure state updates
+              setTimeout(() => {
+                setSelectedTest(targetTest._id);
+              }, 100);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error fetching test categories:", error);
         setPopup({ type: "error", message: "Failed to load test categories" });
@@ -113,21 +209,30 @@ const SchemaBuilderForLabTest = () => {
     };
 
     fetchTestCategories();
-  }, []);
+  }, [isEditMode, initialSchemaData]);
 
   // Update available tests when category selection changes
   useEffect(() => {
     if (selectedCategory) {
       const category = testCategories.find((cat) => cat._id === selectedCategory);
       setAvailableTests(category?.tests || []);
+
+      // If we're in edit mode and the current selected test doesn't belong to the selected category, clear it
+      if (isEditMode && selectedTest) {
+        const testExists = category?.tests?.some((test) => test._id === selectedTest);
+        if (!testExists) {
+          setSelectedTest("");
+        }
+      }
     } else {
       setAvailableTests([]);
+      if (!isEditMode) {
+        setSelectedTest("");
+      }
     }
-    setSelectedTest(""); // Reset test selection when category changes
-  }, [selectedCategory, testCategories]);
+  }, [selectedCategory, testCategories, isEditMode, selectedTest]);
 
-  // ========== HELPER FUNCTIONS ==========
-
+  // Helper Functions
   const getFieldsCount = () => {
     if (useSections && schema.sections) {
       return schema.sections.reduce((total, section) => total + section.fields.length, 0);
@@ -139,10 +244,12 @@ const SchemaBuilderForLabTest = () => {
     return editingSectionIndex !== null || editingFieldId !== null;
   };
 
-  // ========== FIELD OPTIONS MANAGEMENT ==========
-
+  // Field Options Management
   const addFieldOption = () => {
-    if (!newOption.trim()) return;
+    if (!newOption.trim()) {
+      setPopup({ type: "error", message: "Option cannot be empty" });
+      return;
+    }
 
     setCurrentField((prev) => ({
       ...prev,
@@ -158,8 +265,7 @@ const SchemaBuilderForLabTest = () => {
     }));
   };
 
-  // ========== STANDARD RANGE MANAGEMENT ==========
-
+  // Standard Range Management
   const initializeStandardRange = (type) => {
     let initialData = { type };
 
@@ -359,10 +465,12 @@ const SchemaBuilderForLabTest = () => {
     });
   };
 
-  // ========== TEST STANDARD RANGE MANAGEMENT ==========
-
+  // Test Standard Range Management
   const addTestStandardRangeOption = () => {
-    if (!newTestStandardRangeKey.trim() || !newTestStandardRangeValue.trim()) return;
+    if (!newTestStandardRangeKey.trim() || !newTestStandardRangeValue.trim()) {
+      setPopup({ type: "error", message: "Both key and value are required" });
+      return;
+    }
 
     setTestStandardRange((prev) => ({
       ...prev,
@@ -380,15 +488,13 @@ const SchemaBuilderForLabTest = () => {
     }));
   };
 
-  // ========== SECTION MANAGEMENT ==========
-
+  // Section Management
   const addSection = () => {
     if (!currentSection.name.trim()) {
-      alert("Section name is required");
+      setPopup({ type: "error", message: "Section name is required" });
       return;
     }
 
-    // Generate unique section ID automatically
     const sectionId = currentSection.name.toLowerCase().replace(/\s+/g, "_") + "_" + Date.now();
 
     const newSection = {
@@ -414,14 +520,12 @@ const SchemaBuilderForLabTest = () => {
       ...prev,
       sections: prev.sections.filter((_, i) => i !== index),
     }));
-    // If we're editing this section, cancel editing
     if (editingSectionIndex === index) {
       cancelEditingSection();
     }
   };
 
-  // ========== EDITING FUNCTIONS ==========
-
+  // Editing Functions
   const startEditingSection = (sectionIndex) => {
     const section = schema.sections[sectionIndex];
     setCurrentSection({
@@ -433,7 +537,7 @@ const SchemaBuilderForLabTest = () => {
 
   const updateSection = () => {
     if (!currentSection.name.trim()) {
-      alert("Section name is required");
+      setPopup({ type: "error", message: "Section name is required" });
       return;
     }
 
@@ -466,7 +570,6 @@ const SchemaBuilderForLabTest = () => {
   };
 
   const startEditingField = (field, sectionIndex = null) => {
-    // Convert required from boolean back to string for the form
     const requiredString = field.required ? "yes" : "no";
 
     setCurrentField({
@@ -483,10 +586,8 @@ const SchemaBuilderForLabTest = () => {
     setEditingFieldId(field.id);
   };
 
-  // ========== FIELD MANAGEMENT ==========
-
+  // Field Management
   const createFieldData = () => {
-    // Convert required from string to boolean for schema
     const isRequired = currentField.required === "yes";
 
     const fieldData = {
@@ -496,21 +597,17 @@ const SchemaBuilderForLabTest = () => {
       required: isRequired,
     };
 
-    // Only include options for field types that actually use them
     if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length > 0) {
       fieldData.options = [...currentField.options];
     }
 
-    // Only include unit if provided
     if (currentField.unit && currentField.unit.trim()) {
       fieldData.unit = currentField.unit;
     }
 
-    // Only include standard range for number fields
     if (currentField.type === "number" && currentField.standardRange && currentField.standardRange.type !== "none") {
       const standardRangeData = { ...currentField.standardRange };
 
-      // Clean up empty values for age and genderAge types
       if (standardRangeData.type === "ageBased" && standardRangeData.ranges) {
         standardRangeData.ranges = standardRangeData.ranges.filter((range) => range.min !== "" || range.max !== "");
       } else if (standardRangeData.type === "genderWithAgeBased") {
@@ -520,7 +617,6 @@ const SchemaBuilderForLabTest = () => {
           );
         });
       } else {
-        // Cleanup logic for other types
         Object.keys(standardRangeData).forEach((key) => {
           if (
             standardRangeData[key] === "" ||
@@ -553,15 +649,17 @@ const SchemaBuilderForLabTest = () => {
 
   const addField = () => {
     if (!currentField.label.trim()) {
-      alert("Field label is required");
+      setPopup({ type: "error", message: "Field label is required" });
       return;
     }
 
-    // Check for options for radio, select, and checkbox fields
     if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length === 0) {
-      alert(
-        `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
-      );
+      setPopup({
+        type: "error",
+        message: `${
+          currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)
+        } fields must have at least one option`,
+      });
       return;
     }
 
@@ -586,15 +684,17 @@ const SchemaBuilderForLabTest = () => {
 
   const updateField = () => {
     if (!currentField.label.trim()) {
-      alert("Field label is required");
+      setPopup({ type: "error", message: "Field label is required" });
       return;
     }
 
-    // Check for options for radio, select, and checkbox fields
     if (["radio", "select", "checkbox"].includes(currentField.type) && currentField.options.length === 0) {
-      alert(
-        `${currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)} fields must have at least one option`
-      );
+      setPopup({
+        type: "error",
+        message: `${
+          currentField.type.charAt(0).toUpperCase() + currentField.type.slice(1)
+        } fields must have at least one option`,
+      });
       return;
     }
 
@@ -602,7 +702,6 @@ const SchemaBuilderForLabTest = () => {
 
     setSchema((prev) => {
       if (useSections && currentField.sectionId) {
-        // Update field in section
         return {
           ...prev,
           sections: prev.sections.map((section) =>
@@ -615,7 +714,6 @@ const SchemaBuilderForLabTest = () => {
           ),
         };
       } else {
-        // Update field in root fields
         return {
           ...prev,
           fields: prev.fields.map((field) => (field.id === editingFieldId ? fieldData : field)),
@@ -659,7 +757,6 @@ const SchemaBuilderForLabTest = () => {
         ),
       }));
 
-      // If we're editing this field, cancel editing
       if (editingFieldId === fieldId) {
         cancelEditingField();
       }
@@ -671,19 +768,16 @@ const SchemaBuilderForLabTest = () => {
         fields: prev.fields.filter((_, fIndex) => fIndex !== fieldIndex),
       }));
 
-      // If we're editing this field, cancel editing
       if (editingFieldId === fieldId) {
         cancelEditingField();
       }
     }
   };
 
-  // ========== SCHEMA CLEANING AND SAVING ==========
-
+  // Schema Cleaning and Saving
   const cleanFieldData = (field) => {
     const cleanedField = { ...field };
 
-    // Remove standardRange if type is "none" or if it's empty
     if (
       cleanedField.standardRange?.type === "none" ||
       (cleanedField.standardRange && Object.keys(cleanedField.standardRange).length === 0)
@@ -691,12 +785,10 @@ const SchemaBuilderForLabTest = () => {
       delete cleanedField.standardRange;
     }
 
-    // Remove unit if empty
     if (!cleanedField.unit || cleanedField.unit === "") {
       delete cleanedField.unit;
     }
 
-    // Remove options if empty or if field type doesn't use options
     if (
       cleanedField.options &&
       (cleanedField.options.length === 0 || !["radio", "select", "checkbox"].includes(cleanedField.type))
@@ -711,16 +803,15 @@ const SchemaBuilderForLabTest = () => {
     const cleanedSchema = {
       testName: schema.testName.trim(),
       testDescription: schema.testDescription ? schema.testDescription.trim() : "",
-      testId: selectedTest, // NEW: Add the selected test ID
-      categoryId: selectedCategory, // NEW: Add the selected category ID
+      testId: selectedTest,
+      categoryId: selectedCategory,
+      isActive: isActive,
     };
 
-    // Clean and add fields
     if (schema.fields && schema.fields.length > 0) {
       cleanedSchema.fields = schema.fields.map(cleanFieldData);
     }
 
-    // Clean and add sections if using sections
     if (useSections && schema.sections && schema.sections.length > 0) {
       cleanedSchema.sections = schema.sections.map((section) => ({
         ...section,
@@ -728,29 +819,24 @@ const SchemaBuilderForLabTest = () => {
       }));
     }
 
-    // Add test standard range if enabled and valid
     if (useStandardRange) {
       const testStandardRangeData = { ...testStandardRange };
 
-      // Convert options array to object for "options" type
       if (testStandardRangeData.type === "options" && testStandardRangeData.options.length > 0) {
         const optionsObj = {};
         testStandardRangeData.options.forEach((option) => {
           optionsObj[option.key] = option.value;
         });
         testStandardRangeData.options = optionsObj;
-      }
-      // Remove empty text for "text" type
-      else if (
+      } else if (
         testStandardRangeData.type === "text" &&
         (!testStandardRangeData.text || !testStandardRangeData.text.trim())
       ) {
         delete testStandardRangeData.text;
       }
 
-      // Only include testStandardRange if it has valid data
       if (
-        Object.keys(testStandardRangeData).length > 1 || // More than just "type"
+        Object.keys(testStandardRangeData).length > 1 ||
         (testStandardRangeData.type === "text" && testStandardRangeData.text) ||
         (testStandardRangeData.type === "options" && testStandardRangeData.options)
       ) {
@@ -787,25 +873,33 @@ const SchemaBuilderForLabTest = () => {
     try {
       const cleanedSchema = prepareSchemaForSave();
 
-      console.log("Saving schema:", cleanedSchema);
+      console.log(isEditMode ? "Updating schema:" : "Saving schema:", cleanedSchema);
 
-      // Call the backend service to save the schema
-      await testSchemaService.addNew(cleanedSchema);
-      setPopup({ type: "success", message: "Test schema saved successfully!" });
-      // Optional: Reset the form after successful save
-      resetForm();
+      let response;
+      if (isEditMode) {
+        response = await testSchemaService.update(schemaId, cleanedSchema);
+        setPopup({ type: "success", message: "Test schema updated successfully!" });
+      } else {
+        response = await testSchemaService.addNew(cleanedSchema);
+        setPopup({ type: "success", message: "Test schema saved successfully!" });
+      }
+
+      setTimeout(() => {
+        if (!isEditMode) {
+          resetForm();
+        }
+      }, 2000);
     } catch (error) {
       console.error("Error saving schema:", error);
       setPopup({
         type: "error",
-        message: "Error saving test schema. Please try again.",
+        message: `Error ${isEditMode ? "updating" : "saving"} test schema. Please try again.`,
       });
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Updated: Reset form function to clear category and test selection
   const resetForm = () => {
     setSchema({
       testName: "",
@@ -826,44 +920,58 @@ const SchemaBuilderForLabTest = () => {
     });
     setEditingSectionIndex(null);
     setEditingFieldId(null);
-    // NEW: Reset category and test selection
     setSelectedCategory("");
     setSelectedTest("");
+    setIsActive(true);
+    setInitialSchemaData(null);
   };
 
-  // Show loading screen while tests are loading
-  if (testsLoading) {
+  const handleCancel = () => {
+    if (isEditMode) {
+      navigate("/schema-list");
+    } else {
+      resetForm();
+    }
+  };
+
+  if (testsLoading || isLoading) {
     return <LoadingScreen />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
-      {/* Loading Screen */}
-      {isSaving && <LoadingScreen />}
+      {(isSaving || isLoading) && <LoadingScreen />}
 
-      {/* Popup Component */}
       {popup && (
         <Popup
           type={popup.type}
           message={popup.message}
           onClose={() => setPopup(null)}
-          onConfirm={popup.type === "confirmation" ? handleDelete : null}
+          onConfirm={popup.onConfirm}
+          confirmText={popup.confirmText}
+          cancelText={popup.cancelText}
         />
       )}
 
       <div className="max-w-7xl mx-auto space-y-3 sm:space-y-6">
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
-          Lab Test Builder
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
+            {isEditMode ? "Edit Lab Test Schema" : "Lab Test Builder"}
+          </h2>
+          {isEditMode && (
+            <div className="bg-blue-100 border border-blue-300 rounded-lg px-3 py-2 mt-2 sm:mt-0">
+              <span className="text-blue-800 text-sm font-medium">Editing Mode</span>
+            </div>
+          )}
+        </div>
 
-        {/* NEW: Test Category and Test Selection */}
+        {/* Test Category and Test Selection */}
         <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
           <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Test Selection</h3>
           </div>
           <div className="p-3 sm:p-4 lg:p-6 space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Test Category Selection */}
               <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
                 <label className="w-full sm:w-40 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
                   Test Category
@@ -882,7 +990,6 @@ const SchemaBuilderForLabTest = () => {
                 </select>
               </div>
 
-              {/* Test Selection */}
               <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
                 <label className="w-full sm:w-40 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
                   Test
@@ -903,7 +1010,6 @@ const SchemaBuilderForLabTest = () => {
               </div>
             </div>
 
-            {/* Selected Test Info */}
             {selectedTest && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center">
@@ -981,6 +1087,41 @@ const SchemaBuilderForLabTest = () => {
                   onChange={(e) => setSchema((prev) => ({ ...prev, testDescription: e.target.value }))}
                 />
               </div>
+            </div>
+
+            {/* Active Status Toggle */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border border-gray-300 rounded-lg space-y-3 sm:space-y-0">
+              <div className="flex-1">
+                <h4 className="text-base sm:text-lg font-semibold text-gray-700">Active Status</h4>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  {isActive
+                    ? "This schema is active and can be used for tests"
+                    : "This schema is deactivated and won't be available for new tests"}
+                </p>
+              </div>
+              <label className="flex items-center cursor-pointer">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                  />
+                  <div
+                    className={`block w-12 h-6 sm:w-14 sm:h-8 rounded-full transition-colors ${
+                      isActive ? "bg-green-600" : "bg-gray-300"
+                    }`}
+                  ></div>
+                  <div
+                    className={`absolute left-1 top-1 bg-white w-4 h-4 sm:w-6 sm:h-6 rounded-full transition-transform ${
+                      isActive ? "transform translate-x-6 sm:translate-x-8" : ""
+                    }`}
+                  ></div>
+                </div>
+                <div className="ml-2 sm:ml-3 text-gray-700 font-medium text-sm">
+                  {isActive ? "Active" : "Deactivated"}
+                </div>
+              </label>
             </div>
 
             {/* Standard Range Toggle */}
@@ -1139,7 +1280,6 @@ const SchemaBuilderForLabTest = () => {
               <div className="space-y-3">
                 <h4 className="text-base sm:text-lg font-semibold text-gray-700">Manage Test Sections</h4>
                 <div className="space-y-3 p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50">
-                  {/* Section Inputs in a row for desktop */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     <InputField
                       label="Section Name"
@@ -1178,7 +1318,6 @@ const SchemaBuilderForLabTest = () => {
                   </div>
                 </div>
 
-                {/* Existing Sections - Updated layout */}
                 <div>
                   <h5 className="text-sm font-semibold text-gray-700 mb-2">Existing Sections</h5>
                   {!schema.sections || schema.sections.length === 0 ? (
@@ -1190,7 +1329,6 @@ const SchemaBuilderForLabTest = () => {
                       {schema.sections.map((section, index) => (
                         <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
                           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-2 lg:space-y-0">
-                            {/* Section Name and Description in a row for desktop */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 flex-1">
                               <div>
                                 <h6 className="font-medium text-gray-800 text-sm sm:text-base">{section.name}</h6>
@@ -1254,9 +1392,7 @@ const SchemaBuilderForLabTest = () => {
                   </div>
                 )}
 
-                {/* Redesigned layout: Field Name and Type in first row, Required and Unit in second row */}
                 <div className="space-y-3">
-                  {/* First Row: Field Name and Type */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     <InputField
                       label="Field Name"
@@ -1276,9 +1412,7 @@ const SchemaBuilderForLabTest = () => {
                           setCurrentField((prev) => ({
                             ...prev,
                             type: newType,
-                            // Reset standard range when switching to non-number type
                             standardRange: newType === "number" ? prev.standardRange : null,
-                            // Reset options when switching to non-option types
                             options: ["radio", "select", "checkbox"].includes(newType) ? prev.options : [],
                           }));
                         }}
@@ -1293,9 +1427,7 @@ const SchemaBuilderForLabTest = () => {
                     </div>
                   </div>
 
-                  {/* Second Row: Required and Unit */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    {/* Changed Required from checkbox to Yes/No select */}
                     <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
                       <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
                         Required
@@ -1329,7 +1461,6 @@ const SchemaBuilderForLabTest = () => {
                   </div>
                 </div>
 
-                {/* Field Options for Radio/Select/Checkbox */}
                 {["radio", "select", "checkbox"].includes(currentField.type) && (
                   <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
                     <div className="flex flex-col sm:flex-row">
@@ -1372,7 +1503,6 @@ const SchemaBuilderForLabTest = () => {
                   </div>
                 )}
 
-                {/* Field Standard Range Values Section - Only show for number fields */}
                 {currentField.type === "number" && (
                   <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
                     <div className="flex flex-col sm:flex-row border-b border-gray-300">
@@ -1403,7 +1533,6 @@ const SchemaBuilderForLabTest = () => {
                           </select>
                         </div>
 
-                        {/* Gender Based Standard Range */}
                         {currentField.standardRange?.type === "genderBased" && (
                           <div className="space-y-3">
                             {genderOptions.map((gender) => (
@@ -1436,7 +1565,6 @@ const SchemaBuilderForLabTest = () => {
                           </div>
                         )}
 
-                        {/* Age Based Standard Range - Improved design */}
                         {currentField.standardRange?.type === "ageBased" && (
                           <div className="space-y-4">
                             <div className="flex justify-between items-center">
@@ -1505,7 +1633,6 @@ const SchemaBuilderForLabTest = () => {
                           </div>
                         )}
 
-                        {/* Gender and Age Based Standard Range - Improved design */}
                         {currentField.standardRange?.type === "genderWithAgeBased" && (
                           <div className="space-y-6">
                             {genderOptions.map((gender) => (
@@ -1588,7 +1715,6 @@ const SchemaBuilderForLabTest = () => {
                           </div>
                         )}
 
-                        {/* Number Range Only */}
                         {currentField.standardRange?.type === "numberRange" && (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <InputField
@@ -1608,7 +1734,6 @@ const SchemaBuilderForLabTest = () => {
                           </div>
                         )}
 
-                        {/* Textarea Standard Range */}
                         {currentField.standardRange?.type === "text" && (
                           <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden">
                             <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
@@ -1651,8 +1776,16 @@ const SchemaBuilderForLabTest = () => {
               </div>
             </div>
 
-            {/* Save Schema Button */}
-            <div className="flex justify-center">
+            {/* Save/Cancel Buttons */}
+            <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
+              <button
+                type="button"
+                onClick={handleCancel}
+                disabled={isSaving}
+                className="w-full sm:w-32 bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                {isEditMode ? "Back" : "Reset"}
+              </button>
               <button
                 type="button"
                 onClick={saveSchema}
@@ -1661,13 +1794,12 @@ const SchemaBuilderForLabTest = () => {
                 }
                 className="w-full sm:w-64 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                {isSaving ? "Saving..." : "Save Schema"}
+                {isSaving ? "Saving..." : isEditMode ? "Update Schema" : "Save Schema"}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Form Preview Section - Updated to pass editing functions */}
         <FormPreview
           schema={schema}
           useSections={useSections}
@@ -1678,7 +1810,6 @@ const SchemaBuilderForLabTest = () => {
           startEditingField={startEditingField}
         />
 
-        {/* Schema Display Section */}
         <SchemaDisplay
           schema={schema}
           useSections={useSections}
@@ -1690,4 +1821,4 @@ const SchemaBuilderForLabTest = () => {
   );
 };
 
-export default SchemaBuilderForLabTest;
+export default SchemaBuilder;

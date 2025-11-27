@@ -6,7 +6,9 @@ import Lab from "./pages/lab";
 import Zone from "./pages/zone";
 import Test from "./pages/test";
 import LabManagement from "./pages/labManagement";
-import TestComponent from "./pages/testComp"
+import TestComponent from "./pages/schemaBuilder";
+import SchemaList from "./pages/schemaList";
+import SchemaBuilder from "./pages/schemaBuilder";
 
 function App() {
   return (
@@ -17,7 +19,10 @@ function App() {
         <Route path="/zones" element={<Zone />} />
         <Route path="/tests" element={<Test />} />
         <Route path="/lab-management" element={<LabManagement />} />
-        <Route path="/testComponent" element={<TestComponent/>} />
+        <Route path="/schema-builder" element={<SchemaBuilder />} />
+         <Route path="/schema-builder/:schemaId" element={<SchemaBuilder />} />
+        <Route path="/schema-list" element={<SchemaList />} />
+        <Route path="/testComponent" element={<TestComponent />} />
       </Routes>
     </Layout>
   );

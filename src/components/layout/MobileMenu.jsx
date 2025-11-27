@@ -134,74 +134,80 @@ const MobileMenu = () => {
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-          <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
-              <span className="text-white font-bold text-sm">SF</span>
+        {/* Flex container for proper scrolling */}
+        <div className="flex flex-col h-full">
+          {/* Header - Fixed */}
+          <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex items-center space-x-3">
+              <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
+                <span className="text-white font-bold text-sm">SF</span>
+              </div>
+              <div>
+                <p className="text-gray-900 font-semibold">Samiul Fahad</p>
+                <p className="text-gray-500 text-sm mt-0.5">Administrator</p>
+              </div>
             </div>
-            <div>
-              <p className="text-gray-900 font-semibold">Samiul Fahad</p>
-              <p className="text-gray-500 text-sm mt-0.5">Administrator</p>
+
+            <button
+              onClick={toggleMenu}
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white hover:bg-gray-50 transition-all duration-200 border border-gray-200 shadow-sm"
+            >
+              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Scrollable Menu Items */}
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full overflow-y-auto">
+              <div className="space-y-2 p-4">
+                {menu.map((item, index) => (
+                  <NavLink
+                    key={index}
+                    to={item.path}
+                    end={item.path === "/"}
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 p-4 rounded-2xl transition-all duration-200 group ${
+                        isActive
+                          ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      }`
+                    }
+                    onClick={handleMenuClick}
+                  >
+                    <div
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 ${({
+                        isActive,
+                      }) =>
+                        isActive ? "bg-white/20" : "bg-gray-100 group-hover:bg-blue-100 group-hover:text-blue-600"}`}
+                    >
+                      <span className="text-base">{getIconForMenu(item.label)}</span>
+                    </div>
+                    <span className="font-medium text-sm">{item.label}</span>
+                  </NavLink>
+                ))}
+              </div>
             </div>
           </div>
 
-          <button
-            onClick={toggleMenu}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-white hover:bg-gray-50 transition-all duration-200 border border-gray-200 shadow-sm"
-          >
-            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Menu Items */}
-        <div className="flex-1 overflow-y-auto pb-28">
-          <div className="space-y-2 p-4">
-            {menu.map((item, index) => (
-              <NavLink
-                key={index}
-                to={item.path}
-                end={item.path === "/"}
-                className={({ isActive }) =>
-                  `flex items-center space-x-3 p-4 rounded-2xl transition-all duration-200 group ${
-                    isActive
-                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`
-                }
-                onClick={handleMenuClick}
-              >
-                <div
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 ${({
-                    isActive,
-                  }) => (isActive ? "bg-white/20" : "bg-gray-100 group-hover:bg-blue-100 group-hover:text-blue-600")}`}
-                >
-                  <span className="text-base">{getIconForMenu(item.label)}</span>
-                </div>
-                <span className="font-medium text-sm">{item.label}</span>
-              </NavLink>
-            ))}
+          {/* Fixed Logout Section */}
+          <div className="flex-shrink-0 p-5 border-t border-gray-100 bg-white/95 backdrop-blur-sm">
+            <button
+              className="w-full flex items-center justify-center space-x-2 p-4 bg-red-700 text-white rounded-2xl font-medium hover:bg-red-500 transition-all duration-200 shadow-sm hover:shadow-md"
+              onClick={handleMenuClick}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+              <span className="text-sm font-medium">Logout</span>
+            </button>
           </div>
-        </div>
-
-        {/* Modern Logout Section */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 border-t border-gray-100 bg-white/95 backdrop-blur-sm">
-          <button
-            className="w-full flex items-center justify-center space-x-2 p-4 bg-red-700 text-white rounded-2xl font-medium hover:bg-red-500 transition-all duration-200 shadow-sm hover:shadow-md"
-            onClick={handleMenuClick}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
-            <span className="text-sm font-medium">Logout</span>
-          </button>
         </div>
       </div>
     </>
