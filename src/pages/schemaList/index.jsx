@@ -10,7 +10,7 @@ import Schema from "./Schema";
 const SchemaList = () => {
   const [schemas, setSchemas] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [popup, setPopup] = useState(null);
+  const [popup, setPopup] = useState({});
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedTest, setSelectedTest] = useState("");
@@ -37,7 +37,6 @@ const SchemaList = () => {
       resetFilters();
       const response = await schemaService.getAll();
       setSchemas(response.data || []);
-      console.log(response.data[0]);
       if (response.data?.length === 0) {
         setPopup({ type: "error", message: "No schemas found" });
       }
@@ -85,6 +84,7 @@ const SchemaList = () => {
     }
   };
 
+  // Handle schema deletion
   const handleDelete = async () => {
     try {
       setLoading(true);
@@ -94,6 +94,75 @@ const SchemaList = () => {
     } catch (error) {
       console.error("Error deleting schema:", error);
       setPopup({ type: "error", message: "Failed to delete schema" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle schema activation
+  const handleActivate = async () => {
+    try {
+      setLoading(true);
+      await schemaService.activate(popup._id);
+
+      // Update the local state to reflect the activation
+      setSchemas((prev) => prev.map((schema) => (schema._id === popup._id ? { ...schema, isActive: true } : schema)));
+
+      setPopup({ type: "success", message: "Schema activated successfully" });
+    } catch (error) {
+      console.error("Error activating schema:", error);
+      setPopup({ type: "error", message: "Failed to activate schema" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle schema deactivation
+  const handleDeactivate = async () => {
+    try {
+      setLoading(true);
+      await schemaService.deactivate(popup._id);
+
+      // Update the local state to reflect the deactivation
+      setSchemas((prev) => prev.map((schema) => (schema._id === popup._id ? { ...schema, isActive: false } : schema)));
+
+      setPopup({ type: "success", message: "Schema deactivated successfully" });
+    } catch (error) {
+      console.error("Error deactivating schema:", error);
+      setPopup({ type: "error", message: "Failed to deactivate schema" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle setting schema as default
+  const handleSetDefault = async () => {
+    try {
+      setLoading(true);
+
+      // First, deactivate all other schemas (assuming only one can be default/active at a time)
+      // If your backend handles this differently, adjust accordingly
+      await Promise.all(
+        schemas.map((schema) =>
+          schema._id !== popup._id && schema.isActive ? schemaService.deactivate(schema._id) : Promise.resolve()
+        )
+      );
+
+      // Then activate the selected schema
+      await schemaService.activate(popup._id);
+
+      // Update all schemas in local state
+      setSchemas((prev) =>
+        prev.map((schema) => ({
+          ...schema,
+          isActive: schema._id === popup._id,
+        }))
+      );
+
+      setPopup({ type: "success", message: "Schema set as default successfully" });
+    } catch (error) {
+      console.error("Error setting default schema:", error);
+      setPopup({ type: "error", message: "Failed to set schema as default" });
     } finally {
       setLoading(false);
     }
@@ -157,13 +226,30 @@ const SchemaList = () => {
   return (
     <div className="min-h-screen bg-gray-50/30 py-2">
       {loading && <LoadingScreen />}
-      {popup && (
-        <Popup
-          type={popup.type}
-          message={popup.message}
-          onClose={() => setPopup(null)}
-          onConfirm={popup.type === "confirmation" ? handleDelete : null}
-        />
+
+      {/* Popup for delete confirmation */}
+      {popup.type === "confirmation" && popup.action === "delete" && (
+        <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} onConfirm={handleDelete} />
+      )}
+
+      {/* Popup for activate confirmation */}
+      {popup.type === "confirmation" && popup.action === "activate" && (
+        <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} onConfirm={handleActivate} />
+      )}
+
+      {/* Popup for deactivate confirmation */}
+      {popup.type === "confirmation" && popup.action === "deactivate" && (
+        <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} onConfirm={handleDeactivate} />
+      )}
+
+      {/* Popup for set default confirmation */}
+      {popup.type === "confirmation" && popup.action === "setDefault" && (
+        <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} onConfirm={handleSetDefault} />
+      )}
+
+      {/* Success/Error popup */}
+      {(popup.type === "success" || popup.type === "error") && (
+        <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} />
       )}
 
       {/* Header */}
@@ -304,11 +390,7 @@ const SchemaList = () => {
 
             {/* Schemas Grid */}
             <div className="space-y-4">
-              {
-                console.log(schemas)
-              }
               {schemas.map((schema, index) => (
-                // In your SchemaList component, update the Schema component usage:
                 <Schema
                   key={schema._id}
                   input={schema}
@@ -318,6 +400,7 @@ const SchemaList = () => {
                       type: "confirmation",
                       message: `Do you want to delete the schema "${schema.testName}"?`,
                       _id: schema._id,
+                      action: "delete",
                     })
                   }
                   onActivate={() =>
@@ -344,6 +427,11 @@ const SchemaList = () => {
                       action: "setDefault",
                     })
                   }
+                  onRenderForm={() => {
+                    // Add your form rendering logic here
+                    console.log("Render form for schema:", schema._id);
+                    // You can navigate to form render page or open a modal
+                  }}
                 />
               ))}
             </div>

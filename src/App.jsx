@@ -9,6 +9,7 @@ import LabManagement from "./pages/labManagement";
 import TestComponent from "./pages/schemaBuilder";
 import SchemaList from "./pages/schemaList";
 import SchemaBuilder from "./pages/schemaBuilder";
+import SchemaRenderer from "./pages/schemaRenderer";
 
 function App() {
   return (
@@ -20,7 +21,8 @@ function App() {
         <Route path="/tests" element={<Test />} />
         <Route path="/lab-management" element={<LabManagement />} />
         <Route path="/schema-builder" element={<SchemaBuilder />} />
-         <Route path="/schema-builder/:schemaId" element={<SchemaBuilder />} />
+        <Route path="/render-schema/:schemaId" element={<SchemaRenderer />} />
+        <Route path="/schema-builder/:schemaId" element={<SchemaBuilder />} />
         <Route path="/schema-list" element={<SchemaList />} />
         <Route path="/testComponent" element={<TestComponent />} />
       </Routes>

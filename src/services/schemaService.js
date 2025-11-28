@@ -9,7 +9,8 @@ const schemaService = {
   update: (schemaId, data) => api.put("/test/schema/update", { schemaId, data }),
   delete: (schemaId) => api.delete(`/test/schema/delete/${schemaId}`),
   deactivate: (_id) => api.patch("/test/schema/deactivate", { _id: _id }),
-  activate: (_id) => api.patch("/test/schema/activate", { _id: _id }),
+  activate: (schemaId) => api.patch(`/test/schema/activate/${schemaId}`),
+  deactivate: (schemaId) => api.patch(`/test/schema/deactivate/${schemaId}`),
 };
 
 export default schemaService;

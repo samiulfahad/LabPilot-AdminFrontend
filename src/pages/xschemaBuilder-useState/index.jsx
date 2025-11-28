@@ -1,106 +1,70 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import testSchemaService from "../../services/schemaService";
 import testService from "../../services/testService";
 import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
 import SchemaDisplay from "./SchemaDisplay";
-import FormPreview from "./FormPreview"; // Add this import
+import FormPreview from "./FormPreview";
 import Popup from "../../components/popup/Popup";
 import LoadingScreen from "../../components/loadingPage";
-import { useSchemaBuilderStore } from "./store";
 
 const SchemaBuilder = () => {
   const { schemaId } = useParams();
   const navigate = useNavigate();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Get state and actions from store
-  const {
-    // Schema state
-    schema,
-    useSections,
-    useStandardRange,
-    isEditMode,
-    initialSchemaData,
-    isActive,
+  const [schema, setSchema] = useState({
+    testName: "",
+    testDescription: "",
+    fields: [],
+  });
 
-    // UI state
-    isLoading,
-    isSaving,
-    popup,
-    testsLoading,
-    editingSectionIndex,
-    editingFieldId,
-    isAddingRange,
+  const [useSections, setUseSections] = useState(false);
+  const [useStandardRange, setUseStandardRange] = useState(false);
+  const [currentSection, setCurrentSection] = useState({
+    name: "",
+    description: "",
+  });
 
-    // Form state
-    currentField,
-    currentSection,
-    testStandardRange,
-    newOption,
-    newTestStandardRangeKey,
-    newTestStandardRangeValue,
+  const [currentField, setCurrentField] = useState({
+    label: "",
+    type: "text",
+    required: "no",
+    unit: "",
+    standardRange: null,
+    options: [],
+    sectionId: "",
+    editingIndex: null,
+    editingSectionIndex: null,
+  });
 
-    // Selection state
-    testCategories,
-    selectedCategory,
-    selectedTest,
-    availableTests,
+  const [testStandardRange, setTestStandardRange] = useState({
+    type: "options",
+    options: [],
+    text: "",
+  });
 
-    // Schema actions
-    setSchema,
-    updateSchema,
-    setUseSections,
-    setUseStandardRange,
-    setIsEditMode,
-    setInitialSchemaData,
-    setIsActive,
-    getFieldsCount,
-    addFieldToSchema,
-    updateFieldInSchema,
-    removeFieldFromSchema,
-    addSection,
-    updateSection,
-    removeSection,
-    resetSchema,
+  const [newOption, setNewOption] = useState("");
+  const [newTestStandardRangeKey, setNewTestStandardRangeKey] = useState("");
+  const [newTestStandardRangeValue, setNewTestStandardRangeValue] = useState("");
 
-    // UI actions
-    setIsLoading,
-    setIsSaving,
-    setPopup,
-    setTestsLoading,
-    setEditingSectionIndex,
-    setEditingFieldId,
-    setIsAddingRange,
-    isEditing,
-    resetUI,
+  const [isAddingRange, setIsAddingRange] = useState(false);
+  const [editingSectionIndex, setEditingSectionIndex] = useState(null);
+  const [editingFieldId, setEditingFieldId] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [popup, setPopup] = useState(null);
 
-    // Form actions
-    setCurrentField,
-    updateCurrentField,
-    setCurrentSection,
-    updateCurrentSection,
-    setTestStandardRange,
-    updateTestStandardRange,
-    setNewOption,
-    setNewTestStandardRangeKey,
-    setNewTestStandardRangeValue,
-    addFieldOption,
-    removeFieldOption,
-    addTestStandardRangeOption,
-    removeTestStandardRangeOption,
-    resetFieldForm,
-    resetSectionForm,
-    resetAllForms,
+  const [testCategories, setTestCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedTest, setSelectedTest] = useState("");
+  const [testsLoading, setTestsLoading] = useState(true);
+  const [availableTests, setAvailableTests] = useState([]);
+  const [isActive, setIsActive] = useState(true);
 
-    // Selection actions
-    setTestCategories,
-    setSelectedCategory,
-    setSelectedTest,
-    setAvailableTests,
-    updateAvailableTests,
-    resetSelection,
-  } = useSchemaBuilderStore();
+  // New state to track initial schema data for edit mode
+  const [initialSchemaData, setInitialSchemaData] = useState(null);
 
   const fieldTypes = ["text", "textarea", "number", "select", "radio", "checkbox"];
 
@@ -267,10 +231,59 @@ const SchemaBuilder = () => {
 
   // Update available tests when category selection changes
   useEffect(() => {
-    updateAvailableTests();
+    if (selectedCategory) {
+      const category = testCategories.find((cat) => cat._id === selectedCategory);
+      setAvailableTests(category?.tests || []);
+
+      // If we're in edit mode and the current selected test doesn't belong to the selected category, clear it
+      if (isEditMode && selectedTest) {
+        const testExists = category?.tests?.some((test) => test._id === selectedTest);
+        if (!testExists) {
+          setSelectedTest("");
+        }
+      }
+    } else {
+      setAvailableTests([]);
+      if (!isEditMode) {
+        setSelectedTest("");
+      }
+    }
   }, [selectedCategory, testCategories, isEditMode, selectedTest]);
 
-  // Standard Range Management Functions (keep these as they are complex)
+  // Helper Functions
+  const getFieldsCount = () => {
+    if (useSections && schema.sections) {
+      return schema.sections.reduce((total, section) => total + section.fields.length, 0);
+    }
+    return schema.fields.length;
+  };
+
+  const isEditing = () => {
+    return editingSectionIndex !== null || editingFieldId !== null;
+  };
+
+  // Field Options Management
+  const addFieldOption = () => {
+    if (!newOption.trim()) {
+      setPopup({ type: "error", message: "Option cannot be empty" });
+      return;
+    }
+
+    setCurrentField((prev) => ({
+      ...prev,
+      options: [...prev.options, newOption.trim()],
+    }));
+    setNewOption("");
+  };
+
+  const removeFieldOption = (index) => {
+    setCurrentField((prev) => ({
+      ...prev,
+      options: prev.options.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Standard Range Management
   const initializeStandardRange = (type) => {
     let initialData = { type };
 
@@ -293,24 +306,32 @@ const SchemaBuilder = () => {
       initialData.value = "";
     }
 
-    updateCurrentField({ standardRange: initialData });
+    setCurrentField((prev) => ({
+      ...prev,
+      standardRange: initialData,
+    }));
   };
 
   const handleStandardRangeChange = (path, value) => {
-    const newStandardRange = { ...currentField.standardRange };
+    setCurrentField((prev) => {
+      const newStandardRange = { ...prev.standardRange };
 
-    if (path.includes(".")) {
-      const [parent, child, subChild] = path.split(".");
-      if (subChild) {
-        newStandardRange[parent][child][subChild] = value;
+      if (path.includes(".")) {
+        const [parent, child, subChild] = path.split(".");
+        if (subChild) {
+          newStandardRange[parent][child][subChild] = value;
+        } else {
+          newStandardRange[parent][child] = value;
+        }
       } else {
-        newStandardRange[parent][child] = value;
+        newStandardRange[path] = value;
       }
-    } else {
-      newStandardRange[path] = value;
-    }
 
-    updateCurrentField({ standardRange: newStandardRange });
+      return {
+        ...prev,
+        standardRange: newStandardRange,
+      };
+    });
   };
 
   const addAgeRange = () => {
@@ -318,58 +339,69 @@ const SchemaBuilder = () => {
 
     setIsAddingRange(true);
 
-    const newStandardRange = { ...currentField.standardRange };
+    setCurrentField((prev) => {
+      const newStandardRange = { ...prev.standardRange };
 
-    if (!newStandardRange.ranges) {
-      newStandardRange.ranges = [];
-    }
+      if (!newStandardRange.ranges) {
+        newStandardRange.ranges = [];
+      }
 
-    const newRange = {
-      ageMin: "",
-      ageMax: "",
-      min: "",
-      max: "",
-    };
+      const newRange = {
+        ageMin: "",
+        ageMax: "",
+        min: "",
+        max: "",
+      };
 
-    updateCurrentField({
-      standardRange: {
-        ...newStandardRange,
-        ranges: [...newStandardRange.ranges, newRange],
-      },
+      return {
+        ...prev,
+        standardRange: {
+          ...newStandardRange,
+          ranges: [...newStandardRange.ranges, newRange],
+        },
+      };
     });
 
     setTimeout(() => setIsAddingRange(false), 100);
   };
 
   const removeAgeRange = (index) => {
-    const newStandardRange = { ...currentField.standardRange };
-    if (newStandardRange.ranges && newStandardRange.ranges.length > index) {
-      const newRanges = [...newStandardRange.ranges];
-      newRanges.splice(index, 1);
-      updateCurrentField({
-        standardRange: {
-          ...newStandardRange,
-          ranges: newRanges,
-        },
-      });
-    }
+    setCurrentField((prev) => {
+      const newStandardRange = { ...prev.standardRange };
+      if (newStandardRange.ranges && newStandardRange.ranges.length > index) {
+        const newRanges = [...newStandardRange.ranges];
+        newRanges.splice(index, 1);
+        return {
+          ...prev,
+          standardRange: {
+            ...newStandardRange,
+            ranges: newRanges,
+          },
+        };
+      }
+      return prev;
+    });
   };
 
   const handleAgeRangeChange = (index, field, value) => {
-    const newStandardRange = { ...currentField.standardRange };
-    if (newStandardRange.ranges && newStandardRange.ranges.length > index) {
-      const newRanges = [...newStandardRange.ranges];
-      newRanges[index] = {
-        ...newRanges[index],
-        [field]: value,
-      };
-      updateCurrentField({
-        standardRange: {
-          ...newStandardRange,
-          ranges: newRanges,
-        },
-      });
-    }
+    setCurrentField((prev) => {
+      const newStandardRange = { ...prev.standardRange };
+      if (newStandardRange.ranges && newStandardRange.ranges.length > index) {
+        const newRanges = [...newStandardRange.ranges];
+        newRanges[index] = {
+          ...newRanges[index],
+          [field]: value,
+        };
+        return {
+          ...prev,
+          standardRange: {
+            ...newStandardRange,
+            ranges: newRanges,
+          },
+        };
+      }
+      return prev;
+    });
   };
 
   const addGenderAgeRange = (gender) => {
@@ -377,80 +409,105 @@ const SchemaBuilder = () => {
 
     setIsAddingRange(true);
 
-    const newStandardRange = { ...currentField.standardRange };
+    setCurrentField((prev) => {
+      const newStandardRange = { ...prev.standardRange };
 
-    if (!newStandardRange.ranges[gender]) {
-      newStandardRange.ranges[gender] = [];
-    }
+      if (!newStandardRange.ranges[gender]) {
+        newStandardRange.ranges[gender] = [];
+      }
 
-    const newRange = {
-      ageMin: "",
-      ageMax: "",
-      min: "",
-      max: "",
-    };
+      const newRange = {
+        ageMin: "",
+        ageMax: "",
+        min: "",
+        max: "",
+      };
 
-    updateCurrentField({
-      standardRange: {
-        ...newStandardRange,
-        ranges: {
-          ...newStandardRange.ranges,
-          [gender]: [...newStandardRange.ranges[gender], newRange],
+      return {
+        ...prev,
+        standardRange: {
+          ...newStandardRange,
+          ranges: {
+            ...newStandardRange.ranges,
+            [gender]: [...newStandardRange.ranges[gender], newRange],
+          },
         },
-      },
+      };
     });
 
     setTimeout(() => setIsAddingRange(false), 100);
   };
 
   const removeGenderAgeRange = (gender, index) => {
-    const newStandardRange = { ...currentField.standardRange };
-    if (newStandardRange.ranges[gender] && newStandardRange.ranges[gender].length > index) {
-      const newGenderRanges = [...newStandardRange.ranges[gender]];
-      newGenderRanges.splice(index, 1);
-      updateCurrentField({
-        standardRange: {
-          ...newStandardRange,
-          ranges: {
-            ...newStandardRange.ranges,
-            [gender]: newGenderRanges,
+    setCurrentField((prev) => {
+      const newStandardRange = { ...prev.standardRange };
+      if (newStandardRange.ranges[gender] && newStandardRange.ranges[gender].length > index) {
+        const newGenderRanges = [...newStandardRange.ranges[gender]];
+        newGenderRanges.splice(index, 1);
+        return {
+          ...prev,
+          standardRange: {
+            ...newStandardRange,
+            ranges: {
+              ...newStandardRange.ranges,
+              [gender]: newGenderRanges,
+            },
           },
-        },
-      });
-    }
+        };
+      }
+      return prev;
+    });
   };
 
   const handleGenderAgeRangeChange = (gender, index, field, value) => {
-    const newStandardRange = { ...currentField.standardRange };
-    if (newStandardRange.ranges[gender] && newStandardRange.ranges[gender].length > index) {
-      const newGenderRanges = [...newStandardRange.ranges[gender]];
-      newGenderRanges[index] = {
-        ...newGenderRanges[index],
-        [field]: value,
-      };
-      updateCurrentField({
-        standardRange: {
-          ...newStandardRange,
-          ranges: {
-            ...newStandardRange.ranges,
-            [gender]: newGenderRanges,
+    setCurrentField((prev) => {
+      const newStandardRange = { ...prev.standardRange };
+      if (newStandardRange.ranges[gender] && newStandardRange.ranges[gender].length > index) {
+        const newGenderRanges = [...newStandardRange.ranges[gender]];
+        newGenderRanges[index] = {
+          ...newGenderRanges[index],
+          [field]: value,
+        };
+        return {
+          ...prev,
+          standardRange: {
+            ...newStandardRange,
+            ranges: {
+              ...newStandardRange.ranges,
+              [gender]: newGenderRanges,
+            },
           },
-        },
-      });
+        };
+      }
+      return prev;
+    });
+  };
+
+  // Test Standard Range Management
+  const addTestStandardRangeOption = () => {
+    if (!newTestStandardRangeKey.trim() || !newTestStandardRangeValue.trim()) {
+      setPopup({ type: "error", message: "Both key and value are required" });
+      return;
     }
+
+    setTestStandardRange((prev) => ({
+      ...prev,
+      options: [...prev.options, { key: newTestStandardRangeKey.trim(), value: newTestStandardRangeValue.trim() }],
+    }));
+
+    setNewTestStandardRangeKey("");
+    setNewTestStandardRangeValue("");
+  };
+
+  const removeTestStandardRangeOption = (index) => {
+    setTestStandardRange((prev) => ({
+      ...prev,
+      options: prev.options.filter((_, i) => i !== index),
+    }));
   };
 
   // Section Management
-  const startEditingSection = (sectionIndex) => {
-    const section = schema.sections[sectionIndex];
-    setCurrentSection({
-      name: section.name,
-      description: section.description || "",
-    });
-    setEditingSectionIndex(sectionIndex);
-  };
-
-  const handleAddSection = () => {
+  const addSection = () => {
     if (!currentSection.name.trim()) {
       setPopup({ type: "error", message: "Section name is required" });
       return;
@@ -462,32 +519,71 @@ const SchemaBuilder = () => {
       fields: [],
     };
 
-    addSection(newSection);
-    resetSectionForm();
+    setSchema((prev) => ({
+      ...prev,
+      sections: [...(prev.sections || []), newSection],
+    }));
+
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
   };
 
-  const handleUpdateSection = () => {
+  const removeSection = (index) => {
+    setSchema((prev) => ({
+      ...prev,
+      sections: prev.sections.filter((_, i) => i !== index),
+    }));
+    if (editingSectionIndex === index) {
+      cancelEditingSection();
+    }
+  };
+
+  // Editing Functions
+  const startEditingSection = (sectionIndex) => {
+    const section = schema.sections[sectionIndex];
+    setCurrentSection({
+      name: section.name,
+      description: section.description || "",
+    });
+    setEditingSectionIndex(sectionIndex);
+  };
+
+  const updateSection = () => {
     if (!currentSection.name.trim()) {
       setPopup({ type: "error", message: "Section name is required" });
       return;
     }
 
-    updateSection(editingSectionIndex, {
-      ...schema.sections[editingSectionIndex],
-      name: currentSection.name,
-      description: currentSection.description,
-    });
+    setSchema((prev) => ({
+      ...prev,
+      sections: prev.sections.map((section, index) =>
+        index === editingSectionIndex
+          ? {
+              ...section,
+              name: currentSection.name,
+              description: currentSection.description,
+            }
+          : section
+      ),
+    }));
 
-    resetSectionForm();
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
     setEditingSectionIndex(null);
   };
 
   const cancelEditingSection = () => {
-    resetSectionForm();
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
     setEditingSectionIndex(null);
   };
 
-  // Field Management
   const startEditingField = (fieldIndex, sectionIndex = null) => {
     const field = sectionIndex !== null ? schema.sections[sectionIndex].fields[fieldIndex] : schema.fields[fieldIndex];
 
@@ -508,6 +604,7 @@ const SchemaBuilder = () => {
     setEditingFieldId(sectionIndex !== null ? `section-${sectionIndex}-field-${fieldIndex}` : `field-${fieldIndex}`);
   };
 
+  // Field Management
   const createFieldData = () => {
     const isRequired = currentField.required === "yes";
 
@@ -567,7 +664,7 @@ const SchemaBuilder = () => {
     return fieldData;
   };
 
-  const handleAddField = () => {
+  const addField = () => {
     if (!currentField.label.trim()) {
       setPopup({ type: "error", message: "Field label is required" });
       return;
@@ -588,16 +685,24 @@ const SchemaBuilder = () => {
     if (useSections && currentField.sectionId) {
       const sectionIndex = schema.sections.findIndex((section) => section.name === currentField.sectionId);
       if (sectionIndex !== -1) {
-        addFieldToSchema(fieldData, sectionIndex);
+        setSchema((prev) => ({
+          ...prev,
+          sections: prev.sections.map((section, index) =>
+            index === sectionIndex ? { ...section, fields: [...section.fields, fieldData] } : section
+          ),
+        }));
       }
     } else {
-      addFieldToSchema(fieldData);
+      setSchema((prev) => ({
+        ...prev,
+        fields: [...prev.fields, fieldData],
+      }));
     }
 
     resetFieldForm();
   };
 
-  const handleUpdateField = () => {
+  const updateField = () => {
     if (!currentField.label.trim()) {
       setPopup({ type: "error", message: "Field label is required" });
       return;
@@ -615,10 +720,46 @@ const SchemaBuilder = () => {
 
     const fieldData = createFieldData();
 
-    updateFieldInSchema(fieldData, currentField.editingIndex, currentField.editingSectionIndex);
+    setSchema((prev) => {
+      if (useSections && currentField.editingSectionIndex !== null) {
+        return {
+          ...prev,
+          sections: prev.sections.map((section, sIndex) =>
+            sIndex === currentField.editingSectionIndex
+              ? {
+                  ...section,
+                  fields: section.fields.map((field, fIndex) =>
+                    fIndex === currentField.editingIndex ? fieldData : field
+                  ),
+                }
+              : section
+          ),
+        };
+      } else {
+        return {
+          ...prev,
+          fields: prev.fields.map((field, fIndex) => (fIndex === currentField.editingIndex ? fieldData : field)),
+        };
+      }
+    });
 
     resetFieldForm();
     setEditingFieldId(null);
+  };
+
+  const resetFieldForm = () => {
+    setCurrentField({
+      label: "",
+      type: "text",
+      required: "no",
+      unit: "",
+      standardRange: null,
+      options: [],
+      sectionId: useSections && schema.sections && schema.sections.length > 0 ? schema.sections[0].name : "",
+      editingIndex: null,
+      editingSectionIndex: null,
+    });
+    setNewOption("");
   };
 
   const cancelEditingField = () => {
@@ -626,11 +767,29 @@ const SchemaBuilder = () => {
     setEditingFieldId(null);
   };
 
-  const handleRemoveField = (fieldIndex, sectionIndex = null) => {
-    removeFieldFromSchema(fieldIndex, sectionIndex);
+  const removeField = (fieldIndex, sectionIndex = null) => {
+    if (useSections && sectionIndex !== null) {
+      setSchema((prev) => ({
+        ...prev,
+        sections: prev.sections.map((section, sIndex) =>
+          sIndex === sectionIndex
+            ? { ...section, fields: section.fields.filter((_, fIndex) => fIndex !== fieldIndex) }
+            : section
+        ),
+      }));
 
-    if (editingFieldId === `section-${sectionIndex}-field-${fieldIndex}` || editingFieldId === `field-${fieldIndex}`) {
-      cancelEditingField();
+      if (editingFieldId === `section-${sectionIndex}-field-${fieldIndex}`) {
+        cancelEditingField();
+      }
+    } else {
+      setSchema((prev) => ({
+        ...prev,
+        fields: prev.fields.filter((_, fIndex) => fIndex !== fieldIndex),
+      }));
+
+      if (editingFieldId === `field-${fieldIndex}`) {
+        cancelEditingField();
+      }
     }
   };
 
@@ -746,7 +905,7 @@ const SchemaBuilder = () => {
 
       setTimeout(() => {
         if (!isEditMode) {
-          handleResetForm();
+          resetForm();
         }
       }, 2000);
     } catch (error) {
@@ -760,11 +919,29 @@ const SchemaBuilder = () => {
     }
   };
 
-  const handleResetForm = () => {
-    resetSchema();
-    resetAllForms();
-    resetSelection();
-    resetUI();
+  const resetForm = () => {
+    setSchema({
+      testName: "",
+      testDescription: "",
+      fields: [],
+    });
+    setUseSections(false);
+    setUseStandardRange(false);
+    setTestStandardRange({
+      type: "options",
+      options: [],
+      text: "",
+    });
+    resetFieldForm();
+    setCurrentSection({
+      name: "",
+      description: "",
+    });
+    setEditingSectionIndex(null);
+    setEditingFieldId(null);
+    setSelectedCategory("");
+    setSelectedTest("");
+    setIsActive(true);
     setInitialSchemaData(null);
   };
 
@@ -772,7 +949,7 @@ const SchemaBuilder = () => {
     if (isEditMode) {
       navigate("/schema-list");
     } else {
-      handleResetForm();
+      resetForm();
     }
   };
 
@@ -875,13 +1052,13 @@ const SchemaBuilder = () => {
                   label="Test Name"
                   name="testName"
                   value={schema.testName}
-                  onChange={(e) => updateSchema({ testName: e.target.value })}
+                  onChange={(e) => setSchema((prev) => ({ ...prev, testName: e.target.value }))}
                 />
                 <InputField
                   label="Test Description"
                   name="testDescription"
                   value={schema.testDescription}
-                  onChange={(e) => updateSchema({ testDescription: e.target.value })}
+                  onChange={(e) => setSchema((prev) => ({ ...prev, testDescription: e.target.value }))}
                 />
               </div>
             </div>
@@ -963,7 +1140,9 @@ const SchemaBuilder = () => {
                   label="Standard Range Type"
                   name="testStandardRangeType"
                   value={testStandardRange.type}
-                  onChange={(e) => updateTestStandardRange({ type: e.target.value, options: [], text: "" })}
+                  onChange={(e) =>
+                    setTestStandardRange((prev) => ({ ...prev, type: e.target.value, options: [], text: "" }))
+                  }
                   options={[
                     { value: "options", label: "Key-Value Options" },
                     { value: "text", label: "Text Standard Range" },
@@ -1027,7 +1206,7 @@ const SchemaBuilder = () => {
                     </label>
                     <textarea
                       value={testStandardRange.text}
-                      onChange={(e) => updateTestStandardRange({ text: e.target.value })}
+                      onChange={(e) => setTestStandardRange((prev) => ({ ...prev, text: e.target.value }))}
                       rows={3}
                       className="flex-1 px-3 py-2 focus:outline-none resize-none text-sm bg-white"
                     />
@@ -1077,19 +1256,19 @@ const SchemaBuilder = () => {
                       label="Section Name"
                       name="sectionName"
                       value={currentSection.name}
-                      onChange={(e) => updateCurrentSection({ name: e.target.value })}
+                      onChange={(e) => setCurrentSection((prev) => ({ ...prev, name: e.target.value }))}
                     />
                     <InputField
                       label="Description"
                       name="sectionDescription"
                       value={currentSection.description}
-                      onChange={(e) => updateCurrentSection({ description: e.target.value })}
+                      onChange={(e) => setCurrentSection((prev) => ({ ...prev, description: e.target.value }))}
                     />
                   </div>
                   <div className="flex space-x-3">
                     <button
                       type="button"
-                      onClick={editingSectionIndex !== null ? handleUpdateSection : handleAddSection}
+                      onClick={editingSectionIndex !== null ? updateSection : addSection}
                       className={`flex-1 ${
                         editingSectionIndex !== null
                           ? "bg-yellow-600 hover:bg-yellow-700"
@@ -1168,7 +1347,7 @@ const SchemaBuilder = () => {
                     label="Section"
                     name="section"
                     value={currentField.sectionId}
-                    onChange={(e) => updateCurrentField({ sectionId: e.target.value })}
+                    onChange={(e) => setCurrentField((prev) => ({ ...prev, sectionId: e.target.value }))}
                     options={schema.sections.map((section) => ({
                       value: section.name,
                       label: section.name,
@@ -1183,7 +1362,7 @@ const SchemaBuilder = () => {
                       label="Field Name"
                       name="fieldLabel"
                       value={currentField.label}
-                      onChange={(e) => updateCurrentField({ label: e.target.value })}
+                      onChange={(e) => setCurrentField((prev) => ({ ...prev, label: e.target.value }))}
                     />
 
                     <SelectField
@@ -1192,11 +1371,12 @@ const SchemaBuilder = () => {
                       value={currentField.type}
                       onChange={(e) => {
                         const newType = e.target.value;
-                        updateCurrentField({
+                        setCurrentField((prev) => ({
+                          ...prev,
                           type: newType,
-                          standardRange: newType === "number" ? currentField.standardRange : null,
-                          options: ["radio", "select", "checkbox"].includes(newType) ? currentField.options : [],
-                        });
+                          standardRange: newType === "number" ? prev.standardRange : null,
+                          options: ["radio", "select", "checkbox"].includes(newType) ? prev.options : [],
+                        }));
                       }}
                       options={fieldTypes.map((type) => ({
                         value: type,
@@ -1210,7 +1390,7 @@ const SchemaBuilder = () => {
                       label="Required"
                       name="required"
                       value={currentField.required}
-                      onChange={(e) => updateCurrentField({ required: e.target.value })}
+                      onChange={(e) => setCurrentField((prev) => ({ ...prev, required: e.target.value }))}
                       options={[
                         { value: "no", label: "No" },
                         { value: "yes", label: "Yes" },
@@ -1221,7 +1401,7 @@ const SchemaBuilder = () => {
                       label="Unit"
                       name="unit"
                       value={currentField.unit}
-                      onChange={(e) => updateCurrentField({ unit: e.target.value })}
+                      onChange={(e) => setCurrentField((prev) => ({ ...prev, unit: e.target.value }))}
                       options={commonUnits}
                     />
                   </div>
@@ -1282,7 +1462,7 @@ const SchemaBuilder = () => {
                           value={currentField.standardRange?.type || "none"}
                           onChange={(e) => {
                             if (e.target.value === "none") {
-                              updateCurrentField({ standardRange: null });
+                              setCurrentField((prev) => ({ ...prev, standardRange: null }));
                             } else {
                               initializeStandardRange(e.target.value);
                             }
@@ -1512,7 +1692,7 @@ const SchemaBuilder = () => {
                 <div className="flex space-x-3">
                   <button
                     type="button"
-                    onClick={editingFieldId ? handleUpdateField : handleAddField}
+                    onClick={editingFieldId ? updateField : addField}
                     disabled={useSections && !currentField.sectionId}
                     className={`flex-1 ${
                       editingFieldId ? "bg-yellow-600 hover:bg-yellow-700" : "bg-blue-600 hover:bg-blue-700"
@@ -1557,18 +1737,16 @@ const SchemaBuilder = () => {
           </div>
         </div>
 
-        {/* Form Preview */}
         <FormPreview
           schema={schema}
           useSections={useSections}
           useStandardRange={useStandardRange}
           testStandardRange={testStandardRange}
-          removeField={handleRemoveField}
+          removeField={removeField}
           getFieldsCount={getFieldsCount}
           startEditingField={startEditingField}
         />
 
-        {/* JSON Schema Display */}
         <SchemaDisplay
           schema={schema}
           useSections={useSections}

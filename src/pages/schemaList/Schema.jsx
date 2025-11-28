@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Icons from "../../components/icons";
 
-const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault, onRenderForm }) => {
+const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 my-3 hover:shadow-md transition-all duration-300 group">
       {/* Mobile Compact View */}
@@ -51,14 +51,14 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
 
         {/* Mobile Actions */}
         <div className="flex gap-2 mt-3">
-          <button
-            onClick={onRenderForm}
+          <Link
+            to={`/render-schema/${input._id}`}
             className="flex-1 px-3 py-2 border border-purple-300 rounded-lg text-purple-600 text-sm hover:bg-purple-50 transition-colors flex items-center justify-center gap-2"
             title="Render Form"
           >
             <Icons.View className="w-4 h-4" />
             <span>Render Form</span>
-          </button>
+          </Link>
           <Link
             to={`/schema-builder/${input._id}`}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors text-center flex items-center justify-center gap-2"
@@ -162,13 +162,13 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
 
         {/* Actions */}
         <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={onRenderForm}
+          <Link
+            to={`/render-schema/${input._id}`}
             className="p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
             title="Render Form"
           >
             <Icons.View className="w-4 h-4" />
-          </button>
+          </Link>
 
           <Link
             to={`/schema-builder/${input._id}`}
