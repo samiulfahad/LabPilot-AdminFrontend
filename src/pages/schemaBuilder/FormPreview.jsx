@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import SelectField from "../../components/html/SelectField"; // Adjust the import path as needed
 
 const FormPreview = ({
   schema,
@@ -631,19 +632,14 @@ const FormPreview = ({
                 {getLabelText()}
               </label>
               <div className="flex-1 flex items-center">
-                <select
+                <SelectField
+                  label=""
+                  name={field.id}
                   value={value}
                   onChange={(e) => handleInputChange(field.id, e.target.value)}
-                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
-                  required={field.required}
-                >
-                  <option value="">Select an option</option>
-                  {field.options?.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                  options={field.options?.map((option) => ({ value: option, label: option })) || []}
+                  placeholder="Select an option"
+                />
                 {field.unit && (
                   <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
                 )}
@@ -853,6 +849,12 @@ const FormPreview = ({
     );
   };
 
+  // Gender options for the SelectField
+  const genderOptions = [
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+  ];
+
   return (
     <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
       <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
@@ -892,23 +894,15 @@ const FormPreview = ({
               </div>
             </div>
 
-            {/* Gender Selection */}
-            <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-              <label className="w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 text-gray-700 flex items-center">
-                Patient Gender
-              </label>
-              <div className="flex-1 flex items-center">
-                <select
-                  value={patientGender}
-                  onChange={(e) => setPatientGender(e.target.value)}
-                  className="flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm bg-white border-0"
-                >
-                  <option value="">Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-            </div>
+            {/* Gender Selection using SelectField */}
+            <SelectField
+              label="Patient Gender"
+              name="patientGender"
+              value={patientGender}
+              onChange={(e) => setPatientGender(e.target.value)}
+              options={genderOptions}
+              placeholder="Select gender"
+            />
           </div>
           {(patientAge || patientGender) && (
             <div className="mt-3 p-3 bg-green-50 rounded border border-green-200">
