@@ -94,7 +94,7 @@ const LabManagement = () => {
         <ViewLabDetails />
       </Modal>
 
-      <Modal isOpen={modal.view === "addAdminForm"}>
+      <Modal isOpen={modal.view === "addAdminForm"} >
         <AddAdmin />
       </Modal>
 

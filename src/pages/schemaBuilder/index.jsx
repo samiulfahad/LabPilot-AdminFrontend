@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import testSchemaService from "../../services/schemaService";
 import testService from "../../services/testService";
-import InputField from "./InputField";
+import InputField from "../../components/html/InputField";
+import SelectField from "../../components/html/SelectField";
 import SchemaDisplay from "./SchemaDisplay";
 import FormPreview from "./FormPreview";
 import Popup from "../../components/popup/Popup";
@@ -81,22 +82,22 @@ const SchemaBuilder = () => {
   ];
 
   const commonUnits = [
-    "",
-    "mg/L",
-    "mg/dL",
-    "g/dL",
-    "mmol/L",
-    "μmol/L",
-    "U/L",
-    "IU/L",
-    "cells/μL",
-    "×10^9/L",
-    "mmHg",
-    "cm",
-    "kg",
-    "lb",
-    "°C",
-    "°F",
+    { value: "", label: "No Unit" },
+    { value: "mg/L", label: "mg/L" },
+    { value: "mg/dL", label: "mg/dL" },
+    { value: "g/dL", label: "g/dL" },
+    { value: "mmol/L", label: "mmol/L" },
+    { value: "μmol/L", label: "μmol/L" },
+    { value: "U/L", label: "U/L" },
+    { value: "IU/L", label: "IU/L" },
+    { value: "cells/μL", label: "cells/μL" },
+    { value: "×10^9/L", label: "×10^9/L" },
+    { value: "mmHg", label: "mmHg" },
+    { value: "cm", label: "cm" },
+    { value: "kg", label: "kg" },
+    { value: "lb", label: "lb" },
+    { value: "°C", label: "°C" },
+    { value: "°F", label: "°F" },
   ];
 
   // Fetch existing schema when in edit mode
@@ -972,42 +973,30 @@ const SchemaBuilder = () => {
           </div>
           <div className="p-3 sm:p-4 lg:p-6 space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-                <label className="w-full sm:w-40 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
-                  Test Category
-                </label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="flex-1 px-3 py-2 focus:outline-none bg-white"
-                >
-                  <option value="">Select a category</option>
-                  {testCategories.map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.categoryName}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectField
+                label="Test Category"
+                name="category"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                options={testCategories.map((category) => ({
+                  value: category._id,
+                  label: category.categoryName,
+                }))}
+                placeholder="Select a category"
+              />
 
-              <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-                <label className="w-full sm:w-40 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
-                  Test
-                </label>
-                <select
-                  value={selectedTest}
-                  onChange={(e) => setSelectedTest(e.target.value)}
-                  disabled={!selectedCategory}
-                  className="flex-1 px-3 py-2 focus:outline-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                >
-                  <option value="">Select a test</option>
-                  {availableTests.map((test) => (
-                    <option key={test._id} value={test._id}>
-                      {test.testName} {test.isOnline && "(Online)"}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectField
+                label="Test"
+                name="test"
+                value={selectedTest}
+                onChange={(e) => setSelectedTest(e.target.value)}
+                disabled={!selectedCategory}
+                options={availableTests.map((test) => ({
+                  value: test._id,
+                  label: `${test.testName} ${test.isOnline ? "(Online)" : ""}`,
+                }))}
+                placeholder="Select a test"
+              />
             </div>
 
             {selectedTest && (
@@ -1162,21 +1151,18 @@ const SchemaBuilder = () => {
               <div className="space-y-3 p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50">
                 <h4 className="text-base sm:text-lg font-semibold text-gray-700">Test Standard Range Values</h4>
 
-                <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-                  <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
-                    Standard Range Type
-                  </label>
-                  <select
-                    value={testStandardRange.type}
-                    onChange={(e) =>
-                      setTestStandardRange((prev) => ({ ...prev, type: e.target.value, options: [], text: "" }))
-                    }
-                    className="flex-1 px-3 py-2 focus:outline-none bg-white"
-                  >
-                    <option value="options">Key-Value Options</option>
-                    <option value="text">Text Standard Range</option>
-                  </select>
-                </div>
+                <SelectField
+                  label="Standard Range Type"
+                  name="testStandardRangeType"
+                  value={testStandardRange.type}
+                  onChange={(e) =>
+                    setTestStandardRange((prev) => ({ ...prev, type: e.target.value, options: [], text: "" }))
+                  }
+                  options={[
+                    { value: "options", label: "Key-Value Options" },
+                    { value: "text", label: "Text Standard Range" },
+                  ]}
+                />
 
                 {testStandardRange.type === "options" && (
                   <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
@@ -1373,23 +1359,17 @@ const SchemaBuilder = () => {
               </h4>
               <div className="space-y-3 p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50">
                 {useSections && schema.sections && schema.sections.length > 0 && (
-                  <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-                    <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
-                      Section
-                    </label>
-                    <select
-                      value={currentField.sectionId}
-                      onChange={(e) => setCurrentField((prev) => ({ ...prev, sectionId: e.target.value }))}
-                      className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
-                    >
-                      <option value="">Choose a section</option>
-                      {schema.sections.map((section, index) => (
-                        <option key={section.id} value={section.id}>
-                          {section.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SelectField
+                    label="Section"
+                    name="section"
+                    value={currentField.sectionId}
+                    onChange={(e) => setCurrentField((prev) => ({ ...prev, sectionId: e.target.value }))}
+                    options={schema.sections.map((section) => ({
+                      value: section.id,
+                      label: section.name,
+                    }))}
+                    placeholder="Choose a section"
+                  />
                 )}
 
                 <div className="space-y-3">
@@ -1401,63 +1381,45 @@ const SchemaBuilder = () => {
                       onChange={(e) => setCurrentField((prev) => ({ ...prev, label: e.target.value }))}
                     />
 
-                    <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-                      <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
-                        Type
-                      </label>
-                      <select
-                        value={currentField.type}
-                        onChange={(e) => {
-                          const newType = e.target.value;
-                          setCurrentField((prev) => ({
-                            ...prev,
-                            type: newType,
-                            standardRange: newType === "number" ? prev.standardRange : null,
-                            options: ["radio", "select", "checkbox"].includes(newType) ? prev.options : [],
-                          }));
-                        }}
-                        className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
-                      >
-                        {fieldTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <SelectField
+                      label="Type"
+                      name="fieldType"
+                      value={currentField.type}
+                      onChange={(e) => {
+                        const newType = e.target.value;
+                        setCurrentField((prev) => ({
+                          ...prev,
+                          type: newType,
+                          standardRange: newType === "number" ? prev.standardRange : null,
+                          options: ["radio", "select", "checkbox"].includes(newType) ? prev.options : [],
+                        }));
+                      }}
+                      options={fieldTypes.map((type) => ({
+                        value: type,
+                        label: type.charAt(0).toUpperCase() + type.slice(1),
+                      }))}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-                      <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
-                        Required
-                      </label>
-                      <select
-                        value={currentField.required}
-                        onChange={(e) => setCurrentField((prev) => ({ ...prev, required: e.target.value }))}
-                        className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
-                      >
-                        <option value="no">No</option>
-                        <option value="yes">Yes</option>
-                      </select>
-                    </div>
+                    <SelectField
+                      label="Required"
+                      name="required"
+                      value={currentField.required}
+                      onChange={(e) => setCurrentField((prev) => ({ ...prev, required: e.target.value }))}
+                      options={[
+                        { value: "no", label: "No" },
+                        { value: "yes", label: "Yes" },
+                      ]}
+                    />
 
-                    <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-                      <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
-                        Unit
-                      </label>
-                      <select
-                        value={currentField.unit}
-                        onChange={(e) => setCurrentField((prev) => ({ ...prev, unit: e.target.value }))}
-                        className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
-                      >
-                        {commonUnits.map((unit) => (
-                          <option key={unit} value={unit}>
-                            {unit || "No Unit"}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <SelectField
+                      label="Unit"
+                      name="unit"
+                      value={currentField.unit}
+                      onChange={(e) => setCurrentField((prev) => ({ ...prev, unit: e.target.value }))}
+                      options={commonUnits}
+                    />
                   </div>
                 </div>
 
@@ -1510,28 +1472,19 @@ const SchemaBuilder = () => {
                         Standard Range
                       </label>
                       <div className="flex-1 p-3 space-y-4">
-                        <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden">
-                          <label className="w-full sm:w-32 px-3 py-2 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 flex items-center">
-                            Type
-                          </label>
-                          <select
-                            value={currentField.standardRange?.type || "none"}
-                            onChange={(e) => {
-                              if (e.target.value === "none") {
-                                setCurrentField((prev) => ({ ...prev, standardRange: null }));
-                              } else {
-                                initializeStandardRange(e.target.value);
-                              }
-                            }}
-                            className="flex-1 px-3 py-2 focus:outline-none text-sm bg-white"
-                          >
-                            {standardRangeTypes.map((ref) => (
-                              <option key={ref.value} value={ref.value}>
-                                {ref.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                        <SelectField
+                          label="Type"
+                          name="standardRangeType"
+                          value={currentField.standardRange?.type || "none"}
+                          onChange={(e) => {
+                            if (e.target.value === "none") {
+                              setCurrentField((prev) => ({ ...prev, standardRange: null }));
+                            } else {
+                              initializeStandardRange(e.target.value);
+                            }
+                          }}
+                          options={standardRangeTypes}
+                        />
 
                         {currentField.standardRange?.type === "genderBased" && (
                           <div className="space-y-3">

@@ -37,6 +37,7 @@ const SchemaList = () => {
       resetFilters();
       const response = await schemaService.getAll();
       setSchemas(response.data || []);
+      console.log(response.data[0]);
       if (response.data?.length === 0) {
         setPopup({ type: "error", message: "No schemas found" });
       }
@@ -54,7 +55,7 @@ const SchemaList = () => {
       setLoading(true);
       const response = await schemaService.getByTestId(testId);
       if (response.data) {
-        setSchemas([response.data]);
+        setSchemas(response.data);
       } else {
         setSchemas([]);
         setPopup({ type: "error", message: "No schema found for selected test" });
@@ -303,6 +304,9 @@ const SchemaList = () => {
 
             {/* Schemas Grid */}
             <div className="space-y-4">
+              {
+                console.log(schemas)
+              }
               {schemas.map((schema, index) => (
                 // In your SchemaList component, update the Schema component usage:
                 <Schema
