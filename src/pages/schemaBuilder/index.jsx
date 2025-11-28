@@ -957,7 +957,7 @@ const SchemaBuilder = () => {
       <div className="max-w-7xl mx-auto space-y-3 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between">
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
-            {isEditMode ? "Edit Lab Test Schema" : "Lab Test Builder"}
+            {isEditMode ? "Edit Schema for Lab Test" : "Schema Builder for Lab Test"}
           </h2>
           {isEditMode && (
             <div className="bg-blue-100 border border-blue-300 rounded-lg px-3 py-2 mt-2 sm:mt-0">
