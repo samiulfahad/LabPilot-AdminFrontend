@@ -16,8 +16,8 @@ const SchemaBuilder = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [schema, setSchema] = useState({
-    testName: "",
-    testDescription: "",
+    name: "",
+    description: "",
     fields: [],
   });
 
@@ -134,7 +134,7 @@ const SchemaBuilder = () => {
 
           // Populate form with existing schema data
           setSchema({
-            testName: existingSchema.testName || "",
+            name: existingSchema.name || "",
             testDescription: existingSchema.testDescription || "",
             fields: cleanFields(existingSchema.fields || []),
             sections: existingSchema.sections ? cleanSections(existingSchema.sections) : [],
@@ -820,7 +820,7 @@ const SchemaBuilder = () => {
 
   const prepareSchemaForSave = () => {
     const cleanedSchema = {
-      testName: schema.testName.trim(),
+      name: schema.name.trim(),
       testDescription: schema.testDescription ? schema.testDescription.trim() : "",
       testId: selectedTest,
       categoryId: selectedCategory,
@@ -867,7 +867,7 @@ const SchemaBuilder = () => {
   };
 
   const saveSchema = async () => {
-    if (!schema.testName.trim()) {
+    if (!schema.name.trim()) {
       setPopup({ type: "error", message: "Test name is required" });
       return;
     }
@@ -921,8 +921,8 @@ const SchemaBuilder = () => {
 
   const resetForm = () => {
     setSchema({
-      testName: "",
-      testDescription: "",
+      name: "",
+      description: "",
       fields: [],
     });
     setUseSections(false);
@@ -1011,7 +1011,7 @@ const SchemaBuilder = () => {
                 disabled={!selectedCategory}
                 options={availableTests.map((test) => ({
                   value: test._id,
-                  label: `${test.testName} ${test.isOnline ? "(Online)" : ""}`,
+                  label: `${test.name} ${test.isOnline ? "(Online)" : ""}`,
                 }))}
                 placeholder="Select a test"
               />
@@ -1028,7 +1028,7 @@ const SchemaBuilder = () => {
                     <div className="mt-1 text-sm text-blue-700">
                       <p>
                         Schema will be attached to:{" "}
-                        <strong>{availableTests.find((test) => test._id === selectedTest)?.testName}</strong>
+                        <strong>{availableTests.find((test) => test._id === selectedTest)?.name}</strong>
                       </p>
                     </div>
                   </div>
@@ -1049,10 +1049,10 @@ const SchemaBuilder = () => {
             <div className="space-y-3">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <InputField
-                  label="Test Name"
-                  name="testName"
-                  value={schema.testName}
-                  onChange={(e) => setSchema((prev) => ({ ...prev, testName: e.target.value }))}
+                  label="Schema Name"
+                  name="name"
+                  value={schema.name}
+                  onChange={(e) => setSchema((prev) => ({ ...prev, name: e.target.value }))}
                 />
                 <InputField
                   label="Test Description"
@@ -1727,7 +1727,7 @@ const SchemaBuilder = () => {
                 type="button"
                 onClick={saveSchema}
                 disabled={
-                  isSaving || !schema.testName.trim() || !selectedCategory || !selectedTest || getFieldsCount() === 0
+                  isSaving || !schema.name.trim() || !selectedCategory || !selectedTest || getFieldsCount() === 0
                 }
                 className="w-full sm:w-64 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >

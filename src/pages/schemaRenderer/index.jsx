@@ -416,8 +416,8 @@ const SchemaRenderer = ({ useSections = true, useStandardRange = true, onSubmit,
         patientAge,
         patientGender,
         formData,
-        testName: schema.testName,
-        testDescription: schema.testDescription,
+        name: schema.name,
+        description: schema.description,
       };
 
       if (onSubmit) {
@@ -858,8 +858,8 @@ const SchemaRenderer = ({ useSections = true, useStandardRange = true, onSubmit,
       <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
           <div>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">{schema.testName || "Form"}</h3>
-            {schema.testDescription && <p className="text-sm text-gray-600 mt-1">{schema.testDescription}</p>}
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">{schema.name || "Form"}</h3>
+            {schema.description && <p className="text-sm text-gray-600 mt-1">{schema.description}</p>}
           </div>
           <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">{getFieldsCount()} field(s)</div>
         </div>

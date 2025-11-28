@@ -1,8 +1,8 @@
 export const schemaSlice = (set, get) => ({
   // Schema state
   schema: {
-    testName: "",
-    testDescription: "",
+    name: "",
+    description: "",
     fields: [],
   },
   useSections: false,
@@ -149,8 +149,8 @@ export const schemaSlice = (set, get) => ({
   // Reset schema
   resetSchema: () => set({
     schema: {
-      testName: "",
-      testDescription: "",
+      name: "",
+      description: "",
       fields: [],
     },
     useSections: false,

@@ -217,11 +217,11 @@ const SchemaList = () => {
 
   const testOptions = availableTests.map((test) => ({
     value: test._id,
-    label: test.testName,
+    label: test.name,
   }));
 
   const selectedCategoryName = categories.find((c) => c._id === selectedCategory)?.categoryName;
-  const selectedTestName = availableTests.find((t) => t._id === selectedTest)?.testName;
+  const selectedTestName = availableTests.find((t) => t._id === selectedTest)?.name;
 
   return (
     <div className="min-h-screen bg-gray-50/30 py-2">
@@ -324,10 +324,10 @@ const SchemaList = () => {
                 {selectedCategoryName && (
                   <>
                     <span className="font-medium">{selectedCategoryName}</span>
-                    {selectedTestName && <span className="mx-2">•</span>}
+                    {selectedTest && <span className="mx-2">•</span>}
                   </>
                 )}
-                {selectedTestName && <span className="font-medium">{selectedTestName}</span>}
+                {selectedTest && <span className="font-medium">{selectedTestName}</span>}
               </div>
               <button onClick={resetFilters} className="text-sm text-blue-600 hover:text-blue-800 font-medium">
                 Clear
@@ -378,7 +378,7 @@ const SchemaList = () => {
                 <p className="text-gray-500 text-sm mt-1">
                   {schemas.length} schema{schemas.length !== 1 ? "s" : ""} found
                   {selectedCategoryName && ` • Filtered by ${selectedCategoryName}`}
-                  {selectedTestName && ` • ${selectedTestName}`}
+                  {selectedTest && ` • ${selectedTest}`}
                 </p>
               </div>
               {(selectedCategory || selectedTest) && (
@@ -398,7 +398,7 @@ const SchemaList = () => {
                   onDelete={() =>
                     setPopup({
                       type: "confirmation",
-                      message: `Do you want to delete the schema "${schema.testName}"?`,
+                      message: `Do you want to delete the schema "${schema.name}"?`,
                       _id: schema._id,
                       action: "delete",
                     })
@@ -406,7 +406,7 @@ const SchemaList = () => {
                   onActivate={() =>
                     setPopup({
                       type: "confirmation",
-                      message: `Do you want to activate the schema "${schema.testName}"?`,
+                      message: `Do you want to activate the schema "${schema.name}"?`,
                       _id: schema._id,
                       action: "activate",
                     })
@@ -414,7 +414,7 @@ const SchemaList = () => {
                   onDeactivate={() =>
                     setPopup({
                       type: "confirmation",
-                      message: `Do you want to deactivate the schema "${schema.testName}"?`,
+                      message: `Do you want to deactivate the schema "${schema.name}"?`,
                       _id: schema._id,
                       action: "deactivate",
                     })
@@ -422,7 +422,7 @@ const SchemaList = () => {
                   onSetDefault={() =>
                     setPopup({
                       type: "confirmation",
-                      message: `Do you want to set "${schema.testName}" as the default schema?`,
+                      message: `Do you want to set "${schema.name}" as the default schema?`,
                       _id: schema._id,
                       action: "setDefault",
                     })

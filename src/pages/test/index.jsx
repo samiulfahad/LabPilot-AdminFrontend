@@ -1,37 +1,54 @@
 import { useState, useEffect } from "react";
 
 import Modal from "../../components/modal";
-import Form from "./Form";
 import Category from "./Category";
 import Popup from "../../components/popup/Popup";
 import LoadingScreen from "../../components/loadingPage";
-import testService from "../../services/testService";
+import labTestService from "../../services/testService";
+import schemaService from "../../services/schemaService";
+import TestCategoryForm from "./FormTestCategory";
+import LabTestForm from "./FormLabTest";
+import DefaultSchemaModal from "./DefaultSchemaModal";
 
 const Tests = () => {
   const [categories, setCategories] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modal, setModal] = useState({});
   const [loading, setLoading] = useState(false);
   const [popup, setPopup] = useState(null);
-  const [form, setForm] = useState(null);
+  const [form, setForm] = useState({});
+  const [schemas, setSchemas] = useState([]);
+  const [selectedTest, setSelectedTest] = useState(null);
+
+  const loadSchema = async (testId) => {
+    try {
+      setLoading(true);
+      console.log("Loading schemas for test:", testId);
+      const response = await schemaService.getByTestId(testId);
+      console.log(response.data);
+      setSchemas(response.data);
+    } catch (e) {
+      setPopup({ type: "error", message: "Could not load schemas" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
       if (form.type === "addCategory") {
-        console.log(form.categoryName);
-        const response = await testService.addCategory({ categoryName: form.categoryName });
-        // Push the new category without reloading
+        console.log(form);
+        const response = await labTestService.addCategory({ categoryName: form.categoryName });
         setCategories((prev) => [...prev, response.data]);
         setPopup({ type: "success", message: "Test Category Added Successfully" });
       }
 
       if (form.type === "editCategory") {
-        const response = await testService.editCategory({
+        const response = await labTestService.editCategory({
           categoryId: form.categoryId,
           categoryName: form.categoryName,
         });
-        // Update the edited category in the DOM
         setCategories((prev) =>
           prev.map((category) =>
             category._id === form.categoryId ? { ...category, categoryName: form.categoryName.toUpperCase() } : category
@@ -40,40 +57,58 @@ const Tests = () => {
         setPopup({ type: "success", message: "Category renamed successfully" });
       }
 
-      if (form.type === "addTest") {
-        const data = { categoryId: form.categoryId, testName: form.testName, isOnline: form.isOnline };
+      if (form.type === "addLabTest") {
+        const data = { categoryId: form.categoryId, name: form.name };
         console.log(data);
-        const response = await testService.addTest(data);
-        // console.log(response.data);
+        const response = await labTestService.addLabTest(data);
         setCategories((prev) =>
           prev.map((category) => (category._id === response.data._id ? response.data : category))
         );
         setPopup({ type: "success", message: "Test added successfully" });
       }
 
-      if (form.type === "editTest") {
+      if (form.type === "editLabTest") {
         const data = {
           categoryId: form.categoryId,
           testId: form.testId,
-          testName: form.testName,
-          isOnline: form.isOnline,
+          name: form.name,
         };
         console.log(data);
-        const response = await testService.editTest(data);
-        // console.log(response.data);
+        const response = await labTestService.editTest(data);
         setCategories((prev) =>
           prev.map((category) => (category._id === response.data._id ? response.data : category))
         );
         setPopup({ type: "success", message: "Test edited successfully" });
       }
 
-      setForm(null);
-      setIsModalOpen(false);
+      setForm({});
+      setModal({});
     } catch (e) {
-      // console.log(e);
       let message = "Could not complete operation";
       if (e.response?.data?.duplicate) message = "This name is already present";
       setPopup({ type: "error", message: message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetDefaultSchema = async (testId, schemaId) => {
+    try {
+      setLoading(true);
+      const response = await labTestService.setDefaultSchema(testId, schemaId);
+
+      // Update the categories state
+      setCategories((prev) =>
+        prev.map((category) => ({
+          ...category,
+          tests: category.tests.map((test) => (test._id === testId ? { ...test, defaultSchema: schemaId } : test)),
+        }))
+      );
+
+      setPopup({ type: "success", message: "Default schema set successfully" });
+      setModal({});
+    } catch (e) {
+      setPopup({ type: "error", message: "Failed to set default schema" });
     } finally {
       setLoading(false);
     }
@@ -83,15 +118,13 @@ const Tests = () => {
     try {
       setLoading(true);
       if (popup.delete === "category") {
-        const response = await testService.deleteCategory(popup.categoryId);
-        // Remove the category from the array without reloading
+        const response = await labTestService.deleteCategory(popup.categoryId);
         setCategories((prev) => prev.filter((item) => item._id !== popup.categoryId));
         setPopup({ type: "success", message: "Category Deleted Successfully" });
       }
 
       if (popup.delete === "test") {
-        const response = await testService.deleteTest(popup.categoryId, popup.testId);
-        // Remove test from the array without reloading
+        const response = await labTestService.deleteTest(popup.categoryId, popup.testId);
         setCategories((prev) =>
           prev.map((category) =>
             category._id === popup.categoryId
@@ -105,22 +138,19 @@ const Tests = () => {
         setPopup({ type: "success", message: "Test Deleted Successfully" });
       }
     } catch (e) {
-      setPopup({
-        type: "error",
-        message: "Something went wrong. Item was not deleted",
-      });
-      // console.log(e);
+      setPopup({ type: "error", message: "Something went wrong. Item was not deleted" });
     } finally {
       setLoading(false);
     }
   };
 
   const handleClose = () => {
-    setIsModalOpen(false);
-    setForm(null);
+    setModal({});
+    setForm({});
+    setSelectedTest(null);
   };
 
-  const handleFormData = (name, value) => {
+  const handleFormChange = (name, value) => {
     setForm((prev) => ({
       ...prev,
       [name]: value,
@@ -130,8 +160,7 @@ const Tests = () => {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const response = await testService.getAllTests();
-      console.log(response.data);
+      const response = await labTestService.getAllTests();
       setCategories(response.data);
     } catch (err) {
       setPopup({ type: "error", message: "Could not load test categories" });
@@ -140,9 +169,16 @@ const Tests = () => {
     }
   };
 
+  const handleOpenDefaultSchemaModal = async (test) => {
+    setSelectedTest(test);
+    await loadSchema(test._id);
+    setModal({ isOpen: true, type: "defaultSchema" });
+  };
+
   useEffect(() => {
     loadCategories();
   }, []);
+
   return (
     <section>
       {loading && <LoadingScreen />}
@@ -159,7 +195,7 @@ const Tests = () => {
         <div className="min-w-full flex justify-center items-center">
           <button
             onClick={() => {
-              setIsModalOpen(true);
+              setModal({ isOpen: true });
               setForm({ type: "addCategory" });
             }}
             className="add-btn"
@@ -167,16 +203,40 @@ const Tests = () => {
             Add Test Category
           </button>
         </div>
+
         {/* Modal */}
-        <Modal isOpen={isModalOpen} size="sm">
-          <Form
-            onSubmit={handleSubmit}
-            formType={form?.type}
-            data={form}
-            onChange={handleFormData}
-            onClose={handleClose}
-          />
+        <Modal isOpen={modal.isOpen} size="sm">
+          {(form?.type === "addCategory" || form?.type === "editCategory") && (
+            <TestCategoryForm
+              onSubmit={handleSubmit}
+              formType={form.type}
+              data={form}
+              categoryId={form.categoryId}
+              onChange={handleFormChange}
+              onClose={handleClose}
+            />
+          )}
+
+          {(form?.type === "addLabTest" || form?.type === "editLabTest") && (
+            <LabTestForm
+              onSubmit={handleSubmit}
+              formType={form.type}
+              data={form}
+              onChange={handleFormChange}
+              onClose={handleClose}
+            />
+          )}
+
+          {modal.type === "defaultSchema" && selectedTest && (
+            <DefaultSchemaModal
+              test={selectedTest}
+              schemas={schemas}
+              onSetDefault={handleSetDefaultSchema}
+              onClose={handleClose}
+            />
+          )}
         </Modal>
+
         {categories.map((category) => (
           <Category
             key={category._id}
@@ -184,11 +244,11 @@ const Tests = () => {
             tests={category.tests}
             onEditCategory={() => {
               setForm({
-                categoryName: category.categoryName,
                 type: "editCategory",
+                categoryName: category.categoryName,
                 categoryId: category._id,
               });
-              setIsModalOpen(true);
+              setModal({ isOpen: true, type: "editCategory" });
             }}
             onDeleteCategory={() => {
               setPopup({
@@ -199,23 +259,23 @@ const Tests = () => {
               });
             }}
             onAddTest={() => {
-              setForm({ type: "addTest", categoryId: category._id });
-              setIsModalOpen(true);
+              setForm({ type: "addLabTest", categoryId: category._id });
+              setModal({ isOpen: true });
             }}
-            onEditTest={(testId, testName, isOnline) => {
+            onEditTest={(test) => {
               setForm({
-                type: "editTest",
+                type: "editLabTest",
                 categoryId: category._id,
-                testId: testId,
-                testName: testName,
-                isOnline: isOnline,
+                testId: test._id,
+                name: test.name,
               });
-              setIsModalOpen(true);
+              setModal({ isOpen: true });
             }}
-            onDeleteTest={(testId, testName) => {
+            onSetDefaultSchema={handleOpenDefaultSchemaModal}
+            onDeleteTest={(testId, name) => {
               setPopup({
                 type: "confirmation",
-                message: `You are going to delete test - ${testName} under category ${category.categoryName}`,
+                message: `You are going to delete test - ${name} under category ${category.categoryName}`,
                 categoryId: category._id,
                 testId: testId,
                 delete: "test",

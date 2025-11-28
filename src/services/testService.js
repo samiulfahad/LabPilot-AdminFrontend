@@ -1,7 +1,7 @@
 import api from "./api";
 
-const testService = {
-  addTest: (data) => api.post("/lab/test/add", data),
+const labTestService = {
+  addLabTest: (data) => api.post("/lab/test/add", data),
   editTest: (data) => api.patch("/lab/test/edit", data),
   deleteTest: (categoryId, testId) => api.delete("/lab/test/delete", { data: { categoryId, testId } }),
   getAllTests: () => api.get("/lab/test/category/all"),
@@ -10,4 +10,4 @@ const testService = {
   deleteCategory: (_id) => api.delete("/lab/test/category/delete", { data: { categoryId: _id } }),
 };
 
-export default testService;
+export default labTestService;

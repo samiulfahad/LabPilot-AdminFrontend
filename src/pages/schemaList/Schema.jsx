@@ -12,8 +12,8 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
               <span className="text-white font-bold text-xs">S{index + 1}</span>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">{input.testName}</h3>
-              {input.testDescription && <p className="text-xs text-gray-500 mt-0.5">{input.testDescription}</p>}
+              <h3 className="font-semibold text-gray-900 text-sm">{input.name}</h3>
+              {input.description && <p className="text-xs text-gray-500 mt-0.5">{input.description}</p>}
             </div>
           </div>
           <span
@@ -117,8 +117,8 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
             <span className="text-white font-bold text-sm">S{index + 1}</span>
           </div>
           <div className="min-w-0">
-            <h3 className="font-semibold text-gray-900 truncate">{input.testName}</h3>
-            {input.testDescription && <p className="text-sm text-gray-500 mt-0.5 truncate">{input.testDescription}</p>}
+            <h3 className="font-semibold text-gray-900 truncate">{input.name}</h3>
+            {input.description && <p className="text-sm text-gray-500 mt-0.5 truncate">{input.description}</p>}
           </div>
         </div>
 
