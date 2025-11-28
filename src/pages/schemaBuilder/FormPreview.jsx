@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import SelectField from "../../components/html/SelectField";
-import InputField from "../../components/html/InputField"; // Import the InputField component
+import SelectField from "../../components/html/SelectField"; // Adjust the import path as needed
 
 const FormPreview = ({
   schema,
@@ -405,7 +404,12 @@ const FormPreview = ({
     const isTouched = touchedFields[field.id];
 
     const getLabelText = () => {
-      return field.label;
+      return (
+        <>
+          {field.label}
+          {field.required && <span className="text-red-500 ml-1">*</span>}
+        </>
+      );
     };
 
     // Dynamic styling based on validation state - only apply error styles if touched AND there's an error
@@ -422,12 +426,14 @@ const FormPreview = ({
             container: "border-green-500 bg-green-50",
             input: "text-green-700 bg-green-50",
             unit: "text-green-700 border-green-300 bg-green-100",
+            label: "border-green-300 bg-green-100 text-green-800",
           };
         case "outOfRange":
           return {
             container: "border-red-500 bg-red-50",
             input: "text-red-700 bg-red-50",
             unit: "text-red-700 border-red-300 bg-red-100",
+            label: "border-red-300 bg-red-100 text-red-800",
           };
         case "error":
           // Only show red styling if field is touched AND has error
@@ -436,6 +442,7 @@ const FormPreview = ({
               container: "border-red-500 bg-red-50",
               input: "text-red-700 bg-red-50",
               unit: "text-red-700 border-red-300 bg-red-100",
+              label: "border-red-300 bg-red-100 text-red-800",
             };
           }
         // Fall through to default if not touched or no error
@@ -444,6 +451,7 @@ const FormPreview = ({
             container: "border-gray-300 bg-white",
             input: "text-gray-900 bg-white",
             unit: "text-gray-500 border-gray-300 bg-gray-50",
+            label: "border-gray-300 bg-gray-50 text-gray-700",
           };
       }
     };
@@ -498,16 +506,24 @@ const FormPreview = ({
       case "text":
         return (
           <div className="space-y-2">
-            <div className={`${styles.container} rounded-lg overflow-hidden`}>
-              <InputField
-                label={getLabelText()}
-                name={field.id}
-                value={value}
-                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                type="text"
-                required={field.required}
-                className={styles.input}
-              />
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
+              >
+                {getLabelText()}
+              </label>
+              <div className="flex-1 flex items-center">
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
+                  required={field.required}
+                />
+                {field.unit && (
+                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
+                )}
+              </div>
             </div>
 
             {/* Show required error only when touched and empty */}
@@ -524,21 +540,18 @@ const FormPreview = ({
       case "textarea":
         return (
           <div className="space-y-2">
-            <div className={`flex border rounded-lg overflow-hidden ${styles.container}`}>
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
               <label
-                className={`w-32 px-3 py-2 text-sm font-medium border-r border-gray-300 flex items-center ${
-                  field.required ? "bg-gray-50 text-gray-700" : "bg-gray-50 text-gray-700"
-                }`}
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
               >
                 {getLabelText()}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
               <div className="flex-1 flex flex-col">
                 <textarea
                   rows={3}
                   value={value}
                   onChange={(e) => handleInputChange(field.id, e.target.value)}
-                  className={`flex-1 px-3 py-2 focus:outline-none text-sm resize-none border-0 ${styles.input}`}
+                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm resize-none border-0 ${styles.input}`}
                   required={field.required}
                 />
                 {field.unit && <div className={`px-3 py-2 text-sm border-t ${styles.unit}`}>Unit: {field.unit}</div>}
@@ -559,17 +572,25 @@ const FormPreview = ({
       case "number":
         return (
           <div className="space-y-2">
-            <div className={`${styles.container} rounded-lg overflow-hidden`}>
-              <InputField
-                label={getLabelText()}
-                name={field.id}
-                value={value}
-                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                type="number"
-                step="any"
-                required={field.required}
-                className={styles.input}
-              />
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
+              >
+                {getLabelText()}
+              </label>
+              <div className="flex-1 flex items-center">
+                <input
+                  type="number"
+                  value={value}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  step="any"
+                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
+                  required={field.required}
+                />
+                {field.unit && (
+                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
+                )}
+              </div>
             </div>
 
             {/* Show standard range info when available - only as info if not touched */}
@@ -604,14 +625,11 @@ const FormPreview = ({
       case "select":
         return (
           <div className="space-y-2">
-            <div className={`flex border rounded-lg overflow-hidden ${styles.container}`}>
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
               <label
-                className={`w-32 px-3 py-2 text-sm font-medium border-r border-gray-300 flex items-center ${
-                  field.required ? "bg-gray-50 text-gray-700" : "bg-gray-50 text-gray-700"
-                }`}
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
               >
                 {getLabelText()}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
               <div className="flex-1 flex items-center">
                 <SelectField
@@ -642,16 +660,13 @@ const FormPreview = ({
       case "radio":
         return (
           <div className="space-y-2">
-            <div className={`flex border rounded-lg overflow-hidden ${styles.container}`}>
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
               <label
-                className={`w-32 px-3 py-2 text-sm font-medium border-r border-gray-300 flex items-center ${
-                  field.required ? "bg-gray-50 text-gray-700" : "bg-gray-50 text-gray-700"
-                }`}
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
               >
                 {getLabelText()}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
-              <div className="flex-1 px-3 py-2">
+              <div className="flex-1 px-3 py-2 sm:py-3">
                 <div className="space-y-2">
                   {field.options?.map((option, index) => (
                     <label key={index} className="flex items-center space-x-2">
@@ -687,16 +702,13 @@ const FormPreview = ({
       case "checkbox":
         return (
           <div className="space-y-2">
-            <div className={`flex border rounded-lg overflow-hidden ${styles.container}`}>
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
               <label
-                className={`w-32 px-3 py-2 text-sm font-medium border-r border-gray-300 flex items-center ${
-                  field.required ? "bg-gray-50 text-gray-700" : "bg-gray-50 text-gray-700"
-                }`}
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
               >
                 {getLabelText()}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
-              <div className="flex-1 px-3 py-2">
+              <div className="flex-1 px-3 py-2 sm:py-3">
                 <div className="space-y-2">
                   {field.options?.map((option, index) => {
                     const isChecked = Array.isArray(value) && value.includes(option);
@@ -741,16 +753,24 @@ const FormPreview = ({
       default:
         return (
           <div className="space-y-2">
-            <div className={`${styles.container} rounded-lg overflow-hidden`}>
-              <InputField
-                label={getLabelText()}
-                name={field.id}
-                value={value}
-                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                type="text"
-                required={field.required}
-                className={styles.input}
-              />
+            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
+              <label
+                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
+              >
+                {getLabelText()}
+              </label>
+              <div className="flex-1 flex items-center">
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
+                  required={field.required}
+                />
+                {field.unit && (
+                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
+                )}
+              </div>
             </div>
 
             {/* Show required error only when touched and empty */}
@@ -853,17 +873,26 @@ const FormPreview = ({
         <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <h4 className="text-lg font-semibold text-blue-800 mb-4">Patient Information</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Age Input using InputField */}
-            <InputField
-              label="Patient Age"
-              name="patientAge"
-              value={patientAge}
-              onChange={(e) => setPatientAge(e.target.value)}
-              type="number"
-              placeholder="Enter age in years"
-              min="0"
-              max="120"
-            />
+            {/* Age Input */}
+            <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
+              <label className="w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 text-gray-700 flex items-center">
+                Patient Age
+              </label>
+              <div className="flex-1 flex items-center">
+                <input
+                  type="number"
+                  value={patientAge}
+                  onChange={(e) => setPatientAge(e.target.value)}
+                  className="flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm bg-white border-0"
+                  placeholder="Enter age in years"
+                  min="0"
+                  max="120"
+                />
+                <span className="px-3 py-2 text-sm text-gray-500 whitespace-nowrap border-l border-gray-300 bg-gray-50">
+                  years
+                </span>
+              </div>
+            </div>
 
             {/* Gender Selection using SelectField */}
             <SelectField
