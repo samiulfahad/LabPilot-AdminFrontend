@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import InputField from "../../components/html/InputField";
+import { useEffect } from "react";
 import useStore from "./store";
 import { Link } from "react-router-dom";
 const SetSchemaForm = () => {
-  const { testAssociatedSchemaList, loadTestSchema, modal, setDefaultSchema, closeModal } = useStore();
+  const { testAssociatedSchemaList, loadTestSchema, modal, setSchema, closeModal } = useStore();
   const categoryId = modal.data.categoryId;
   const testId = modal.data.testId;
+  const selectedSchema = modal.data.selectedSchema;
 
   useEffect(() => {
     loadTestSchema(testId);
@@ -27,14 +27,18 @@ const SetSchemaForm = () => {
               View Schema
             </Link>
 
-            <button onClick={() => setDefaultSchema(categoryId, testId, schema._id)} className="px-2 py-1 bg-gray-300">
-              Set As Default
-            </button>
+            {schema._id === selectedSchema ? (
+              <p className="px-2 py-1 bg-green-500">Selected</p>
+            ) : (
+              <button onClick={() => setSchema(categoryId, testId, schema._id)} className="px-2 py-1 bg-gray-300">
+                Set As Default
+              </button>
+            )}
           </div>
         </div>
       ))}
 
-      <button onClick={closeModal}>Close</button>
+      <button className="close-btn" onClick={closeModal}>Close</button>
     </div>
   );
 };

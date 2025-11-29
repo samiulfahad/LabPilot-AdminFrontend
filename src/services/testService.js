@@ -8,8 +8,8 @@ const labTestService = {
   addCategory: (data) => api.post("/lab/test/category/add", data),
   editCategory: (data) => api.patch("/lab/test/category/edit", data),
   deleteCategory: (categoryId) => api.delete(`/lab/test/category/delete/${categoryId}`),
-  setDefaultSchema: (categoryId, testId, schemaId) =>
-    api.patch("/lab/test/setTestSchema", { categoryId, testId, schemaId }),
+  setSchema: (categoryId, testId, schemaId) => api.patch("/lab/test/setTestSchema", { categoryId, testId, schemaId }),
+  unsetSchema: (categoryId, testId) => api.patch("/lab/test/setTestSchema", { categoryId, testId }),
 };
 
 export default labTestService;

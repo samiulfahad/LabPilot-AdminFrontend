@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import useStore from "./store";
 const TestCard = ({ list, categoryId }) => {
   const { setPopup, setModal } = useStore();
@@ -7,15 +8,41 @@ const TestCard = ({ list, categoryId }) => {
         <div key={test._id} className="flex justify-between items-centr m-1.5 border-1 p-1">
           <div>
             <p>Name: {test.name}</p>
-            {test.defaultSchema ? (
+            {test.schemaId ? (
               <div className="flex justify-center items-center">
                 <p className="text-green-500">Live</p>
-                 <button className="border-2 px-2 mx-2">Change Schema</button>
-                <button className="border-2 px-2 mx-2">Unset Schema</button>
+                <button
+                  onClick={() =>
+                    setModal({
+                      view: "setSchemaForm",
+                      data: { categoryId, testId: test._id, selectedSchema: test.schemaId },
+                    })
+                  }
+                  className="border-2 px-2 mx-2"
+                >
+                  Change Schema
+                </button>
+                <button
+                  onClick={() => {
+                    setPopup({
+                      type: "confirmation",
+                      message: `Are you going to unset the schema for ${test.name}`,
+                      action: "unsetSchema",
+                      data: { categoryId, testId: test._id },
+                    });
+                  }}
+                  className="border-2 px-2 mx-2"
+                >
+                  Unset Schema
+                </button>
+
+                <Link to={"/render-schema/" + test.schemaId} className=" py-.5 px-2 border-2">
+                  View Form
+                </Link>
               </div>
             ) : (
               <button
-                onClick={() => setModal({ view: "testAssociatedschemaList", data: { categoryId, testId: test._id } })}
+                onClick={() => setModal({ view: "setSchemaForm", data: { categoryId, testId: test._id } })}
                 className="border-1 p-.5 px-2 text-blue-500"
               >
                 Set Schema

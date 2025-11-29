@@ -9,8 +9,18 @@ import CategoryCard from "./CategoryCard";
 import SetSchemaForm from "./FormSetSchema";
 
 const TestList = () => {
-  const { loading, categoryList, loadCategoryList, deleteCategory, deleteTest, modal, popup, closePopup, setModal } =
-    useStore();
+  const {
+    loading,
+    categoryList,
+    loadCategoryList,
+    deleteCategory,
+    deleteTest,
+    unsetSchema,
+    modal,
+    popup,
+    closePopup,
+    setModal,
+  } = useStore();
 
   useEffect(() => {
     loadCategoryList();
@@ -25,11 +35,15 @@ const TestList = () => {
         <Popup type="confirmation" message={popup.message} onConfirm={deleteCategory} onClose={closePopup} />
       )}
 
+      {popup && popup.type === "confirmation" && popup.action === "unsetSchema" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={unsetSchema} onClose={closePopup} />
+      )}
+
       {popup && popup.type === "confirmation" && popup.action === "deleteTest" && (
         <Popup type="confirmation" message={popup.message} onConfirm={deleteTest} onClose={closePopup} />
       )}
       <div>
-        <button onClick={() => setModal({ view: "addCategoryForm", data:{} })} className="add-brn">
+        <button onClick={() => setModal({ view: "addCategoryForm", data: {} })} className="add-brn">
           Add New Category
         </button>
       </div>
@@ -40,11 +54,12 @@ const TestList = () => {
       <Modal isOpen={modal.view === "addCategoryForm" || modal.view === "editCategoryForm"}>
         <CategoryForm />
       </Modal>
+      
       <Modal isOpen={modal.view === "addTestForm" || modal.view === "editTestForm"}>
         <TestForm />
       </Modal>
 
-      <Modal isOpen={modal.view === "testAssociatedschemaList"}>
+      <Modal isOpen={modal.view === "setSchemaForm"}>
         <SetSchemaForm />
       </Modal>
     </div>

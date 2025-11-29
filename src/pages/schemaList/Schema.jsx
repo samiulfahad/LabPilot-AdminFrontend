@@ -90,14 +90,6 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
             </button>
           )}
           <button
-            onClick={onSetDefault}
-            className="flex-1 px-3 py-2 border border-blue-300 rounded-lg text-blue-600 text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
-            title="Set as Default Schema"
-          >
-            <Icons.Star className="w-4 h-4" />
-            <span>Default</span>
-          </button>
-          <button
             onClick={onDelete}
             className="flex-1 px-3 py-2 border border-red-300 rounded-lg text-red-600 text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
             title="Delete Schema"
@@ -196,14 +188,6 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
               <Icons.PowerOn className="w-4 h-4" />
             </button>
           )}
-
-          <button
-            onClick={onSetDefault}
-            className="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors"
-            title="Set as Default Schema"
-          >
-            <Icons.Star className="w-4 h-4" />
-          </button>
 
           <button
             onClick={onDelete}

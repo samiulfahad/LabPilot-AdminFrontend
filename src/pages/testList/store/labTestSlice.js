@@ -206,14 +206,69 @@ const categorySlice = (set, get) => ({
     }
   },
 
-  setDefaultSchema: async (categoryId, testId, schemaId) => {
+  setSchema: async (categoryId, testId, schemaId) => {
     try {
       get().startLoading();
-      await labTestService.setDefaultSchema(categoryId, testId, schemaId);
+      await labTestService.setSchema(categoryId, testId, schemaId);
       get().closeModal();
-      set({ popup: { type: "success", message: "Default schema set successfully", data: null, action: null } });
+      set((state) => ({
+        categoryList: state.categoryList.map((category) =>
+          category._id === categoryId
+            ? {
+                ...category,
+                tests: category.tests.map((test) =>
+                  test._id === testId
+                    ? { ...test, schemaId: schemaId } // Set the default schema
+                    : test
+                ),
+              }
+            : category
+        ),
+        popup: {
+          type: "success",
+          message: "Default schema set successfully",
+          data: null,
+          action: null,
+        },
+      }));
+      get().closeModal();
     } catch (e) {
       set({ popup: { type: "error", message: "Failed to set default schema set", data: null, action: null } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
+  unsetSchema: async () => {
+    try {
+      get().startLoading();
+      const {categoryId, testId} = get().popup.data
+      console.log(categoryId, testId);
+      await labTestService.unsetSchema(categoryId, testId);
+      console.log();
+      get().closeModal();
+      set((state) => ({
+        categoryList: state.categoryList.map((category) =>
+          category._id === categoryId
+            ? {
+                ...category,
+                tests: category.tests.map((test) =>
+                  test._id === testId
+                    ? { ...test, schemaId: null } // Set the default schema
+                    : test
+                ),
+              }
+            : category
+        ),
+        popup: {
+          type: "success",
+          message: "Removed default schema successfully",
+          data: null,
+          action: null,
+        },
+      }));
+    } catch (e) {
+      set({ popup: { type: "error", message: "Failed to remove default schema set", data: null, action: null } });
     } finally {
       get().stopLoading();
     }

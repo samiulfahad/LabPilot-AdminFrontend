@@ -6,11 +6,13 @@ const DesktopMenu = () => {
   const getIconForMenu = (label) => {
     const iconMap = {
       Home: "🏠",
-      Labs: "🧪",
+      Labs: "🏥", // Hospital/medical icon
       Zones: "🗺️",
       "Lab Tests": "🔬",
       "Lab Management": "⚙️",
       Billing: "💰",
+      "Schema List": "📊", // Chart/table icon
+      "Test Component": "🧪", // Test tube icon
     };
     return iconMap[label] || "📄";
   };

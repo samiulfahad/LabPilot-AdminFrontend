@@ -6,7 +6,6 @@ const menu = [
   { label: "Lab Management", path: "/lab-management" },
   { label: "Billing", path: "/billing" },
   { label: "Schema List", path: "/schema-list" },
-  { label: "Schema Builder", path: "/schema-builder" },
   { label: "Test Component", path: "/testComponent" },
 ];
 
