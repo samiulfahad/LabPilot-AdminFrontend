@@ -57,7 +57,7 @@ const TestList = () => {
                 <Icons.Details className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">Test Management</h1>
+                <h1 className="text-2xl font-bold text-slate-900">Lab Test Management</h1>
               </div>
             </div>
           </div>
