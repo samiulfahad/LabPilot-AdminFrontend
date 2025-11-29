@@ -120,6 +120,7 @@ const SchemaList = () => {
   // Handle schema deactivation
   const handleDeactivate = async () => {
     try {
+      console.log(popup._id);
       setLoading(true);
       await schemaService.deactivate(popup._id);
 

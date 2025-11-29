@@ -28,7 +28,7 @@ export const uiSlice = (set, get) => ({
     isLoading: false,
     isSaving: false,
     popup: null,
-    testsLoading: true,
+    testsLoading: false,
     editingSectionIndex: null,
     editingFieldId: null,
     isAddingRange: false,

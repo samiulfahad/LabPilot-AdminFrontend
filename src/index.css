@@ -26,6 +26,10 @@
     @apply px-3 py-1 text-white bg-red-800 hover:bg-red-600 rounded text-sm;
 }
 
+.add-btn-sm {
+    @apply px-3 py-1 text-white bg-green-800 hover:bg-green-600 rounded text-sm;
+}
+
 .bgColor {
     @apply bg-slate-700
 }

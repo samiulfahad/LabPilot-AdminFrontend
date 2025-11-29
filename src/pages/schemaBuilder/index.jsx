@@ -72,7 +72,6 @@ const SchemaBuilder = () => {
     setEditingSectionIndex,
     setEditingFieldId,
     setIsAddingRange,
-    isEditing,
     resetUI,
 
     // Form actions
@@ -270,6 +269,13 @@ const SchemaBuilder = () => {
     updateAvailableTests();
   }, [selectedCategory, testCategories, isEditMode, selectedTest]);
 
+  // Add this useEffect to SchemaBuilder component
+  useEffect(() => {
+    return () => {
+      handleResetForm();
+      console.log("remove this useEffect if bug is found");
+    };
+  }, []);
   // Standard Range Management Functions (keep these as they are complex)
   const initializeStandardRange = (type) => {
     let initialData = { type };
@@ -738,17 +744,18 @@ const SchemaBuilder = () => {
       let response;
       if (isEditMode) {
         response = await testSchemaService.update(schemaId, cleanedSchema);
-        setPopup({ type: "success", message: "Test schema updated successfully!" });
       } else {
         response = await testSchemaService.addNew(cleanedSchema);
-        setPopup({ type: "success", message: "Test schema saved successfully!" });
       }
-
+      // Navigate immediately after successful API call
+      setPopup({
+        type: "success",
+        message: `Test schema ${isEditMode ? "updated" : "saved"} successfully and navigating to schema list!`,
+      });
       setTimeout(() => {
-        if (!isEditMode) {
-          handleResetForm();
-        }
-      }, 2000);
+        navigate("/schema-list");
+        handleResetForm();
+      }, 1500);
     } catch (error) {
       console.error("Error saving schema:", error);
       setPopup({
@@ -770,6 +777,7 @@ const SchemaBuilder = () => {
 
   const handleCancel = () => {
     if (isEditMode) {
+      handleResetForm();
       navigate("/schema-list");
     } else {
       handleResetForm();

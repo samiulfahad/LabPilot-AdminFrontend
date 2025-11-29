@@ -4,7 +4,7 @@ import Layout from "./components/layout";
 import Home from "./pages/home";
 import Lab from "./pages/lab";
 import Zone from "./pages/zone";
-import Test from "./pages/test";
+import TestList from "./pages/testList";
 import LabManagement from "./pages/labManagement";
 import TestComponent from "./pages/schemaBuilder";
 import SchemaList from "./pages/schemaList";
@@ -18,7 +18,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/labs" element={<Lab />} />
         <Route path="/zones" element={<Zone />} />
-        <Route path="/tests" element={<Test />} />
+        <Route path="/test-list" element={<TestList />} />
         <Route path="/lab-management" element={<LabManagement />} />
         <Route path="/schema-builder" element={<SchemaBuilder />} />
         <Route path="/render-schema/:schemaId" element={<SchemaRenderer />} />

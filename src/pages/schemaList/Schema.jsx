@@ -53,8 +53,7 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
         <div className="flex gap-2 mt-3">
           <Link
             to={`/render-schema/${input._id}`}
-            className="flex-1 px-3 py-2 border border-purple-300 rounded-lg text-purple-600 text-sm hover:bg-purple-50 transition-colors flex items-center justify-center gap-2"
-            title="Render Form"
+            className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200 text-sm font-medium"
           >
             <Icons.View className="w-4 h-4" />
             <span>Render Form</span>
@@ -164,6 +163,8 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
         <div className="flex gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
           <Link
             to={`/render-schema/${input._id}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
             title="Render Form"
           >
