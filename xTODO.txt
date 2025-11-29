@@ -15,7 +15,7 @@ Task 10: See Refferer list of labs
 Task 11: See Test list associated with a test
 Task 12 Done: Create a react component to generate schema for forms
 Task 13 Done: Add feature to add Schema to each online test and then view it via a form. The form should take age and gender input
-Task 14: Add Free Accounts to create invoice only.
-Task 15 Done: rename lab.name => lab.name
+Task 14: Add feaure to have free accounts to generate invoice only. (Account Type: Free, Premium)
+Task 15 Done: rename lab.labName => lab.name, lab.labCommission=> lab.commission
 
 // Check public/ _redirects file before implementing to the server/production
