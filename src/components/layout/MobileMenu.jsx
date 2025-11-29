@@ -170,7 +170,7 @@ const MobileMenu = () => {
                     to={item.path}
                     end={item.path === "/"}
                     className={({ isActive }) =>
-                      `flex items-center space-x-3 p-4 rounded-2xl transition-all duration-200 group ${
+                      `flex items-center space-x-3 p-2 rounded-2xl transition-all duration-200 group ${
                         isActive
                           ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"

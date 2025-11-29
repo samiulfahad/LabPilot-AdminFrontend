@@ -46,7 +46,7 @@ const DesktopMenu = () => {
                     to={item.path}
                     end={item.path === "/"}
                     className={({ isActive }) =>
-                      `flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200 ${
+                      `flex items-center space-x-3 p-1.5 rounded-lg transition-colors duration-200 ${
                         isActive
                           ? "bg-blue-50 text-blue-700 border border-blue-200"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
