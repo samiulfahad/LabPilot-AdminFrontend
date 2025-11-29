@@ -132,7 +132,7 @@ const AddStaff = () => {
       </div>
 
       {/* Debug info */}
-      {modal.data && <div className="text-xs text-gray-500 mt-2">Adding staff to: {modal.data.labName}</div>}
+      {modal.data && <div className="text-xs text-gray-500 mt-2">Adding staff to: {modal.data.name}</div>}
     </div>
   );
 };

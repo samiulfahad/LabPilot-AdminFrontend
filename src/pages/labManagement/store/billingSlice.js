@@ -4,7 +4,7 @@ const billingSlice = (set, get) => ({
   // State
   billingForm: {
     invoicePrice: 0,
-    labCommission: 0,
+    commission: 0,
     monthlyFee: 0,
   },
 
@@ -33,7 +33,7 @@ const billingSlice = (set, get) => ({
             return {
               ...lab,
               invoicePrice: billingData.invoicePrice,
-              labCommission: billingData.labCommission,
+              commission: billingData.commission,
               monthlyFee: billingData.monthlyFee,
             };
           }
@@ -42,7 +42,7 @@ const billingSlice = (set, get) => ({
         // Clear form after success
         billingForm: {
           invoicePrice: 0,
-          labCommission: 0,
+          commission: 0,
           monthlyFee: 0,
         },
         modal: { view: null, data: null },
@@ -63,7 +63,7 @@ const billingSlice = (set, get) => ({
     set({
       billingForm: {
         invoicePrice: 0,
-        labCommission: 0,
+        commission: 0,
         monthlyFee: 0,
       },
     }),

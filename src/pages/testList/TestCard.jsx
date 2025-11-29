@@ -17,7 +17,10 @@ const TestCard = ({ list, categoryId }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {list.map((test) => (
-        <div key={test._id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-all group">
+        <div
+          key={test._id}
+          className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-all group"
+        >
           {/* Header with status and test name */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -30,7 +33,7 @@ const TestCard = ({ list, categoryId }) => {
               </div>
               <h4 className="font-medium text-gray-900 text-base truncate">{test.name}</h4>
             </div>
-            
+
             {/* Status badge - moved to top right */}
             {test.schemaId ? (
               <span className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium shrink-0 ml-2">

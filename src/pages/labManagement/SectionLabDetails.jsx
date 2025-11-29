@@ -8,7 +8,7 @@ const LabDetails = ({ lab }) => {
     setPopup({
       type: "confirmation",
       action: "deactivateLab",
-      message: `Deactivate Lab ${lab.labName}?`,
+      message: `Deactivate Lab ${lab.name}?`,
       data: { labId: lab._id },
     });
   };
@@ -17,7 +17,7 @@ const LabDetails = ({ lab }) => {
     setPopup({
       type: "confirmation",
       action: "activateLab",
-      message: `Activate Lab ${lab.labName}?`,
+      message: `Activate Lab ${lab.name}?`,
       data: { labId: lab._id },
     });
   };
@@ -37,7 +37,7 @@ const LabDetails = ({ lab }) => {
   };
 
   // Calculate profit
-  const profit = lab.invoicePrice - lab.labCommission;
+  const profit = lab.invoicePrice - lab.commission;
 
   return (
     <div className="flex flex-col gap-6 mb-8">
@@ -49,7 +49,7 @@ const LabDetails = ({ lab }) => {
               <span className="text-white font-bold text-xl">L</span>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">{lab.labName}</h3>
+              <h3 className="text-2xl font-bold text-gray-900">{lab.name}</h3>
               <p className="text-gray-600">ID: {lab.labId}</p>
             </div>
           </div>
@@ -142,7 +142,7 @@ const LabDetails = ({ lab }) => {
                   <p className="text-sm text-gray-500">Partner share</p>
                 </div>
               </div>
-              <p className="text-xl font-bold text-blue-600">৳{lab.labCommission || 0}</p>
+              <p className="text-xl font-bold text-blue-600">৳{lab.commission || 0}</p>
             </div>
 
             <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl">

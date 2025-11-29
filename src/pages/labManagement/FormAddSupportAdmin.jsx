@@ -92,7 +92,7 @@ const AddSupportAdminForm = () => {
       </div>
 
       {/* Debug info */}
-      {modal.data && <div className="text-xs text-gray-500 mt-2">Adding support admin to: {modal.data.labName}</div>}
+      {modal.data && <div className="text-xs text-gray-500 mt-2">Adding support admin to: {modal.data.name}</div>}
     </div>
   );
 };

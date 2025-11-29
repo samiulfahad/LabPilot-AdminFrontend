@@ -6,19 +6,19 @@ const StaffSection = ({ lab }) => {
 
   const handleDeleteStaff = (e, staff) => {
     e.preventDefault();
-    const message = `Deleting staff - ${staff.username} from ${lab.labName}?`;
+    const message = `Deleting staff - ${staff.username} from ${lab.name}?`;
     setPopup({ type: "confirmation", message, action: "deleteStaff", data: { staffId: staff._id, labId: lab._id } });
   };
 
   const handleActivateStaff = (e, staff) => {
     e.preventDefault();
-    const message = `Activating staff - ${staff.username} from ${lab.labName}?`;
+    const message = `Activating staff - ${staff.username} from ${lab.name}?`;
     setPopup({ type: "confirmation", message, action: "activateStaff", data: { staffId: staff._id, labId: lab._id } });
   };
 
   const handleDeactivateStaff = (e, staff) => {
     e.preventDefault();
-    const message = `Deactivating staff - ${staff.username} from ${lab.labName}?`;
+    const message = `Deactivating staff - ${staff.username} from ${lab.name}?`;
     setPopup({
       type: "confirmation",
       message,

@@ -6,14 +6,14 @@ const BillingForm = () => {
   const { billingForm, updateBillingForm, updateLabBilling, modal, closeModal } = useLabManagementStore();
 
   const current = modal.data || {};
-  const currentProfit = (current.invoicePrice || 0) - (current.labCommission || 0);
+  const currentProfit = (current.invoicePrice || 0) - (current.commission || 0);
   const newProfit =
-    (billingForm.invoicePrice ?? current.invoicePrice ?? 0) - (billingForm.labCommission ?? current.labCommission ?? 0);
+    (billingForm.invoicePrice ?? current.invoicePrice ?? 0) - (billingForm.commission ?? current.commission ?? 0);
 
   useEffect(() => {
     if (modal.data) {
       updateBillingForm("invoicePrice", current.invoicePrice || 0);
-      updateBillingForm("labCommission", current.labCommission || 0);
+      updateBillingForm("commission", current.commission || 0);
       updateBillingForm("monthlyFee", current.monthlyFee || 0);
     }
   }, [modal.data]);
@@ -38,7 +38,7 @@ const BillingForm = () => {
       {/* Heading */}
       <div className="text-center mb-4">
         <h2 className="text-xl font-bold text-gray-800">Update Billing</h2>
-        {modal.data && <p className="text-sm text-gray-600 mt-1">for {modal.data.labName}</p>}
+        {modal.data && <p className="text-sm text-gray-600 mt-1">for {modal.data.name}</p>}
       </div>
 
       {/* Input Fields */}
@@ -52,9 +52,9 @@ const BillingForm = () => {
 
       <InputField
         label="Commission"
-        name="labCommission"
+        name="commission"
         type="number"
-        value={billingForm.labCommission ?? current.labCommission ?? ""}
+        value={billingForm.commission ?? current.commission ?? ""}
         onChange={handleFieldChange}
       />
 

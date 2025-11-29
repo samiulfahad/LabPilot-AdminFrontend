@@ -8,7 +8,7 @@ import zoneService from "../../services/zoneService";
 import LoadingScreen from "../../components/loadingPage";
 
 const initialData = {
-  labName: "",
+  name: "",
   labId: "",
   address: "",
   contact1: "",
@@ -175,7 +175,7 @@ const Labs = () => {
           onDelete={() =>
             setPopup({
               type: "confirmation",
-              message: `Do you want to delete the following lab ${item.labName}`,
+              message: `Do you want to delete the following lab ${item.name}`,
               _id: item._id,
             })
           }

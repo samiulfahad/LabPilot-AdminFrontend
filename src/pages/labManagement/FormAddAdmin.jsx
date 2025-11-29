@@ -99,7 +99,7 @@ const AdminForm = () => {
       </div>
 
       {/* Debug info */}
-      {modal.data && <div className="text-xs text-gray-500 mt-2">Adding admin to: {modal.data.labName}</div>}
+      {modal.data && <div className="text-xs text-gray-500 mt-2">Adding admin to: {modal.data.name}</div>}
     </div>
   );
 };

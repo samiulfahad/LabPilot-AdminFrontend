@@ -10,14 +10,14 @@ const ViewLabDetails = () => {
   }
 
   const {
-    labName,
+    name,
     labId,
     address,
     contact1,
     contact2,
     email,
     isActive,
-    labCommission,
+    commission,
     invoicePrice,
     monthlyFee,
     hasWarning,
@@ -34,7 +34,7 @@ const ViewLabDetails = () => {
   };
 
   // Calculate software gets
-  const softwareGets = invoicePrice - labCommission;
+  const softwareGets = invoicePrice - commission;
 
   // Dummy data for new fields
   const totalTests = 300;
@@ -49,7 +49,7 @@ const ViewLabDetails = () => {
               <span className="text-white font-bold text-lg">L</span>
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-lg mb-1">{labName}</h3>
+              <h3 className="font-bold text-gray-900 text-lg mb-1">{name}</h3>
               <p className="text-gray-600 text-sm">Lab ID: {labId}</p>
             </div>
           </div>
@@ -142,7 +142,7 @@ const ViewLabDetails = () => {
             </div>
           )}
 
-          {shouldDisplay(labCommission) && (
+          {shouldDisplay(commission) && (
             <div className="p-2 bg-green-50 rounded-lg border border-green-200 text-center">
               <div className="flex justify-center mb-1">
                 <div className="w-5 h-5 bg-green-100 rounded flex items-center justify-center">
@@ -150,11 +150,11 @@ const ViewLabDetails = () => {
                 </div>
               </div>
               <p className="text-green-800 text-xs font-medium mb-1">Lab Commission</p>
-              <p className="text-gray-700 text-xs font-semibold">৳{labCommission}</p>
+              <p className="text-gray-700 text-xs font-semibold">৳{commission}</p>
             </div>
           )}
 
-          {shouldDisplay(invoicePrice) && shouldDisplay(labCommission) && (
+          {shouldDisplay(invoicePrice) && shouldDisplay(commission) && (
             <div className="p-2 bg-purple-50 rounded-lg border border-purple-200 text-center">
               <div className="flex justify-center mb-1">
                 <div className="w-5 h-5 bg-purple-100 rounded flex items-center justify-center">

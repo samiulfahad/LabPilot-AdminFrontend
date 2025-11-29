@@ -29,9 +29,9 @@ const LabForm = ({ formData, zones = [], onChange, onSubmit, onClose }) => {
         {/* Single Line Inputs */}
         <InputField
           label="Lab Name"
-          name="labName"
-          value={formData.labName || ""}
-          onChange={(e) => handleFieldChange("labName", e.target.value)}
+          name="name"
+          value={formData.name || ""}
+          onChange={(e) => handleFieldChange("name", e.target.value)}
         />
 
         {/* Lab ID & Status in one line */}

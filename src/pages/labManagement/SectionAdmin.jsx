@@ -16,13 +16,13 @@ const AdminSection = ({ lab, hasSupportAdmin }) => {
 
   const handleActivateAdmin = (e, admin) => {
     e.preventDefault();
-    const message = `Activate admin - ${admin.username} from ${lab.labName}?`;
+    const message = `Activate admin - ${admin.username} from ${lab.name}?`;
     setPopup({ type: "confirmation", message, action: "activateAdmin", data: { labId: lab._id, adminId: admin._id } });
   };
 
   const handleDeactivateAdmin = (e, admin) => {
     e.preventDefault();
-    const message = `Deactivate admin - ${admin.username} from ${lab.labName}?`;
+    const message = `Deactivate admin - ${admin.username} from ${lab.name}?`;
     setPopup({
       type: "confirmation",
       message,
@@ -33,7 +33,7 @@ const AdminSection = ({ lab, hasSupportAdmin }) => {
 
   const handleDeleteAdmin = (e, admin) => {
     e.preventDefault();
-    const message = `Deleting admin - ${admin.username} from ${lab.labName}?`;
+    const message = `Deleting admin - ${admin.username} from ${lab.name}?`;
     setPopup({ type: "confirmation", message, action: "deleteAdmin", data: { labId: lab._id, adminId: admin._id } });
   };
 

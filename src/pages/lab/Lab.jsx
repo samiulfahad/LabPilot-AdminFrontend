@@ -9,7 +9,7 @@ const Lab = ({ input, index, onEdit, onDelete }) => {
               <span className="text-white font-bold text-xs">L{index + 1}</span>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">{input.labName}</h3>
+              <h3 className="font-semibold text-gray-900 text-sm">{input.name}</h3>
               <p className="text-xs text-gray-500">
                 ID: <span className="font-mono">{input.labId}</span>
               </p>
@@ -89,7 +89,7 @@ const Lab = ({ input, index, onEdit, onDelete }) => {
             <span className="text-white font-bold text-sm">L{index + 1}</span>
           </div>
           <div className="min-w-0">
-            <h3 className="font-semibold text-gray-900 truncate">{input.labName}</h3>
+            <h3 className="font-semibold text-gray-900 truncate">{input.name}</h3>
             <p className="text-sm text-gray-500 mt-0.5">
               ID: <span className="font-mono">{input.labId}</span>
             </p>
