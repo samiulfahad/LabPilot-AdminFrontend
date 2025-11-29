@@ -27,7 +27,7 @@ const SetSchemaForm = () => {
               View Schema
             </Link>
 
-            <button onClick={() => setDefaultSchema(testId, schema._id)} className="px-2 py-1 bg-gray-300">
+            <button onClick={() => setDefaultSchema(categoryId, testId, schema._id)} className="px-2 py-1 bg-gray-300">
               Set As Default
             </button>
           </div>

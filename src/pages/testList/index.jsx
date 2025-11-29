@@ -33,7 +33,7 @@ const TestList = () => {
           Add New Category
         </button>
       </div>
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <CategoryCard categoryList={categoryList} />
       </div>
 

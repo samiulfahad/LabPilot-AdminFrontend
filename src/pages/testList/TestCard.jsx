@@ -8,7 +8,11 @@ const TestCard = ({ list, categoryId }) => {
           <div>
             <p>Name: {test.name}</p>
             {test.defaultSchema ? (
-              <p className="text-green-500">Live</p>
+              <div className="flex justify-center items-center">
+                <p className="text-green-500">Live</p>
+                 <button className="border-2 px-2 mx-2">Change Schema</button>
+                <button className="border-2 px-2 mx-2">Unset Schema</button>
+              </div>
             ) : (
               <button
                 onClick={() => setModal({ view: "testAssociatedschemaList", data: { categoryId, testId: test._id } })}

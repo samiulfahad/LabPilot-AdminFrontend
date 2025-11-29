@@ -6,12 +6,12 @@ const CategoryCard = ({ categoryList }) => {
     <div>
       {categoryList.map((item) => (
         <div key={item._id} className=" border-2 m-1 p-2 flex justify-between items-center">
-          <div>
+          <div className="w-full">
             <p>Name: {item.categoryName}</p>
             <p>Total Test: {item.tests.length}</p>
             <TestList categoryId={item._id} list={item.tests} />
           </div>
-          <div>
+          <div className="flex flex-col space-y-2 w-1/5">
             <button
               onClick={() => {
                 setPopup({
