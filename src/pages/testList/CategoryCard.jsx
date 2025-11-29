@@ -1,5 +1,5 @@
 import useStore from "./store";
-import TestList from "./TestList";
+import TestList from "./TestCard";
 const CategoryCard = ({ categoryList }) => {
   const { setPopup, setModal } = useStore();
   return (
@@ -9,7 +9,7 @@ const CategoryCard = ({ categoryList }) => {
           <div>
             <p>Name: {item.categoryName}</p>
             <p>Total Test: {item.tests.length}</p>
-            <TestList categoryId={item._id} list={item.tests}/>
+            <TestList categoryId={item._id} list={item.tests} />
           </div>
           <div>
             <button
@@ -18,14 +18,26 @@ const CategoryCard = ({ categoryList }) => {
                   type: "confirmation",
                   action: "deleteCategoy",
                   message: `You are going to delete ${item.categoryName} category`,
-                  data: item._id
+                  data: item._id,
                 });
               }}
               className="delete-btn mx-2"
             >
               Delete Category
             </button>
-            <button onClick={() => setModal({ view: "addTestForm", data: item._id })} className="add-btn-sm">
+
+            <button
+              onClick={() => {
+                setModal({ view: "editCategoryForm", data: { categoryId: item._id, categoryName: item.categoryName } });
+              }}
+              className="add-btn-sm mx-2"
+            >
+              Edit Category
+            </button>
+            <button
+              onClick={() => setModal({ view: "addTestForm", data: { categoryId: item._id } })}
+              className="add-btn-sm"
+            >
               Add Test
             </button>
           </div>

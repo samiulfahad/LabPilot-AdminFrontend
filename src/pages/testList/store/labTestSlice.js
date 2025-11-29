@@ -1,8 +1,9 @@
 import labTestService from "../../../services/testService";
-
+import schemaServive from "../../../services/schemaService";
 const categorySlice = (set, get) => ({
   // State
   categoryList: [],
+  testAssociatedSchemaList: [],
 
   loadCategoryList: async () => {
     try {
@@ -34,6 +35,34 @@ const categorySlice = (set, get) => ({
         message = "This category already exists";
       }
       set({ popup: { type: "error", message: message, action: null, data: null } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
+  editCategory: async (categoryId, categoryName) => {
+    try {
+      get().startLoading();
+      await labTestService.editCategory({ categoryId, categoryName });
+      set((state) => ({
+        popup: {
+          type: "success",
+          message: "Category updated successfully",
+          data: null,
+          action: null,
+        },
+        categoryList: state.categoryList.map((category) =>
+          category._id === categoryId ? { ...category, categoryName: categoryName } : category
+        ),
+      }));
+      get().closeModal();
+    } catch (e) {
+      let message = "Failed to update category";
+
+      if (e.response?.data?.duplicate) {
+        message = "Category already exists";
+      }
+      set({ popup: { type: "error", message: message, data: null, action: null } });
     } finally {
       get().stopLoading();
     }
@@ -86,6 +115,43 @@ const categorySlice = (set, get) => ({
     }
   },
 
+  editTest: async (categoryId, testId, testName) => {
+    try {
+      get().startLoading();
+      await labTestService.editTest({ categoryId, testId, name: testName });
+      set((state) => ({
+        popup: {
+          type: "success",
+          message: "Test updated successfully",
+          data: null,
+          action: null,
+        },
+        categoryList: state.categoryList.map((category) =>
+          category._id === categoryId
+            ? {
+                ...category,
+                tests: category.tests.map((test) =>
+                  test._id === testId
+                    ? { ...test, name: testName } // Update the test name
+                    : test
+                ),
+              }
+            : category
+        ),
+      }));
+      get().closeModal();
+    } catch (e) {
+      let message = "Failed to update Test";
+
+      if (e.response?.data?.duplicate) {
+        message = "Test already exists";
+      }
+      set({ popup: { type: "error", message: message, data: null, action: null } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
   deleteTest: async () => {
     try {
       get().startLoading();
@@ -116,6 +182,25 @@ const categorySlice = (set, get) => ({
           data: null,
         },
       });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
+  loadTestSchema: async (testId) => {
+    try {
+      get().startLoading();
+      const response = await schemaServive.getByTestId(testId);
+      set((state) => ({
+        testAssociatedSchemaList: response.data,
+      }));
+      console.log(response.data);
+      if (response.data.length === 0) {
+        set({ popup: { type: "error", message: "No Schema has been added for this test", data: null, action: null } });
+        get().closeModal()
+      }
+    } catch (e) {
+      set({ popup: { type: "error", message: "Failed to load test associated schemas", data: null, action: null } });
     } finally {
       get().stopLoading();
     }
