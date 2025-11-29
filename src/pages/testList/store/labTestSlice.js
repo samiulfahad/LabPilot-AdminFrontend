@@ -12,6 +12,7 @@ const categorySlice = (set, get) => ({
       set({ categoryList: response.data });
     } catch (e) {
       set({ popup: { type: "error", message: message, action: null, data: null } });
+      
     } finally {
       get().stopLoading();
     }
@@ -201,6 +202,7 @@ const categorySlice = (set, get) => ({
       }
     } catch (e) {
       set({ popup: { type: "error", message: "Failed to load test associated schemas", data: null, action: null } });
+      get().closeModal()
     } finally {
       get().stopLoading();
     }
