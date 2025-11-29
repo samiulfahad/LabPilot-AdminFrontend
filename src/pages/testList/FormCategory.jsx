@@ -9,7 +9,12 @@ const CategoryForm = () => {
 
   return (
     <div>
-      <InputField value={name} onChange={(e) => setName(e.target.value.toUpperCase())} label="Category Name" type="text" />
+      <InputField
+        value={name}
+        onChange={(e) => setName(e.target.value.toUpperCase())}
+        label="Category Name"
+        type="text"
+      />
       <button
         onClick={() => (modal.view === "addCategoryForm" ? addCategory(name) : editCategory(categoryId, name))}
         className="add-btn m-4"
