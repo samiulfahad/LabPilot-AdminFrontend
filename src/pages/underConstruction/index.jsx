@@ -93,7 +93,7 @@ const UnderConstruction = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-slate-50 py-2 rounded-lg">
       {loading && <LoadingScreen />}
 
       {/* Popups */}
@@ -180,11 +180,8 @@ const UnderConstruction = () => {
               {/* Multi-section Feature */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-800 mb-1">Multi-section</h3>
-                  </div>
                   <SelectField
-                    label=""
+                    label="Multi Section"
                     value={schema.hasMultiSection.toString()}
                     onChange={handleMultiSectionChange}
                     options={[
@@ -199,7 +196,7 @@ const UnderConstruction = () => {
                     <div className="flex gap-3">
                       <div className="flex-1">
                         <InputField
-                          label=""
+                          label="Section Name"
                           value={schema.currentSectionName || ""}
                           onChange={(e) => setSchema("currentSectionName", e.target.value)}
                           placeholder="New section name"
@@ -278,7 +275,7 @@ const UnderConstruction = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-800 mb-1">Standard Range</h3>
+                    <h3 className="text-md font-semibold text-slate-800 mb-1">Add Static Standard Range</h3>
                   </div>
                   <div>
                     {!schema.hasStandardRange ? (
