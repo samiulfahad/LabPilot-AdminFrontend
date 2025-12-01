@@ -1,6 +1,7 @@
 import useStore from "./store";
+import TextAreaField from "../../components/html/TextAreaField"
 const StandardRange = () => {
-  const { schema, setSchema } = useStore();
+  const { schema, setSchema, clearStandardRange } = useStore();
 
   const handleStandardRangeToggle = (value) => {
     if (!value && schema.standardRange?.trim() !== "") {

@@ -29,7 +29,7 @@ const UnderConstruction = () => {
   } = useStore();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 pb-4 pt-2 md:p-6">
       {loading && <LoadingScreen />}
 
       {/* Popups */}
@@ -47,10 +47,10 @@ const UnderConstruction = () => {
         />
       )}
 
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6 -mt-3">
         {/* Header */}
         <div className="text-center mb-2">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Schema Builder</h1>
+          <h1 className="text-lg md:text-xl font-bold text-gray-800">Schema Engine</h1>
         </div>
         {/* Row 1: Schema Name and Test Name */}
         <SchemaInfo />
