@@ -22,7 +22,7 @@ const UnderConstruction = () => {
     clearStandardRange,
   } = useStore();
 
-  const [editingSectionName, setEditingSectionName] = (useState < string) | (null > null);
+  const [editingSectionName, setEditingSectionName] = useState(null);
   const [editingNewSectionName, setEditingNewSectionName] = useState("");
 
   useEffect(() => {
@@ -33,12 +33,12 @@ const UnderConstruction = () => {
     ? testList.find((cat) => cat._id === schema.categoryId)?.tests || []
     : [];
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = (e) => {
     setSchema("categoryId", e.target.value);
     setSchema("testId", "");
   };
 
-  const handleStandardRangeToggle = (enable: boolean) => {
+  const handleStandardRangeToggle = (enable) => {
     if (!enable && schema.standardRange?.trim()) {
       confirmRemoveStandardRange();
     } else {
@@ -47,11 +47,11 @@ const UnderConstruction = () => {
     }
   };
 
-  const handleIsActiveChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleIsActiveChange = (e) => {
     setSchema("isActive", e.target.value === "true");
   };
 
-  const startEditing = (section: { name: string }) => {
+  const startEditing = (section) => {
     setEditingSectionName(section.name);
     setEditingNewSectionName(section.name);
   };
@@ -69,7 +69,7 @@ const UnderConstruction = () => {
     setEditingNewSectionName("");
   };
 
-  const safeStringify = (obj: any) => {
+  const safeStringify = (obj) => {
     return JSON.stringify(
       obj,
       (key, value) => {
@@ -202,7 +202,7 @@ const UnderConstruction = () => {
               </div>
             </div>
 
-            {schema.sections?.length > 0 && (
+            {schema.sections && schema.sections.length > 0 && (
               <div>
                 <h4 className="text-base font-semibold text-gray-700 mb-3">
                   Existing Sections ({schema.sections.length})
@@ -287,7 +287,7 @@ const UnderConstruction = () => {
                   label="Reference Values"
                   value={schema.standardRange || ""}
                   onChange={(e) => setSchema("standardRange", e.target.value)}
-                  placeholder="e.g., Normal: 12-15 g/dL&#10;Low: < 12 g/dL&#10;High: > 15 g/dL"
+                  placeholder="e.g., Normal: 12-15 g/dL\nLow: < 12 g/dL\nHigh: > 15 g/dL"
                   rows={8}
                 />
               </div>
