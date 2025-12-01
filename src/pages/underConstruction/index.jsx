@@ -309,37 +309,32 @@ const UnderConstruction = () => {
             </div>
           </div>
 
-          {/* Schema Preview */}
+          {/* Schema Preview - Always Open */}
           <div className="bg-white rounded-xl shadow border border-gray-200 p-4 md:p-6">
-            <details className="group">
-              <summary className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg">
-                <div>
-                  <h2 className="text-lg md:text-xl font-semibold text-gray-900">Schema Preview</h2>
-                  <p className="text-sm text-gray-600">View the complete schema data structure</p>
-                </div>
-                <div className="text-gray-400 group-open:rotate-180 transition-transform">▼</div>
-              </summary>
+            <div className="mb-4">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900">Schema Preview</h2>
+              <p className="text-sm text-gray-600">Live preview of schema data structure</p>
+            </div>
 
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
-                  <div className="text-sm text-gray-600">
-                    Category:{" "}
-                    {schema.categoryId
-                      ? testList.find((cat) => cat._id === schema.categoryId)?.categoryName
-                      : "Not selected"}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Test:{" "}
-                    {schema.testId
-                      ? testsForSelectedCategory.find((test) => test._id === schema.testId)?.name
-                      : "Not selected"}
-                  </div>
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
+                <div className="text-sm text-gray-600">
+                  Category:{" "}
+                  {schema.categoryId
+                    ? testList.find((cat) => cat._id === schema.categoryId)?.categoryName
+                    : "Not selected"}
                 </div>
-                <pre className="text-xs md:text-sm text-gray-700 bg-white p-4 rounded border overflow-x-auto font-mono">
-                  {safeStringify(schema)}
-                </pre>
+                <div className="text-sm text-gray-600">
+                  Test:{" "}
+                  {schema.testId
+                    ? testsForSelectedCategory.find((test) => test._id === schema.testId)?.name
+                    : "Not selected"}
+                </div>
               </div>
-            </details>
+              <pre className="text-xs md:text-sm text-gray-700 bg-white p-4 rounded border overflow-x-auto font-mono max-h-96 overflow-y-auto">
+                {safeStringify(schema)}
+              </pre>
+            </div>
           </div>
         </div>
       </div>
