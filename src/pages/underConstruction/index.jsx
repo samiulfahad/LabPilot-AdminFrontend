@@ -93,7 +93,7 @@ const UnderConstruction = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-2 rounded-lg">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {loading && <LoadingScreen />}
 
       {/* Popups */}
@@ -103,19 +103,17 @@ const UnderConstruction = () => {
         <Popup type="confirmation" message={popup.message} onClose={closePopup} onConfirm={popup.onConfirm} />
       )}
 
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className=" text-center">
-          <h1 className="text-xl font-bold text-slate-900 mb-3 bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-            Schema Builder
-          </h1>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 text-center">Schema Builder</h1>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 md:space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-4 md:p-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <InputField
                   label="Schema Name"
                   value={schema.name}
@@ -142,12 +140,10 @@ const UnderConstruction = () => {
           </div>
 
           {/* Test Configuration */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-            <div className="mb-2">
-              <h2 className="text-lg font-semibold text-slate-900">Test Selection</h2>
-            </div>
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-4 md:p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Test Selection</h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <SelectField
                 label="Test Category"
                 value={schema.categoryId}
@@ -174,12 +170,11 @@ const UnderConstruction = () => {
             </div>
           </div>
 
-          {/* Schema Features */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Multi-section Feature */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
+          {/* Multi-section Feature */}
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-4 md:p-6">
+            <div className="space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="md:flex-1">
                   <SelectField
                     label="Multi Section"
                     value={schema.hasMultiSection.toString()}
@@ -190,113 +185,118 @@ const UnderConstruction = () => {
                     ]}
                   />
                 </div>
-
-                {schema.hasMultiSection && (
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <div className="flex-1">
-                        <InputField
-                          label="Section Name"
-                          value={schema.currentSectionName || ""}
-                          onChange={(e) => setSchema("currentSectionName", e.target.value)}
-                          placeholder="New section name"
-                        />
-                      </div>
-                      <button
-                        onClick={() => addSection()}
-                        className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium whitespace-nowrap self-end"
-                      >
-                        Add
-                      </button>
-                    </div>
-
-                    {schema.sections?.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-slate-700 mb-3">Sections ({schema.sections.length})</h4>
-                        <div className="space-y-2">
-                          {schema.sections.map((section) => (
-                            <div key={section.id} className="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                              {editingSectionId === section.id ? (
-                                <div className="space-y-2">
-                                  <input
-                                    type="text"
-                                    value={editingSectionName}
-                                    onChange={(e) => setEditingSectionName(e.target.value)}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    placeholder="Section name"
-                                  />
-                                  <div className="flex gap-2">
-                                    <button
-                                      onClick={saveEditing}
-                                      className="flex-1 px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
-                                    >
-                                      Save
-                                    </button>
-                                    <button
-                                      onClick={cancelEditing}
-                                      className="flex-1 px-3 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors text-sm font-medium"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <div className="font-medium text-slate-900">{section.name}</div>
-                                    <div className="text-xs text-slate-500 font-mono mt-1">{section.id}</div>
-                                  </div>
-                                  <div className="flex gap-1">
-                                    <button
-                                      onClick={() => startEditing(section)}
-                                      className="p-2 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
-                                    >
-                                      ✏️
-                                    </button>
-                                    <button
-                                      onClick={() => deleteSection(section.id)}
-                                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                    >
-                                      🗑️
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
 
-              {/* Standard Range Feature */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-md font-semibold text-slate-800 mb-1">Add Static Standard Range</h3>
+              {schema.hasMultiSection && (
+                <div className="space-y-4 mt-4">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1">
+                      <InputField
+                        label="Section Name"
+                        value={schema.currentSectionName || ""}
+                        onChange={(e) => setSchema("currentSectionName", e.target.value)}
+                        placeholder="New section name"
+                      />
+                    </div>
+                    <button
+                      onClick={() => addSection()}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      Add Section
+                    </button>
                   </div>
-                  <div>
-                    {!schema.hasStandardRange ? (
-                      <button
-                        onClick={() => handleStandardRangeToggle(true)}
-                        className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
-                      >
-                        Enable
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleStandardRangeToggle(false)}
-                        className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
-                      >
-                        Disable
-                      </button>
-                    )}
-                  </div>
-                </div>
 
-                {schema.hasStandardRange && (
+                  {schema.sections?.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-gray-700 mb-3">Sections ({schema.sections.length})</h4>
+                      <div className="space-y-2">
+                        {schema.sections.map((section) => (
+                          <div key={section.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            {editingSectionId === section.id ? (
+                              <div className="space-y-2">
+                                <input
+                                  type="text"
+                                  value={editingSectionName}
+                                  onChange={(e) => setEditingSectionName(e.target.value)}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                  placeholder="Section name"
+                                />
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={saveEditing}
+                                    className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={cancelEditing}
+                                    className="flex-1 px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                  <div className="font-medium text-gray-900">{section.name}</div>
+                                  <div className="text-xs text-gray-500 font-mono">{section.id}</div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => startEditing(section)}
+                                    className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => deleteSection(section.id)}
+                                    className="px-3 py-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Standard Range Feature */}
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-4 md:p-6">
+            <div className="space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-md font-semibold text-gray-800">Add Static Standard Range</h3>
+                  <p className="text-sm text-gray-600 mt-1">Set reference values for this schema</p>
+                </div>
+                <div>
+                  {!schema.hasStandardRange ? (
+                    <button
+                      onClick={() => handleStandardRangeToggle(true)}
+                      className="w-full md:w-auto px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    >
+                      Enable Standard Range
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleStandardRangeToggle(false)}
+                      className="w-full md:w-auto px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                    >
+                      Disable Standard Range
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {schema.hasStandardRange && (
+                <div className="mt-4">
                   <TextAreaField
                     label="Reference Values"
                     value={schema.standardRange}
@@ -304,38 +304,38 @@ const UnderConstruction = () => {
                     placeholder="Enter standard ranges, reference values, and normal parameters..."
                     rows={5}
                   />
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Schema Preview */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-4 md:p-6">
             <details className="group">
-              <summary className="flex items-center justify-between cursor-pointer list-none p-2 hover:bg-slate-50 rounded-lg">
+              <summary className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg">
                 <div>
-                  <h2 className="text-2xl font-semibold text-slate-900 inline mr-3">Schema Preview</h2>
-                  <span className="text-slate-600">View the complete schema data structure</span>
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900">Schema Preview</h2>
+                  <p className="text-sm text-gray-600">View the complete schema data structure</p>
                 </div>
-                <div className="text-slate-400 group-open:rotate-180 transition-transform">▼</div>
+                <div className="text-gray-400 group-open:rotate-180 transition-transform">▼</div>
               </summary>
 
-              <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-sm text-slate-600">
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
+                  <div className="text-sm text-gray-600">
                     Category:{" "}
                     {schema.categoryId
                       ? testList.find((cat) => cat._id === schema.categoryId)?.categoryName
                       : "Not selected"}
                   </div>
-                  <div className="text-sm text-slate-600">
+                  <div className="text-sm text-gray-600">
                     Test:{" "}
                     {schema.testId
                       ? testsForSelectedCategory.find((test) => test._id === schema.testId)?.name
                       : "Not selected"}
                   </div>
                 </div>
-                <pre className="text-sm text-slate-700 bg-white p-4 rounded border overflow-x-auto font-mono">
+                <pre className="text-xs md:text-sm text-gray-700 bg-white p-4 rounded border overflow-x-auto font-mono">
                   {safeStringify(schema)}
                 </pre>
               </div>
