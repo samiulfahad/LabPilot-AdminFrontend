@@ -1,21 +1,22 @@
-import { data } from "react-router-dom";
 import labTestService from "../../../services/testService";
-
 const schemaSlice = (set, get) => ({
   testList: [],
   schema: {
     name: "",
-    description: "",
+    testName: "",
     testId: "",
     categoryId: "",
     isActive: false, // New field added
-    hasMultiSection: false,
     hasStandardRange: false,
     standardRange: "",
-    sections: [],
+    sections: [
+      {
+        name: "Default",
+        fields: [],
+      },
+    ],
     currentSectionName: "",
   },
-
   // Complete setSchema function
   setSchema: (field, value) => {
     set((state) => ({
@@ -25,7 +26,6 @@ const schemaSlice = (set, get) => ({
       },
     }));
   },
-
   loadTestList: async () => {
     try {
       get().startLoading();
@@ -37,34 +37,20 @@ const schemaSlice = (set, get) => ({
       get().stopLoading();
     }
   },
-
-  // Generate ID from section name
-  generateSectionId: (name) => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "_") // Replace spaces with underscores
-      .replace(/[^a-z0-9_]/g, ""); // Remove special characters
-  },
-
   // Check if section name already exists
-  isSectionNameUnique: (name, excludeId = null) => {
+  isSectionNameUnique: (name, excludeName = null) => {
     const { sections } = get().schema;
     const normalizedNewName = name.toLowerCase().trim();
-
     return !sections.some((section) => {
-      if (excludeId && section.id === excludeId) return false; // Skip the section being edited
+      if (excludeName && section.name === excludeName) return false; // Skip the section being edited
       const normalizedExistingName = section.name.toLowerCase().trim();
       return normalizedExistingName === normalizedNewName;
     });
   },
-
   addSection: () => {
     const { schema } = get();
     const sectionName = schema.currentSectionName.trim();
-
     if (!sectionName) return;
-
     // Check if section name already exists
     if (!get().isSectionNameUnique(sectionName)) {
       set({
@@ -77,17 +63,12 @@ const schemaSlice = (set, get) => ({
       });
       return;
     }
-
-    // Generate ID from section name
-    const sectionId = get().generateSectionId(sectionName);
-
     set((state) => ({
       schema: {
         ...state.schema,
         sections: [
           ...state.schema.sections,
           {
-            id: sectionId,
             name: sectionName,
             fields: [],
           },
@@ -95,24 +76,32 @@ const schemaSlice = (set, get) => ({
         currentSectionName: "",
       },
     }));
-
     // Show success message
     set({
       popup: { type: "success", message: `Section "${sectionName}" added successfully!`, data: null, action: null },
     });
   },
-
-  // Delete a specific section by id
-  deleteSection: (sectionId) => {
-    const section = get().schema.sections.find((s) => s.id === sectionId);
-
+  // Delete a specific section by name
+  deleteSection: (sectionName) => {
+    const { sections } = get().schema;
+    if (sections.length === 1) {
+      set({
+        popup: {
+          type: "error",
+          message: "Cannot delete the last section!",
+          data: null,
+          action: null,
+        },
+      });
+      return;
+    }
+    const section = sections.find((s) => s.name === sectionName);
     set((state) => ({
       schema: {
         ...state.schema,
-        sections: state.schema.sections.filter((section) => section.id !== sectionId),
+        sections: state.schema.sections.filter((section) => section.name !== sectionName),
       },
     }));
-
     // Show success message
     if (section) {
       set({
@@ -125,14 +114,12 @@ const schemaSlice = (set, get) => ({
       });
     }
   },
-
   // Update a section name
-  updateSection: (sectionId, newName) => {
+  updateSection: (oldName, newName) => {
     const newNameTrimmed = newName.trim();
     if (!newNameTrimmed) return;
-
     // Check if the new name is unique (excluding the current section)
-    if (!get().isSectionNameUnique(newNameTrimmed, sectionId)) {
+    if (!get().isSectionNameUnique(newNameTrimmed, oldName)) {
       set({
         popup: {
           type: "error",
@@ -143,20 +130,15 @@ const schemaSlice = (set, get) => ({
       });
       return;
     }
-
-    // Generate new ID from the new name
-    const newSectionId = get().generateSectionId(newNameTrimmed);
-    const oldSection = get().schema.sections.find((s) => s.id === sectionId);
-
+    const oldSection = get().schema.sections.find((s) => s.name === oldName);
     set((state) => ({
       schema: {
         ...state.schema,
         sections: state.schema.sections.map((section) =>
-          section.id === sectionId ? { ...section, id: newSectionId, name: newNameTrimmed } : section
+          section.name === oldName ? { ...section, name: newNameTrimmed } : section
         ),
       },
     }));
-
     // Show success message
     if (oldSection) {
       set({
@@ -169,31 +151,6 @@ const schemaSlice = (set, get) => ({
       });
     }
   },
-
-  // Show confirmation when disabling multi-section
-  confirmDisableMultiSection: () => {
-    set({
-      popup: {
-        type: "confirmation",
-        message: "All data of this section will be lost? Are you sure?",
-        data: null,
-        onConfirm: () => {
-          // This function will be called when user confirms
-          set((state) => ({
-            schema: {
-              ...state.schema,
-              hasMultiSection: false,
-              sections: [],
-              currentSectionName: "",
-            },
-          }));
-          // Close the popup
-          set({ popup: null });
-        },
-      },
-    });
-  },
-
   // Show confirmation when removing standard range with data
   confirmRemoveStandardRange: () => {
     set({
@@ -216,7 +173,6 @@ const schemaSlice = (set, get) => ({
       },
     });
   },
-
   // Clear standard range values
   clearStandardRange: () => {
     set((state) => ({
@@ -226,17 +182,5 @@ const schemaSlice = (set, get) => ({
       },
     }));
   },
-
-  // Clear section values
-  clearSections: () => {
-    set((state) => ({
-      schema: {
-        ...state.schema,
-        sections: [],
-        currentSectionName: "",
-      },
-    }));
-  },
 });
-
 export default schemaSlice;
