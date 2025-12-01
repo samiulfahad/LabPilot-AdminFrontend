@@ -24,6 +24,7 @@ const UnderConstruction = () => {
 
   const [editingSectionName, setEditingSectionName] = useState(null);
   const [editingNewSectionName, setEditingNewSectionName] = useState("");
+  const [showAddSectionInput, setShowAddSectionInput] = useState(false);
 
   useEffect(() => {
     loadTestList();
@@ -67,6 +68,16 @@ const UnderConstruction = () => {
   const cancelEditing = () => {
     setEditingSectionName(null);
     setEditingNewSectionName("");
+  };
+
+  const handleAddSectionClick = () => {
+    addSection();
+    setShowAddSectionInput(false);
+  };
+
+  const handleCancelAddSection = () => {
+    setSchema("currentSectionName", "");
+    setShowAddSectionInput(false);
   };
 
   const safeStringify = (obj) => {
@@ -160,28 +171,48 @@ const UnderConstruction = () => {
         {/* Sections Feature */}
         <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
           <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Sections</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Sections</h3>
+              {!showAddSectionInput && (
+                <button
+                  onClick={() => setShowAddSectionInput(true)}
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
+                >
+                  Add Section
+                </button>
+              )}
+            </div>
           </div>
           <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1">
-                <InputField
-                  label="Section Title"
-                  value={schema.currentSectionName || ""}
-                  onChange={(e) => setSchema("currentSectionName", e.target.value)}
-                  placeholder="Enter section title"
-                />
+            {/* Add Section Input (only shown when showAddSectionInput is true) */}
+            {showAddSectionInput && (
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-4">
+                <div className="space-y-4">
+                  <InputField
+                    label="Section Title"
+                    value={schema.currentSectionName || ""}
+                    onChange={(e) => setSchema("currentSectionName", e.target.value)}
+                    placeholder="Enter section title"
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleAddSectionClick}
+                      disabled={!schema.currentSectionName?.trim()}
+                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                    >
+                      Add Section
+                    </button>
+                    <button
+                      onClick={handleCancelAddSection}
+                      className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="sm:self-end">
-                <button
-                  onClick={() => addSection()}
-                  disabled={!schema.currentSectionName?.trim()}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium text-sm sm:text-base"
-                >
-                  Add New Section
-                </button>
-              </div>
-            </div>
+            )}
 
             {schema.sections?.length > 0 && (
               <div>

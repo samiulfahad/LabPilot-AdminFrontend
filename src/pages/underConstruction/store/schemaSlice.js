@@ -1,4 +1,6 @@
+// schemaSlice.js
 import labTestService from "../../../services/testService";
+
 const schemaSlice = (set, get) => ({
   testList: [],
   schema: {
@@ -6,181 +8,141 @@ const schemaSlice = (set, get) => ({
     testName: "",
     testId: "",
     categoryId: "",
-    isActive: false, // New field added
+    isActive: false,
     hasStandardRange: false,
     standardRange: "",
-    sections: [
-      {
-        name: "Default",
-        fields: [],
-      },
-    ],
+    sections: [{ name: "Default", fields: [] }],
     currentSectionName: "",
   },
-  // Complete setSchema function
+
   setSchema: (field, value) => {
     set((state) => ({
-      schema: {
-        ...state.schema,
-        [field]: value,
-      },
+      schema: { ...state.schema, [field]: value },
     }));
   },
+
   loadTestList: async () => {
     try {
       get().startLoading();
       const response = await labTestService.getAllTests();
       set({ testList: response.data });
     } catch (e) {
-      set({ popup: { type: "error", message: "Failed to load schema", data: null, action: null } });
+      get().setPopup({
+        type: "error",
+        message: "Failed to load tests. Please try again.",
+      });
     } finally {
       get().stopLoading();
     }
   },
-  // Check if section name already exists
+
   isSectionNameUnique: (name, excludeName = null) => {
-    const { sections } = get().schema;
-    const normalizedNewName = name.toLowerCase().trim();
-    return !sections.some((section) => {
-      if (excludeName && section.name === excludeName) return false; // Skip the section being edited
-      const normalizedExistingName = section.name.toLowerCase().trim();
-      return normalizedExistingName === normalizedNewName;
+    const sections = get().schema.sections;
+    const normalized = name.toLowerCase().trim();
+    return !sections.some((s) => {
+      if (excludeName && s.name === excludeName) return false;
+      return s.name.toLowerCase().trim() === normalized;
     });
   },
+
   addSection: () => {
-    const { schema } = get();
-    const sectionName = schema.currentSectionName.trim();
-    if (!sectionName) return;
-    // Check if section name already exists
-    if (!get().isSectionNameUnique(sectionName)) {
-      set({
-        popup: {
-          type: "error",
-          message: `Section name "${sectionName}" already exists! Please use a unique name.`,
-          data: null,
-          action: null,
-        },
+    const name = get().schema.currentSectionName.trim();
+    if (!name) return;
+
+    if (!get().isSectionNameUnique(name)) {
+      get().setPopup({
+        type: "error",
+        message: `Section "${name}" already exists!`,
       });
       return;
     }
+
     set((state) => ({
       schema: {
         ...state.schema,
-        sections: [
-          ...state.schema.sections,
-          {
-            name: sectionName,
-            fields: [],
-          },
-        ],
+        sections: [...state.schema.sections, { name, fields: [] }],
         currentSectionName: "",
       },
     }));
-    // Show success message
-    set({
-      popup: { type: "success", message: `Section "${sectionName}" added successfully!`, data: null, action: null },
+
+    get().setPopup({
+      type: "success",
+      message: `Section "${name}" added successfully!`,
     });
   },
-  // Delete a specific section by name
+
   deleteSection: (sectionName) => {
-    const { sections } = get().schema;
-    if (sections.length === 1) {
-      set({
-        popup: {
-          type: "error",
-          message: "Cannot delete the last section!",
-          data: null,
-          action: null,
-        },
+    if (get().schema.sections.length === 1) {
+      get().setPopup({
+        type: "error",
+        message: "Cannot delete the last section!",
       });
       return;
     }
-    const section = sections.find((s) => s.name === sectionName);
+
     set((state) => ({
       schema: {
         ...state.schema,
-        sections: state.schema.sections.filter((section) => section.name !== sectionName),
+        sections: state.schema.sections.filter((s) => s.name !== sectionName),
       },
     }));
-    // Show success message
-    if (section) {
-      set({
-        popup: {
-          type: "success",
-          message: `Section "${section.name}" deleted successfully!`,
-          data: null,
-          action: null,
-        },
-      });
-    }
+
+    get().setPopup({
+      type: "success",
+      message: `Section "${sectionName}" deleted!`,
+    });
   },
-  // Update a section name
+
   updateSection: (oldName, newName) => {
-    const newNameTrimmed = newName.trim();
-    if (!newNameTrimmed) return;
-    // Check if the new name is unique (excluding the current section)
-    if (!get().isSectionNameUnique(newNameTrimmed, oldName)) {
-      set({
-        popup: {
-          type: "error",
-          message: `Section name "${newNameTrimmed}" already exists! Please use a unique name.`,
-          data: null,
-          action: null,
-        },
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+
+    if (!get().isSectionNameUnique(trimmed, oldName)) {
+      get().setPopup({
+        type: "error",
+        message: `Section "${trimmed}" already exists!`,
       });
       return;
     }
-    const oldSection = get().schema.sections.find((s) => s.name === oldName);
+
     set((state) => ({
       schema: {
         ...state.schema,
-        sections: state.schema.sections.map((section) =>
-          section.name === oldName ? { ...section, name: newNameTrimmed } : section
-        ),
+        sections: state.schema.sections.map((s) => (s.name === oldName ? { ...s, name: trimmed } : s)),
       },
     }));
-    // Show success message
-    if (oldSection) {
-      set({
-        popup: {
-          type: "success",
-          message: `Section renamed from "${oldSection.name}" to "${newNameTrimmed}" successfully!`,
-          data: null,
-          action: null,
-        },
-      });
-    }
+
+    get().setPopup({
+      type: "success",
+      message: `Section renamed successfully!`,
+    });
   },
-  // Show confirmation when removing standard range with data
+
   confirmRemoveStandardRange: () => {
-    set({
-      popup: {
-        type: "confirmation",
-        message: "All standard range data will be lost? Are you sure?",
-        data: null,
-        onConfirm: () => {
-          // This function will be called when user confirms
-          set((state) => ({
-            schema: {
-              ...state.schema,
-              hasStandardRange: false,
-              standardRange: "",
-            },
-          }));
-          // Close the popup
-          set({ popup: null });
-        },
+    get().setPopup({
+      type: "confirmation",
+      message: "This will delete all reference values. Continue?",
+      onConfirm: () => {
+        set((state) => ({
+          schema: {
+            ...state.schema,
+            hasStandardRange: false,
+            standardRange: "",
+          },
+        }));
+        get().setPopup({
+          type: "success",
+          message: "Standard range disabled.",
+        });
       },
     });
   },
-  // Clear standard range values
+
   clearStandardRange: () => {
     set((state) => ({
-      schema: {
-        ...state.schema,
-        standardRange: "",
-      },
+      schema: { ...state.schema, standardRange: "" },
     }));
   },
 });
+
 export default schemaSlice;
