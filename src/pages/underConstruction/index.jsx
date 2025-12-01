@@ -18,8 +18,8 @@ const UnderConstruction = () => {
     popup,
     closePopup,
     loading,
-    confirmRemoveStandardRange,
     clearStandardRange,
+    confirmRemoveStandardRange,
   } = useStore();
 
   const [editingSectionName, setEditingSectionName] = useState(null);
@@ -38,12 +38,12 @@ const UnderConstruction = () => {
     setSchema("testId", "");
   };
 
-  const handleStandardRangeToggle = (enable) => {
-    if (!enable && schema.standardRange?.trim()) {
+  const handleStandardRangeToggle = (value) => {
+    if (!value && schema.standardRange?.trim() !== "") {
       confirmRemoveStandardRange();
     } else {
-      setSchema("hasStandardRange", enable);
-      if (!enable) clearStandardRange();
+      setSchema("hasStandardRange", value);
+      if (!value) clearStandardRange();
     }
   };
 
@@ -58,7 +58,7 @@ const UnderConstruction = () => {
 
   const saveEditing = () => {
     if (editingSectionName && editingNewSectionName.trim()) {
-      updateSection(editingSectionName, editingNewSectionName.trim());
+      updateSection(editingSectionName, editingNewSectionName);
       setEditingSectionName(null);
       setEditingNewSectionName("");
     }
@@ -81,8 +81,7 @@ const UnderConstruction = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Full-screen loading */}
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
       {loading && <LoadingScreen />}
 
       {/* Popups */}
@@ -92,31 +91,26 @@ const UnderConstruction = () => {
         <Popup type="confirmation" message={popup.message} onClose={closePopup} onConfirm={popup.onConfirm} />
       )}
 
-      {/* Main container - critical for no horizontal scroll */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 overflow-x-hidden">
+      <div className="mx-auto space-y-3 sm:space-y-6">
         {/* Header */}
-        <div className="text-center sm:text-left">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Schema Builder</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
+            Schema Builder
+          </h2>
         </div>
 
         {/* Basic Information */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Basic Information</h3>
           </div>
-          <div className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <InputField
-                label="Schema Name"
-                value={schema.name}
-                onChange={(e) => setSchema("name", e.target.value)}
-                placeholder="Enter schema name"
-              />
+          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+              <InputField label="Schema Name" value={schema.name} onChange={(e) => setSchema("name", e.target.value)} />
               <InputField
                 label="Test Name"
                 value={schema.testName}
                 onChange={(e) => setSchema("testName", e.target.value)}
-                placeholder="Enter test display name"
               />
               <SelectField
                 label="Status"
@@ -131,124 +125,111 @@ const UnderConstruction = () => {
           </div>
         </div>
 
-        {/* Test Selection */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
+        {/* Test Configuration */}
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Test Selection</h3>
           </div>
-          <div className="p-4 sm:p-6 space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
               <SelectField
                 label="Test Category"
                 value={schema.categoryId}
                 onChange={handleCategoryChange}
-                options={testList.map((cat) => ({
-                  value: cat._id,
-                  label: cat.categoryName,
+                options={testList.map((category) => ({
+                  value: category._id,
+                  label: category.categoryName,
                 }))}
-                placeholder="Select a category"
+                placeholder="Choose a category"
               />
               <SelectField
                 label="Specific Test"
                 value={schema.testId}
                 onChange={(e) => setSchema("testId", e.target.value)}
-                disabled={!schema.categoryId}
                 options={testsForSelectedCategory.map((test) => ({
                   value: test._id,
-                  label: `${test.name}${test.schemaId ? " (Attached)" : ""}`,
+                  label: `${test.name}${test.schemaId ? " ✓" : ""}`,
                 }))}
                 placeholder="Select a test"
+                disabled={!schema.categoryId}
               />
             </div>
-
-            {schema.testId && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
-                <div className="flex items-start">
-                  <span className="text-blue-400 text-xl mr-3">Info</span>
-                  <div>
-                    <p className="font-medium text-blue-800">Selected Test</p>
-                    <p className="text-blue-700">
-                      Schema will be attached to:{" "}
-                      <strong>{testsForSelectedCategory.find((t) => t._id === schema.testId)?.name}</strong>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Sections */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
+        {/* Sections Feature */}
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Sections</h3>
           </div>
-          <div className="p-4 sm:p-6 space-y-5">
-            <div className="flex flex-col lg:flex-row gap-3">
+          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
                 <InputField
-                  label="New Section Title"
+                  label="Section Title"
                   value={schema.currentSectionName || ""}
                   onChange={(e) => setSchema("currentSectionName", e.target.value)}
-                  placeholder="e.g., Hematology, Biochemistry"
+                  placeholder="Enter section title"
                 />
               </div>
-              <div className="lg:self-end">
+              <div className="sm:self-end">
                 <button
-                  onClick={addSection}
+                  onClick={() => addSection()}
                   disabled={!schema.currentSectionName?.trim()}
-                  className="w-full lg:w-auto px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium text-sm sm:text-base"
                 >
-                  Add Section
+                  Add New Section
                 </button>
               </div>
             </div>
 
-            {schema.sections && schema.sections.length > 0 && (
+            {schema.sections?.length > 0 && (
               <div>
-                <h4 className="text-base font-semibold text-gray-700 mb-3">
-                  Existing Sections ({schema.sections.length})
+                <h4 className="text-sm sm:text-base font-medium text-gray-700 mb-3">
+                  Sections ({schema.sections.length})
                 </h4>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {schema.sections.map((section) => (
-                    <div key={section.name} className="border border-gray-200 rounded-lg p-4 bg-gray-50 w-full">
+                    <div key={section.name} className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
                       {editingSectionName === section.name ? (
                         <div className="space-y-3">
-                          <InputField
+                          <input
+                            type="text"
                             value={editingNewSectionName}
                             onChange={(e) => setEditingNewSectionName(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                             placeholder="Section name"
                             autoFocus
                           />
                           <div className="grid grid-cols-2 gap-2">
                             <button
                               onClick={saveEditing}
-                              className="bg-green-600 text-white py-2 rounded hover:bg-green-700 font-medium text-sm"
+                              className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                             >
                               Save
                             </button>
                             <button
                               onClick={cancelEditing}
-                              className="bg-gray-500 text-white py-2 rounded hover:bg-gray-600 font-medium text-sm"
+                              className="px-3 sm:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
                             >
                               Cancel
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                          <div className="font-medium text-gray-900 break-words">{section.name}</div>
-                          <div className="flex gap-2 flex-shrink-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
+                          <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{section.name}</div>
+                          <div className="flex gap-2">
                             <button
                               onClick={() => startEditing(section)}
-                              className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded font-medium text-sm transition-colors"
+                              className="px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => deleteSection(section.name)}
+                              className="px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               disabled={schema.sections.length === 1}
-                              className="px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               Delete
                             </button>
@@ -263,17 +244,17 @@ const UnderConstruction = () => {
           </div>
         </div>
 
-        {/* Standard Range */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
-          <div className="p-4 sm:p-6 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200">
+        {/* Standard Range Feature */}
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-gray-200">
               <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Static Standard Range</h3>
-                <p className="text-sm text-gray-600">Add fixed reference values (optional)</p>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-700">Add Static Standard Range</h3>
+                <p className="text-xs sm:text-sm text-gray-600">Set reference values for this schema</p>
               </div>
               <button
                 onClick={() => handleStandardRangeToggle(!schema.hasStandardRange)}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                   schema.hasStandardRange
                     ? "bg-red-600 hover:bg-red-700 text-white"
                     : "bg-green-600 hover:bg-green-700 text-white"
@@ -284,13 +265,13 @@ const UnderConstruction = () => {
             </div>
 
             {schema.hasStandardRange && (
-              <div>
+              <div className="pt-2">
                 <TextAreaField
                   label="Reference Values"
-                  value={schema.standardRange || ""}
+                  value={schema.standardRange}
                   onChange={(e) => setSchema("standardRange", e.target.value)}
-                  placeholder="e.g., Normal: 12-15 g/dL\nLow: < 12 g/dL\nHigh: > 15 g/dL"
-                  rows={8}
+                  placeholder="Enter standard ranges, reference values, and normal parameters..."
+                  rows={4}
                 />
               </div>
             )}
@@ -298,29 +279,38 @@ const UnderConstruction = () => {
         </div>
 
         {/* Schema Preview */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Schema Preview</h3>
-            <p className="text-sm text-gray-600">Live JSON structure</p>
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-700">Schema Preview</h3>
+                <p className="text-xs sm:text-sm text-gray-600">Live preview of schema data structure</p>
+              </div>
+              <div className="text-xs sm:text-sm text-gray-500">{schema.sections?.length || 0} section(s)</div>
+            </div>
           </div>
-          <div className="p-4 sm:p-6 bg-gray-50">
+
+          <div className="p-3 sm:p-4 lg:p-6 bg-gray-50">
             <div className="text-xs sm:text-sm text-gray-600 mb-3 space-y-1">
               <div>
                 <strong>Category:</strong>{" "}
                 {schema.categoryId
-                  ? testList.find((c) => c._id === schema.categoryId)?.categoryName || "—"
+                  ? testList.find((cat) => cat._id === schema.categoryId)?.categoryName
                   : "Not selected"}
               </div>
               <div>
                 <strong>Test:</strong>{" "}
                 {schema.testId
-                  ? testsForSelectedCategory.find((t) => t._id === schema.testId)?.name || "—"
+                  ? testsForSelectedCategory.find((test) => test._id === schema.testId)?.name
                   : "Not selected"}
               </div>
             </div>
-            <pre className="text-xs sm:text-sm bg-white p-4 rounded-lg border border-gray-200 font-mono overflow-x-auto whitespace-pre-wrap break-words max-h-96">
-              {safeStringify(schema)}
-            </pre>
+
+            <div className="bg-white p-3 sm:p-4 rounded border border-gray-200 overflow-x-auto">
+              <pre className="text-xs sm:text-sm text-gray-700 font-mono whitespace-pre-wrap break-words max-h-96 overflow-y-auto">
+                {safeStringify(schema)}
+              </pre>
+            </div>
           </div>
         </div>
       </div>
