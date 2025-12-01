@@ -116,13 +116,11 @@ const UnderConstruction = () => {
               label="Schema Name"
               value={schema.name}
               onChange={(e) => setSchema("name", e.target.value)}
-              placeholder="Enter schema name"
             />
             <InputField
               label="Test Name"
               value={schema.testName}
               onChange={(e) => setSchema("testName", e.target.value)}
-              placeholder="Enter test display name"
             />
           </div>
         </div>
@@ -201,7 +199,6 @@ const UnderConstruction = () => {
                 label="Section Title"
                 value={schema.currentSectionName || ""}
                 onChange={(e) => setSchema("currentSectionName", e.target.value)}
-                placeholder="Enter section title (e.g., Hematology, Biochemistry)"
                 autoFocus
               />
               <div className="flex gap-3 mt-4">
@@ -318,7 +315,6 @@ const UnderConstruction = () => {
                 label="Reference Values"
                 value={schema.standardRange}
                 onChange={(e) => setSchema("standardRange", e.target.value)}
-                placeholder="Enter standard ranges, reference values, and normal parameters...\n\nExample:\nNormal: 12–15 g/dL\nLow: < 12 g/dL\nHigh: > 15 g/dL"
                 rows={4}
               />
             </div>
