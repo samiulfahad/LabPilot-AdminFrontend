@@ -53,8 +53,10 @@ const schemaSlice = (set, get) => ({
       get().setPopup({
         type: "error",
         message: `Section "${name}" already exists!`,
+        data: null,
+        action: null
       });
-      return;
+      return false;
     }
 
     set((state) => ({
@@ -69,6 +71,7 @@ const schemaSlice = (set, get) => ({
       type: "success",
       message: `Section "${name}" added successfully!`,
     });
+    return true
   },
 
   deleteSection: (sectionName) => {
