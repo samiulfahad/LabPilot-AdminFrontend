@@ -81,7 +81,8 @@ const UnderConstruction = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* Full-screen loading */}
       {loading && <LoadingScreen />}
 
       {/* Popups */}
@@ -91,18 +92,19 @@ const UnderConstruction = () => {
         <Popup type="confirmation" message={popup.message} onClose={closePopup} onConfirm={popup.onConfirm} />
       )}
 
-      <div className="max-w-7xl mx-auto space-y-3 sm:space-y-6">
+      {/* Main container - critical for no horizontal scroll */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 overflow-x-hidden">
         {/* Header */}
         <div className="text-center sm:text-left">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Schema Builder</h1>
         </div>
 
         {/* Basic Information */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
+          <div className="p-4 sm:p-6 border-b border-gray-200">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Basic Information</h3>
           </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+          <div className="p-4 sm:p-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <InputField
                 label="Schema Name"
@@ -130,11 +132,11 @@ const UnderConstruction = () => {
         </div>
 
         {/* Test Selection */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
+          <div className="p-4 sm:p-6 border-b border-gray-200">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Test Selection</h3>
           </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+          <div className="p-4 sm:p-6 space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <SelectField
                 label="Test Category"
@@ -160,12 +162,12 @@ const UnderConstruction = () => {
             </div>
 
             {schema.testId && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
+                <div className="flex items-start">
                   <span className="text-blue-400 text-xl mr-3">Info</span>
                   <div>
-                    <p className="text-sm font-medium text-blue-800">Selected Test</p>
-                    <p className="text-sm text-blue-700">
+                    <p className="font-medium text-blue-800">Selected Test</p>
+                    <p className="text-blue-700">
                       Schema will be attached to:{" "}
                       <strong>{testsForSelectedCategory.find((t) => t._id === schema.testId)?.name}</strong>
                     </p>
@@ -177,11 +179,11 @@ const UnderConstruction = () => {
         </div>
 
         {/* Sections */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
+          <div className="p-4 sm:p-6 border-b border-gray-200">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Sections</h3>
           </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-5">
+          <div className="p-4 sm:p-6 space-y-5">
             <div className="flex flex-col lg:flex-row gap-3">
               <div className="flex-1">
                 <InputField
@@ -209,7 +211,7 @@ const UnderConstruction = () => {
                 </h4>
                 <div className="space-y-3">
                   {schema.sections.map((section) => (
-                    <div key={section.name} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div key={section.name} className="border border-gray-200 rounded-lg p-4 bg-gray-50 w-full">
                       {editingSectionName === section.name ? (
                         <div className="space-y-3">
                           <InputField
@@ -218,16 +220,16 @@ const UnderConstruction = () => {
                             placeholder="Section name"
                             autoFocus
                           />
-                          <div className="flex gap-2">
+                          <div className="grid grid-cols-2 gap-2">
                             <button
                               onClick={saveEditing}
-                              className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700 font-medium text-sm"
+                              className="bg-green-600 text-white py-2 rounded hover:bg-green-700 font-medium text-sm"
                             >
                               Save
                             </button>
                             <button
                               onClick={cancelEditing}
-                              className="flex-1 bg-gray-500 text-white py-2 rounded hover:bg-gray-600 font-medium text-sm"
+                              className="bg-gray-500 text-white py-2 rounded hover:bg-gray-600 font-medium text-sm"
                             >
                               Cancel
                             </button>
@@ -235,8 +237,8 @@ const UnderConstruction = () => {
                         </div>
                       ) : (
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                          <div className="font-medium text-gray-900">{section.name}</div>
-                          <div className="flex gap-2">
+                          <div className="font-medium text-gray-900 break-words">{section.name}</div>
+                          <div className="flex gap-2 flex-shrink-0">
                             <button
                               onClick={() => startEditing(section)}
                               className="px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded font-medium text-sm transition-colors"
@@ -262,12 +264,12 @@ const UnderConstruction = () => {
         </div>
 
         {/* Standard Range */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 space-y-5">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
+          <div className="p-4 sm:p-6 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200">
               <div>
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Static Standard Range</h3>
-                <p className="text-sm text-gray-600">Add fixed reference values for this schema (optional)</p>
+                <p className="text-sm text-gray-600">Add fixed reference values (optional)</p>
               </div>
               <button
                 onClick={() => handleStandardRangeToggle(!schema.hasStandardRange)}
@@ -282,7 +284,7 @@ const UnderConstruction = () => {
             </div>
 
             {schema.hasStandardRange && (
-              <div className="pt-2">
+              <div>
                 <TextAreaField
                   label="Reference Values"
                   value={schema.standardRange || ""}
@@ -296,23 +298,27 @@ const UnderConstruction = () => {
         </div>
 
         {/* Schema Preview */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm w-full overflow-hidden">
+          <div className="p-4 sm:p-6 border-b border-gray-200">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Schema Preview</h3>
-            <p className="text-sm text-gray-600">Live JSON structure of your schema</p>
+            <p className="text-sm text-gray-600">Live JSON structure</p>
           </div>
-          <div className="p-3 sm:p-4 lg:p-6 bg-gray-50">
+          <div className="p-4 sm:p-6 bg-gray-50">
             <div className="text-xs sm:text-sm text-gray-600 mb-3 space-y-1">
               <div>
                 <strong>Category:</strong>{" "}
-                {schema.categoryId ? testList.find((c) => c._id === schema.categoryId)?.categoryName : "Not selected"}
+                {schema.categoryId
+                  ? testList.find((c) => c._id === schema.categoryId)?.categoryName || "—"
+                  : "Not selected"}
               </div>
               <div>
                 <strong>Test:</strong>{" "}
-                {schema.testId ? testsForSelectedCategory.find((t) => t._id === schema.testId)?.name : "Not selected"}
+                {schema.testId
+                  ? testsForSelectedCategory.find((t) => t._id === schema.testId)?.name || "—"
+                  : "Not selected"}
               </div>
             </div>
-            <pre className="text-xs sm:text-sm bg-white p-4 rounded-lg border border-gray-200 font-mono overflow-x-auto max-h-96 whitespace-pre-wrap break-words">
+            <pre className="text-xs sm:text-sm bg-white p-4 rounded-lg border border-gray-200 font-mono overflow-x-auto whitespace-pre-wrap break-words max-h-96">
               {safeStringify(schema)}
             </pre>
           </div>
