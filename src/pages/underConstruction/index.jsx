@@ -103,7 +103,7 @@ const UnderConstruction = () => {
         <Popup type="confirmation" message={popup.message} onClose={closePopup} onConfirm={popup.onConfirm} />
       )}
 
-      <div className="max-w-full mx-auto">
+      <div className="w-full mx-auto">
         {/* Header */}
         <div className="mb-4 md:mb-8">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 text-center">Schema Builder</h1>
@@ -111,67 +111,77 @@ const UnderConstruction = () => {
 
         <div className="space-y-4 md:space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6">
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6 overflow-hidden">
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
-                <InputField
-                  label="Schema Name"
-                  value={schema.name}
-                  onChange={(e) => setSchema("name", e.target.value)}
-                />
+                <div className="w-full">
+                  <InputField
+                    label="Schema Name"
+                    value={schema.name}
+                    onChange={(e) => setSchema("name", e.target.value)}
+                  />
+                </div>
 
-                <SelectField
-                  label="Status"
-                  value={schema.isActive.toString()}
-                  onChange={handleIsActiveChange}
-                  options={[
-                    { label: "🟡 Draft", value: "false" },
-                    { label: "🟢 Active", value: "true" },
-                  ]}
-                />
+                <div className="w-full">
+                  <SelectField
+                    label="Status"
+                    value={schema.isActive.toString()}
+                    onChange={handleIsActiveChange}
+                    options={[
+                      { label: "🟡 Draft", value: "false" },
+                      { label: "🟢 Active", value: "true" },
+                    ]}
+                  />
+                </div>
               </div>
 
-              <InputField
-                label="Description"
-                value={schema.description}
-                onChange={(e) => setSchema("description", e.target.value)}
-              />
+              <div className="w-full">
+                <InputField
+                  label="Description"
+                  value={schema.description}
+                  onChange={(e) => setSchema("description", e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
           {/* Test Configuration */}
-          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6">
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6 overflow-hidden">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Test Selection</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
-              <SelectField
-                label="Test Category"
-                value={schema.categoryId}
-                onChange={handleCategoryChange}
-                options={testList.map((category) => ({
-                  value: category._id,
-                  label: category.categoryName,
-                }))}
-                placeholder="Choose a category"
-              />
+              <div className="w-full">
+                <SelectField
+                  label="Test Category"
+                  value={schema.categoryId}
+                  onChange={handleCategoryChange}
+                  options={testList.map((category) => ({
+                    value: category._id,
+                    label: category.categoryName,
+                  }))}
+                  placeholder="Choose a category"
+                />
+              </div>
 
               {schema.categoryId && (
-                <SelectField
-                  label="Specific Test"
-                  value={schema.testId}
-                  onChange={(e) => setSchema("testId", e.target.value)}
-                  options={testsForSelectedCategory.map((test) => ({
-                    value: test._id,
-                    label: `${test.name}${test.schemaId ? " ✓" : ""}`,
-                  }))}
-                  placeholder="Select a test"
-                />
+                <div className="w-full">
+                  <SelectField
+                    label="Specific Test"
+                    value={schema.testId}
+                    onChange={(e) => setSchema("testId", e.target.value)}
+                    options={testsForSelectedCategory.map((test) => ({
+                      value: test._id,
+                      label: `${test.name}${test.schemaId ? " ✓" : ""}`,
+                    }))}
+                    placeholder="Select a test"
+                  />
+                </div>
               )}
             </div>
           </div>
 
           {/* Multi-section Feature */}
-          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6">
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6 overflow-hidden">
             <div className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="w-full">
@@ -191,8 +201,6 @@ const UnderConstruction = () => {
                 <div className="space-y-4 mt-4">
                   <div className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-1 min-w-0">
-                      {" "}
-                      {/* Added min-w-0 to prevent overflow */}
                       <InputField
                         label="Section Name"
                         value={schema.currentSectionName || ""}
@@ -202,7 +210,7 @@ const UnderConstruction = () => {
                     </div>
                     <button
                       onClick={() => addSection()}
-                      className="px-4 md:px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
+                      className="px-4 md:px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                     >
                       Add Section
                     </button>
@@ -240,24 +248,20 @@ const UnderConstruction = () => {
                               </div>
                             ) : (
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                <div className="min-w-0 flex-1">
-                                  {" "}
-                                  {/* Added min-w-0 and flex-1 */}
+                                <div className="flex-1 min-w-0 overflow-hidden">
                                   <div className="font-medium text-gray-900 truncate">{section.name}</div>
                                   <div className="text-xs text-gray-500 font-mono truncate">{section.id}</div>
                                 </div>
                                 <div className="flex gap-2 flex-shrink-0">
-                                  {" "}
-                                  {/* Added flex-shrink-0 */}
                                   <button
                                     onClick={() => startEditing(section)}
-                                    className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded transition-colors whitespace-nowrap"
+                                    className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded transition-colors"
                                   >
                                     Edit
                                   </button>
                                   <button
                                     onClick={() => deleteSection(section.id)}
-                                    className="px-3 py-1 text-red-600 hover:bg-red-50 rounded transition-colors whitespace-nowrap"
+                                    className="px-3 py-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                                   >
                                     Delete
                                   </button>
@@ -275,7 +279,7 @@ const UnderConstruction = () => {
           </div>
 
           {/* Standard Range Feature */}
-          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6">
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6 overflow-hidden">
             <div className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
@@ -286,14 +290,14 @@ const UnderConstruction = () => {
                   {!schema.hasStandardRange ? (
                     <button
                       onClick={() => handleStandardRangeToggle(true)}
-                      className="w-full md:w-auto px-4 md:px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium whitespace-nowrap"
+                      className="w-full md:w-auto px-4 md:px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                     >
                       Enable Standard Range
                     </button>
                   ) : (
                     <button
                       onClick={() => handleStandardRangeToggle(false)}
-                      className="w-full md:w-auto px-4 md:px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium whitespace-nowrap"
+                      className="w-full md:w-auto px-4 md:px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                     >
                       Disable Standard Range
                     </button>
@@ -316,7 +320,7 @@ const UnderConstruction = () => {
           </div>
 
           {/* Schema Preview - Always Open */}
-          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6">
+          <div className="bg-white rounded-xl shadow border border-gray-200 p-3 md:p-6 overflow-hidden">
             <div className="mb-4">
               <h2 className="text-lg md:text-xl font-semibold text-gray-900">Schema Preview</h2>
               <p className="text-sm text-gray-600">Live preview of schema data structure</p>
@@ -337,9 +341,11 @@ const UnderConstruction = () => {
                     : "Not selected"}
                 </div>
               </div>
-              <pre className="text-xs md:text-sm text-gray-700 bg-white p-2 md:p-4 rounded border overflow-x-auto font-mono max-h-96 overflow-y-auto whitespace-pre-wrap break-words">
-                {safeStringify(schema)}
-              </pre>
+              <div className="w-full overflow-hidden">
+                <pre className="text-xs md:text-sm text-gray-700 bg-white p-2 md:p-4 rounded border overflow-x-auto font-mono max-h-96 overflow-y-auto w-full">
+                  {safeStringify(schema)}
+                </pre>
+              </div>
             </div>
           </div>
         </div>
