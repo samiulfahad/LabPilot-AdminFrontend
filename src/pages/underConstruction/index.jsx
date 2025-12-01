@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import InputField from "../../components/html/InputField";
-import SelectField from "../../components/html/SelectField";
+import SelectField from "../../components/html/SelectFieldTypes/SelectField";
 import TextAreaField from "../../components/html/TextAreaField";
 import useStore from "./store";
 import Popup from "../../components/popup/Popup";
@@ -18,8 +18,8 @@ const UnderConstruction = () => {
     popup,
     closePopup,
     loading,
-    clearStandardRange,
     confirmRemoveStandardRange,
+    clearStandardRange,
   } = useStore();
 
   const [editingSectionName, setEditingSectionName] = useState(null);
@@ -39,26 +39,23 @@ const UnderConstruction = () => {
   };
 
   const handleStandardRangeToggle = (value) => {
-    if (!value && schema.standardRange?.trim() !== "") {
-      confirmRemoveStandardRange();
+    if (!value && schema.standardRange?.trim()) {
+      confirmRemoveStandardRange(); // This now correctly opens confirmation
     } else {
       setSchema("hasStandardRange", value);
       if (!value) clearStandardRange();
     }
   };
 
-  const handleIsActiveChange = (e) => {
-    setSchema("isActive", e.target.value === "true");
-  };
-
   const startEditing = (section) => {
     setEditingSectionName(section.name);
     setEditingNewSectionName(section.name);
+  );
   };
 
   const saveEditing = () => {
-    if (editingSectionName && editingNewSectionName.trim()) {
-      updateSection(editingSectionName, editingNewSectionName);
+    if (editingNewSectionName.trim() && editingSectionName) {
+      updateSection(editingSectionName, editingNewSectionName.trim());
       setEditingSectionName(null);
       setEditingNewSectionName("");
     }
@@ -69,250 +66,241 @@ const UnderConstruction = () => {
     setEditingNewSectionName("");
   };
 
-  const safeStringify = (obj) => {
-    return JSON.stringify(
-      obj,
-      (key, value) => {
-        if (typeof value === "function" || value instanceof HTMLElement) return undefined;
-        return value;
-      },
-      2
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
       {loading && <LoadingScreen />}
 
-      {/* Popups */}
-      {popup && popup.type === "success" && <Popup type="success" message={popup.message} onClose={closePopup} />}
-      {popup && popup.type === "error" && <Popup type="error" message={popup.message} onClose={closePopup} />}
-      {popup && popup.type === "confirmation" && (
-        <Popup type="confirmation" message={popup.message} onClose={closePopup} onConfirm={popup.onConfirm} />
+      {/* Unified Popup Handler – This is the KEY fix */}
+      {popup && (
+        <Popup
+          type={popup.type}
+          message={popup.message}
+          onClose={closePopup}
+          onConfirm={popup.onConfirm || closePopup} // ← Critical: fallback to close
+          confirmText={popup.confirmText || "Confirm"}
+          cancelText={popup.cancelText || "Cancel"}
+        />
       )}
 
-      <div className="mx-auto space-y-3 sm:space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
             Schema Builder
           </h2>
+          <span className="px-4 py-2 bg-orange-100 text-orange-800 rounded-lg font-medium">
+            Simple Mode
+          </span>
         </div>
 
         {/* Basic Information */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Basic Information</h3>
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-xl font-semibold text-gray-700">Basic Information</h3>
           </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-              <InputField label="Schema Name" value={schema.name} onChange={(e) => setSchema("name", e.target.value)} />
+          <div className="p-6 space-y-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               <InputField
-                label="Test Name"
-                value={schema.testName}
+                label="Schema Name"
+                value={schema.name || ""}
+                onChange={(e) => setSchema("name", e.target.value)}
+                placeholder="e.g., CBC Panel Schema"
+              />
+              <InputField
+                label="Display Test Name"
+                value={schema.testName || ""}
                 onChange={(e) => setSchema("testName", e.target.value)}
+                placeholder="e.g., Complete Blood Count"
               />
-              <SelectField
-                label="Status"
-                value={schema.isActive.toString()}
-                onChange={handleIsActiveChange}
-                options={[
-                  { label: "Draft", value: "false" },
-                  { label: "Active", value: "true" },
-                ]}
-              />
+              <div className="flex items-center justify-between p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <div>
+                  <p className="font-medium text-gray-700">Status</p>
+                  <p className="text-xs text-gray-600">Active or Draft?</p>
+                </div>
+                <select
+                  value={schema.isActive}
+                  onChange={(e) => setSchema("isActive", e.target.value === "true")}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  <option value={false}>Draft</option>
+                  <option value={true}>Active</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Test Configuration */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Test Selection</h3>
+        {/* Test Selection */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-xl font-semibold text-gray-700">Test Selection</h3>
           </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+          <div className="p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <SelectField
                 label="Test Category"
-                value={schema.categoryId}
+                value={schema.categoryId || ""}
                 onChange={handleCategoryChange}
-                options={testList.map((category) => ({
-                  value: category._id,
-                  label: category.categoryName,
+                options={testList.map((cat) => ({
+                  value: cat._id,
+                  label: cat.categoryName,
                 }))}
-                placeholder="Choose a category"
+                placeholder="Select category"
               />
               <SelectField
                 label="Specific Test"
-                value={schema.testId}
+                value={schema.testId || ""}
                 onChange={(e) => setSchema("testId", e.target.value)}
+                disabled={!schema.categoryId}
                 options={testsForSelectedCategory.map((test) => ({
                   value: test._id,
-                  label: `${test.name}${test.schemaId ? " ✓" : ""}`,
+                  label: test.name + (test.schemaId ? " (has schema)" : ""),
                 }))}
-                placeholder="Select a test"
-                disabled={!schema.categoryId}
+                placeholder="Select test"
               />
             </div>
+
+            {schema.testId && (
+              <div className="mt-5 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm font-medium text-blue-800">
+                  Schema will be linked to:{" "}
+                  <strong>
+                    {testsForSelectedCategory.find((t) => t._id === schema.testId)?.name}
+                  </strong>
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Sections Feature */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Sections</h3>
+        {/* Sections */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-xl font-semibold text-gray-700">Sections</h3>
           </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1">
-                <InputField
-                  label="Section Title"
-                  value={schema.currentSectionName || ""}
-                  onChange={(e) => setSchema("currentSectionName", e.target.value)}
-                  placeholder="Enter section title"
-                />
-              </div>
+          <div className="p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
+              <InputField
+                label="New Section"
+                value={schema.currentSectionName || ""}
+                onChange={(e) => setSchema("currentSectionName", e.target.value)}
+                placeholder="e.g., Hematology, Biochemistry"
+              />
               <div className="sm:self-end">
                 <button
-                  onClick={() => addSection()}
+                  onClick={addSection}
                   disabled={!schema.currentSectionName?.trim()}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium text-sm sm:text-base"
+                  className="w-full sm:w-auto px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 font-medium transition"
                 >
-                  Add New Section
+                  Add Section
                 </button>
               </div>
             </div>
 
             {schema.sections?.length > 0 && (
-              <div>
-                <h4 className="text-sm sm:text-base font-medium text-gray-700 mb-3">
-                  Sections ({schema.sections.length})
-                </h4>
-                <div className="space-y-2 sm:space-y-3">
-                  {schema.sections.map((section) => (
-                    <div key={section.name} className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
-                      {editingSectionName === section.name ? (
-                        <div className="space-y-3">
-                          <input
-                            type="text"
-                            value={editingNewSectionName}
-                            onChange={(e) => setEditingNewSectionName(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                            placeholder="Section name"
-                            autoFocus
-                          />
-                          <div className="grid grid-cols-2 gap-2">
-                            <button
-                              onClick={saveEditing}
-                              className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={cancelEditing}
-                              className="px-3 sm:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
-                            >
-                              Cancel
-                            </button>
-                          </div>
+              <div className="space-y-3">
+                {schema.sections.map((section) => (
+                  <div
+                    key={section.name}
+                    className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-lg hover:shadow transition"
+                  >
+                    {editingSectionName === section.name ? (
+                      <div className="flex-1 flex gap-3">
+                        <input
+                          type="text"
+                          value={editingNewSectionName}
+                          onChange={(e) => setEditingNewSectionName(e.target.value)}
+                          className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                          autoFocus
+                        />
+                        <button
+                          onClick={saveEditing}
+                          className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={cancelEditing}
+                          className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="font-medium text-gray-800">{section.name}</span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => startEditing(section)}
+                            className="px-4 py-1 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => deleteSection(section.name)}
+                            disabled={schema.sections.length === 1}
+                            className="px-4 py-1 text-red-600 bg-red-50 hover:bg-red-100 rounded disabled:opacity-50"
+                          >
+                            Delete
+                          </button>
                         </div>
-                      ) : (
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
-                          <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{section.name}</div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => startEditing(section)}
-                              className="px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => deleteSection(section.name)}
-                              className="px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              disabled={schema.sections.length === 1}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                      </>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>
         </div>
 
-        {/* Standard Range Feature */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-gray-200">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-700">Add Static Standard Range</h3>
-                <p className="text-xs sm:text-sm text-gray-600">Set reference values for this schema</p>
-              </div>
-              <button
-                onClick={() => handleStandardRangeToggle(!schema.hasStandardRange)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                  schema.hasStandardRange
-                    ? "bg-red-600 hover:bg-red-700 text-white"
-                    : "bg-green-600 hover:bg-green-700 text-white"
-                }`}
-              >
-                {schema.hasStandardRange ? "Disable" : "Enable"} Standard Range
-              </button>
+        {/* Standard Range Toggle */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-700">Static Standard Range</h3>
+              <p className="text-sm text-gray-600">Optional fixed reference values</p>
             </div>
-
-            {schema.hasStandardRange && (
-              <div className="pt-2">
-                <TextAreaField
-                  label="Reference Values"
-                  value={schema.standardRange}
-                  onChange={(e) => setSchema("standardRange", e.target.value)}
-                  placeholder="Enter standard ranges, reference values, and normal parameters..."
-                  rows={4}
-                />
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={schema.hasStandardRange}
+                onChange={(e) => handleStandardRangeToggle(e.target.checked)}
+                className="sr-only"
+              />
+              <div className={`w-14 h-8 rounded-full transition ${schema.hasStandardRange ? "bg-blue-600" : "bg-gray-300"}`}>
+                <div className={`w-6 h-6 bg-white rounded-full shadow transform transition ${schema.hasStandardRange ? "translate-x-6" : "translate-x-1"} mt-1`} />
               </div>
-            )}
+              <span className="ml-3 font-medium text-gray-700">
+                {schema.hasStandardRange ? "Enabled" : "Disabled"}
+              </span>
+            </label>
+          </div>
+          {schema.hasStandardRange && (
+            <div className="p-6">
+              <TextAreaField
+                label="Reference Values"
+                value={schema.standardRange || ""}
+                onChange={(e) => setSchema("standardRange", e.target.value)}
+                placeholder="Normal: 4.5–11.0 × 10⁹/L&#10;Low: < 4.5&#10;High: > 11.0"
+                rows={6}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* JSON Preview */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-xl font-semibold text-gray-700">Live JSON Preview</h3>
+          </div>
+          <div className="p-6 bg-gray-50">
+            <pre className="text-xs font-mono bg-white p-5 rounded-lg border border-gray-200 overflow-x-auto max-h-96">
+              {JSON.stringify(schema, null, 2)}
+            </pre>
           </div>
         </div>
 
-        {/* Schema Preview */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-700">Schema Preview</h3>
-                <p className="text-xs sm:text-sm text-gray-600">Live preview of schema data structure</p>
-              </div>
-              <div className="text-xs sm:text-sm text-gray-500">{schema.sections?.length || 0} section(s)</div>
-            </div>
-          </div>
-
-          <div className="p-3 sm:p-4 lg:p-6 bg-gray-50">
-            <div className="text-xs sm:text-sm text-gray-600 mb-3 space-y-1">
-              <div>
-                <strong>Category:</strong>{" "}
-                {schema.categoryId
-                  ? testList.find((cat) => cat._id === schema.categoryId)?.categoryName
-                  : "Not selected"}
-              </div>
-              <div>
-                <strong>Test:</strong>{" "}
-                {schema.testId
-                  ? testsForSelectedCategory.find((test) => test._id === schema.testId)?.name
-                  : "Not selected"}
-              </div>
-            </div>
-
-            <div className="bg-white p-3 sm:p-4 rounded border border-gray-200 overflow-x-auto">
-              <pre className="text-xs sm:text-sm text-gray-700 font-mono whitespace-pre-wrap break-words max-h-96 overflow-y-auto">
-                {safeStringify(schema)}
-              </pre>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
