@@ -49,7 +49,7 @@ const UnderConstruction = () => {
   };
 
   const handleIsActiveChange = (e) => {
-    setSchema("isActive", e.target.value === "true");
+    setSchema("isActive", e.target.checked);
   };
 
   const startEditing = (section) => {
@@ -92,7 +92,7 @@ const UnderConstruction = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {loading && <LoadingScreen />}
 
       {/* Popups */}
@@ -102,243 +102,277 @@ const UnderConstruction = () => {
         <Popup type="confirmation" message={popup.message} onClose={closePopup} onConfirm={popup.onConfirm} />
       )}
 
-      <div className="mx-auto space-y-3 sm:space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center sm:text-left px-2 sm:px-0">
-            Schema Builder
-          </h2>
+        <div className="text-center mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Schema Builder</h1>
         </div>
 
-        {/* Basic Information */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Basic Information</h3>
+        {/* Row 1: Schema Name & Test Name */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Basic Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <InputField
+              label="Schema Name"
+              value={schema.name}
+              onChange={(e) => setSchema("name", e.target.value)}
+              placeholder="Enter schema name"
+            />
+            <InputField
+              label="Test Name"
+              value={schema.testName}
+              onChange={(e) => setSchema("testName", e.target.value)}
+              placeholder="Enter test display name"
+            />
           </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-              <InputField label="Schema Name" value={schema.name} onChange={(e) => setSchema("name", e.target.value)} />
-              <InputField
-                label="Test Name"
-                value={schema.testName}
-                onChange={(e) => setSchema("testName", e.target.value)}
-              />
-              <SelectField
-                label="Status"
-                value={schema.isActive.toString()}
+        </div>
+
+        {/* Row 2: Test Category & Test Selection */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Test Selection</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <SelectField
+              label="Test Category"
+              value={schema.categoryId}
+              onChange={handleCategoryChange}
+              options={testList.map((category) => ({
+                value: category._id,
+                label: category.categoryName,
+              }))}
+              placeholder="Select a category"
+            />
+            <SelectField
+              label="Specific Test"
+              value={schema.testId}
+              onChange={(e) => setSchema("testId", e.target.value)}
+              options={testsForSelectedCategory.map((test) => ({
+                value: test._id,
+                label: `${test.name}${test.schemaId ? " ✓" : ""}`,
+              }))}
+              placeholder="Select a test"
+              disabled={!schema.categoryId}
+            />
+          </div>
+        </div>
+
+        {/* Row 3: Status Toggle */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Status</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {schema.isActive ? "Schema is active and can be used" : "Schema is in draft mode"}
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={schema.isActive}
                 onChange={handleIsActiveChange}
-                options={[
-                  { label: "Draft", value: "false" },
-                  { label: "Active", value: "true" },
-                ]}
+                className="sr-only peer"
               />
-            </div>
+              <div className="w-12 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6"></div>
+              <span className="ml-3 text-sm font-medium text-gray-700">{schema.isActive ? "Active" : "Draft"}</span>
+            </label>
           </div>
         </div>
 
-        {/* Test Configuration */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Test Selection</h3>
-          </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-              <SelectField
-                label="Test Category"
-                value={schema.categoryId}
-                onChange={handleCategoryChange}
-                options={testList.map((category) => ({
-                  value: category._id,
-                  label: category.categoryName,
-                }))}
-                placeholder="Choose a category"
-              />
-              <SelectField
-                label="Specific Test"
-                value={schema.testId}
-                onChange={(e) => setSchema("testId", e.target.value)}
-                options={testsForSelectedCategory.map((test) => ({
-                  value: test._id,
-                  label: `${test.name}${test.schemaId ? " ✓" : ""}`,
-                }))}
-                placeholder="Select a test"
-                disabled={!schema.categoryId}
-              />
+        {/* Row 4: Sections */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Sections</h3>
+              <p className="text-sm text-gray-600 mt-1">Organize test fields into sections</p>
             </div>
+            {!showAddSectionInput && (
+              <button
+                onClick={() => setShowAddSectionInput(true)}
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+              >
+                Add Section
+              </button>
+            )}
           </div>
-        </div>
 
-        {/* Sections Feature */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Sections</h3>
-              {!showAddSectionInput && (
+          {/* Add Section Input */}
+          {showAddSectionInput && (
+            <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <InputField
+                label="Section Title"
+                value={schema.currentSectionName || ""}
+                onChange={(e) => setSchema("currentSectionName", e.target.value)}
+                placeholder="Enter section title (e.g., Hematology, Biochemistry)"
+                autoFocus
+              />
+              <div className="flex gap-3 mt-4">
                 <button
-                  onClick={() => setShowAddSectionInput(true)}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
+                  onClick={handleAddSectionClick}
+                  disabled={!schema.currentSectionName?.trim()}
+                  className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium text-sm"
                 >
                   Add Section
                 </button>
-              )}
+                <button
+                  onClick={handleCancelAddSection}
+                  className="flex-1 px-4 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            {/* Add Section Input (only shown when showAddSectionInput is true) */}
-            {showAddSectionInput && (
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-4">
-                <div className="space-y-4">
-                  <InputField
-                    label="Section Title"
-                    value={schema.currentSectionName || ""}
-                    onChange={(e) => setSchema("currentSectionName", e.target.value)}
-                    placeholder="Enter section title"
-                    autoFocus
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleAddSectionClick}
-                      disabled={!schema.currentSectionName?.trim()}
-                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium text-sm"
-                    >
-                      Add Section
-                    </button>
-                    <button
-                      onClick={handleCancelAddSection}
-                      className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium text-sm"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+          )}
 
-            {schema.sections?.length > 0 && (
-              <div>
-                <h4 className="text-sm sm:text-base font-medium text-gray-700 mb-3">
-                  Sections ({schema.sections.length})
-                </h4>
-                <div className="space-y-2 sm:space-y-3">
-                  {schema.sections.map((section) => (
-                    <div key={section.name} className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
-                      {editingSectionName === section.name ? (
-                        <div className="space-y-3">
-                          <input
-                            type="text"
-                            value={editingNewSectionName}
-                            onChange={(e) => setEditingNewSectionName(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                            placeholder="Section name"
-                            autoFocus
-                          />
-                          <div className="grid grid-cols-2 gap-2">
-                            <button
-                              onClick={saveEditing}
-                              className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={cancelEditing}
-                              className="px-3 sm:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
-                          <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{section.name}</div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => startEditing(section)}
-                              className="px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => deleteSection(section.name)}
-                              className="px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              disabled={schema.sections.length === 1}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+          {/* Existing Sections List */}
+          {schema.sections?.length > 0 && (
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-sm font-medium text-gray-700">Existing Sections ({schema.sections.length})</h4>
+                {schema.sections.length === 1 && (
+                  <span className="text-xs text-gray-500">Default section is required</span>
+                )}
               </div>
-            )}
-          </div>
+              <div className="space-y-3">
+                {schema.sections.map((section) => (
+                  <div key={section.name} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    {editingSectionName === section.name ? (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={editingNewSectionName}
+                          onChange={(e) => setEditingNewSectionName(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          placeholder="Section name"
+                          autoFocus
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={saveEditing}
+                            className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={cancelEditing}
+                            className="flex-1 px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900 truncate">{section.name}</span>
+                          {section.name === "Default" && (
+                            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Default</span>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => startEditing(section)}
+                            className="px-3 py-1.5 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => deleteSection(section.name)}
+                            className="px-3 py-1.5 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={schema.sections.length === 1}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Standard Range Feature */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-gray-200">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-700">Add Static Standard Range</h3>
-                <p className="text-xs sm:text-sm text-gray-600">Set reference values for this schema</p>
-              </div>
-              <button
-                onClick={() => handleStandardRangeToggle(!schema.hasStandardRange)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                  schema.hasStandardRange
-                    ? "bg-red-600 hover:bg-red-700 text-white"
-                    : "bg-green-600 hover:bg-green-700 text-white"
+        {/* Row 5: Standard Range */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Standard Range</h3>
+              <p className="text-sm text-gray-600 mt-1">Add static reference values for this test</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={schema.hasStandardRange}
+                onChange={(e) => handleStandardRangeToggle(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-12 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6"></div>
+              <span className="ml-3 text-sm font-medium text-gray-700">
+                {schema.hasStandardRange ? "Enabled" : "Disabled"}
+              </span>
+            </label>
+          </div>
+
+          {schema.hasStandardRange && (
+            <div className="mt-4">
+              <TextAreaField
+                label="Reference Values"
+                value={schema.standardRange}
+                onChange={(e) => setSchema("standardRange", e.target.value)}
+                placeholder="Enter standard ranges, reference values, and normal parameters...\n\nExample:\nNormal: 12–15 g/dL\nLow: < 12 g/dL\nHigh: > 15 g/dL"
+                rows={4}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Row 6: Schema Preview */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Schema Preview</h3>
+              <p className="text-sm text-gray-600">Live preview of schema data structure</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                {schema.sections?.length || 0} section(s)
+              </span>
+              <span
+                className={`px-3 py-1 rounded-full text-xs ${
+                  schema.isActive ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
                 }`}
               >
-                {schema.hasStandardRange ? "Disable" : "Enable"} Standard Range
-              </button>
-            </div>
-
-            {schema.hasStandardRange && (
-              <div className="pt-2">
-                <TextAreaField
-                  label="Reference Values"
-                  value={schema.standardRange}
-                  onChange={(e) => setSchema("standardRange", e.target.value)}
-                  placeholder="Enter standard ranges, reference values, and normal parameters..."
-                  rows={4}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Schema Preview */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-          <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-700">Schema Preview</h3>
-                <p className="text-xs sm:text-sm text-gray-600">Live preview of schema data structure</p>
-              </div>
-              <div className="text-xs sm:text-sm text-gray-500">{schema.sections?.length || 0} section(s)</div>
+                {schema.isActive ? "Active" : "Draft"}
+              </span>
+              <span
+                className={`px-3 py-1 rounded-full text-xs ${
+                  schema.hasStandardRange ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {schema.hasStandardRange ? "Standard Range" : "No Range"}
+              </span>
             </div>
           </div>
 
-          <div className="p-3 sm:p-4 lg:p-6 bg-gray-50">
-            <div className="text-xs sm:text-sm text-gray-600 mb-3 space-y-1">
-              <div>
-                <strong>Category:</strong>{" "}
-                {schema.categoryId
-                  ? testList.find((cat) => cat._id === schema.categoryId)?.categoryName
-                  : "Not selected"}
-              </div>
-              <div>
-                <strong>Test:</strong>{" "}
-                {schema.testId
-                  ? testsForSelectedCategory.find((test) => test._id === schema.testId)?.name
-                  : "Not selected"}
+          <div className="bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                <div>
+                  <strong>Category:</strong>{" "}
+                  {schema.categoryId
+                    ? testList.find((cat) => cat._id === schema.categoryId)?.categoryName
+                    : "Not selected"}
+                </div>
+                <div>
+                  <strong>Test:</strong>{" "}
+                  {schema.testId
+                    ? testsForSelectedCategory.find((test) => test._id === schema.testId)?.name
+                    : "Not selected"}
+                </div>
               </div>
             </div>
 
-            <div className="bg-white p-3 sm:p-4 rounded border border-gray-200 overflow-x-auto">
-              <pre className="text-xs sm:text-sm text-gray-700 font-mono whitespace-pre-wrap break-words max-h-96 overflow-y-auto">
+            <div className="p-4">
+              <pre className="text-xs md:text-sm text-gray-700 font-mono whitespace-pre-wrap break-words max-h-96 overflow-y-auto bg-white p-3 rounded border">
                 {safeStringify(schema)}
               </pre>
             </div>
