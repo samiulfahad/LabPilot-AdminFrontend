@@ -93,7 +93,7 @@ const UnderConstruction = () => {
   };
 
   return (
-    <div className="min-h-screen max-w-3xl lg:max-w-full bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen overflow-x-hidden lg:max-w-full bg-gray-50 p-4 md:p-6">
       {loading && <LoadingScreen />}
 
       {/* Popups */}
