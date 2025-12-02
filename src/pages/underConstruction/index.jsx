@@ -1,7 +1,3 @@
-import { useEffect, useState } from "react";
-import InputField from "../../components/html/InputField";
-import SelectField from "../../components/html/SelectField";
-import TextAreaField from "../../components/html/TextAreaField";
 import useStore from "./store";
 import Popup from "../../components/popup/Popup";
 import LoadingScreen from "../../components/loadingPage";
@@ -11,22 +7,10 @@ import Status from "./Status";
 import Section from "./Section";
 import SchemaPreview from "./SchemaPreview";
 import StandardRange from "./StandardRange";
+import AddField from "./addField"; // Updated component
 
 const UnderConstruction = () => {
-  const {
-    schema,
-    setSchema,
-    addSection,
-    deleteSection,
-    updateSection,
-    testList,
-    loadTestList,
-    popup,
-    closePopup,
-    loading,
-    clearStandardRange,
-    confirmRemoveStandardRange,
-  } = useStore();
+  const { deleteSection, popup, closePopup, loading, modal } = useStore();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-4 pt-2 md:p-6">
@@ -47,6 +31,8 @@ const UnderConstruction = () => {
         />
       )}
 
+      {/* No more modal for addField; handled inline now */}
+
       <div className="max-w-4xl mx-auto space-y-6 -mt-3">
         {/* Header */}
         <div className="text-center mb-2">
@@ -62,6 +48,9 @@ const UnderConstruction = () => {
         <Status />
         {/* Row 4: Sections */}
         <Section />
+
+        {/* Row 4.5: Add Field (now with inline form) */}
+        <AddField />
 
         {/* Row 5: Standard Range */}
         <StandardRange />

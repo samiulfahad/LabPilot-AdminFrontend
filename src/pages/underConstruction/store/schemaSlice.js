@@ -54,7 +54,7 @@ const schemaSlice = (set, get) => ({
         type: "error",
         message: `Section "${name}" already exists!`,
         data: null,
-        action: null
+        action: null,
       });
       return false;
     }
@@ -71,7 +71,7 @@ const schemaSlice = (set, get) => ({
       type: "success",
       message: `Section "${name}" added successfully!`,
     });
-    return true
+    return true;
   },
 
   deleteSection: (sectionName) => {
@@ -140,6 +140,64 @@ const schemaSlice = (set, get) => ({
       },
     });
   },
+
+  addField: (sectionName, newField) =>
+    set((state) => {
+      const updatedSections = state.schema.sections.map((sec) => {
+        if (sec.name === sectionName) {
+          return {
+            ...sec,
+            fields: [...(sec.fields || []), newField],
+          };
+        }
+        return sec;
+      });
+      return {
+        schema: {
+          ...state.schema,
+          sections: updatedSections,
+        },
+      };
+    }),
+
+  updateField: (sectionName, oldFieldName, updatedField) =>
+    set((state) => {
+      const updatedSections = state.schema.sections.map((sec) => {
+        if (sec.name === sectionName) {
+          const updatedFields = sec.fields.map((field) => (field.name === oldFieldName ? updatedField : field));
+          return {
+            ...sec,
+            fields: updatedFields,
+          };
+        }
+        return sec;
+      });
+      return {
+        schema: {
+          ...state.schema,
+          sections: updatedSections,
+        },
+      };
+    }),
+
+  deleteField: (sectionName, fieldName) =>
+    set((state) => {
+      const updatedSections = state.schema.sections.map((sec) => {
+        if (sec.name === sectionName) {
+          return {
+            ...sec,
+            fields: sec.fields.filter((field) => field.name !== fieldName),
+          };
+        }
+        return sec;
+      });
+      return {
+        schema: {
+          ...state.schema,
+          sections: updatedSections,
+        },
+      };
+    }),
 
   clearStandardRange: () => {
     set((state) => ({
