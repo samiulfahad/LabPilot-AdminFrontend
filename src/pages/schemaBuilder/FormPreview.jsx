@@ -1,947 +1,611 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import useStore from "./store";
+import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
 
-const FormPreview = ({
-  schema,
-  useSections,
-  useStandardRange,
-  testStandardRange,
-  removeField,
-  getFieldsCount,
-  startEditingField,
-}) => {
-  const [formData, setFormData] = useState({});
-  const [errors, setErrors] = useState({});
-  const [validationStates, setValidationStates] = useState({});
-  const [patientAge, setPatientAge] = useState("");
-  const [patientGender, setPatientGender] = useState("");
-  const [touchedFields, setTouchedFields] = useState({});
+const PreviewForm = () => {
+  const { schema, updateSection, deleteSection, updateField, deleteField, setPopup } = useStore();
 
-  // Generate a unique key for each field since we don't have IDs anymore
-  const generateFieldKey = (field, sectionIndex = null, fieldIndex) => {
-    if (sectionIndex !== null) {
-      return `section-${sectionIndex}-field-${fieldIndex}`;
-    }
-    return `field-${fieldIndex}`;
-  };
+  // Section editing states
+  const [editingSection, setEditingSection] = useState(null);
+  const [newSectionName, setNewSectionName] = useState("");
 
-  const getStandardRangeText = useCallback(
-    (field) => {
-      if (!field.standardRange) return null;
+  // Field editing states
+  const [editingField, setEditingField] = useState(null);
+  const [fieldSection, setFieldSection] = useState("");
+  const [fieldName, setFieldName] = useState("");
+  const [fieldType, setFieldType] = useState("input");
+  const [isRequired, setIsRequired] = useState(false);
+  const [maxLength, setMaxLength] = useState("");
+  const [options, setOptions] = useState([]);
+  const [standardRangeType, setStandardRangeType] = useState("none");
+  const [rangeData, setRangeData] = useState(null);
+  const [unit, setUnit] = useState("");
 
-      const { type, ranges, min, max } = field.standardRange;
+  // FieldOptionsEditor states
+  const [newOption, setNewOption] = useState("");
+  const [editingOptionIndex, setEditingOptionIndex] = useState(null);
+  const [editingOptionValue, setEditingOptionValue] = useState("");
 
-      if (type === "numberRange" && min && max) {
-        return `Standard range: ${min} - ${max}`;
-      }
+  // StandardRangeEditor states
+  const [newRangeEntry, setNewRangeEntry] = useState({});
+  const [editingRangeIndex, setEditingRangeIndex] = useState(null);
 
-      if (type === "ageBased" && ranges && patientAge) {
-        const ageNum = parseFloat(patientAge);
-        if (!isNaN(ageNum)) {
-          const matchingRange = ranges.find((range) => {
-            const minAge = range.ageMin ? parseFloat(range.ageMin) : -Infinity;
-            const maxAge = range.ageMax ? parseFloat(range.ageMax) : Infinity;
-            return ageNum >= minAge && ageNum <= maxAge;
-          });
-
-          if (matchingRange) {
-            const hasMin = matchingRange.min && matchingRange.min !== "";
-            const hasMax = matchingRange.max && matchingRange.max !== "";
-
-            const ageRangeText = matchingRange.ageMax
-              ? `age ${matchingRange.ageMin}-${matchingRange.ageMax}`
-              : `age ${matchingRange.ageMin}+`;
-
-            if (hasMin && hasMax) {
-              return `Standard range (${ageRangeText}): ${matchingRange.min} - ${matchingRange.max}`;
-            } else if (hasMin) {
-              return `Standard range (${ageRangeText}): ≥ ${matchingRange.min}`;
-            } else if (hasMax) {
-              return `Standard range (${ageRangeText}): ≤ ${matchingRange.max}`;
-            }
-          }
-        }
-      }
-
-      if (type === "genderBased" && ranges && patientGender) {
-        if (ranges[patientGender]) {
-          const range = ranges[patientGender];
-          const hasMin = range.min && range.min !== "";
-          const hasMax = range.max && range.max !== "";
-
-          if (hasMin && hasMax) {
-            return `Standard range for ${patientGender}: ${range.min} - ${range.max}`;
-          } else if (hasMin) {
-            return `Standard range for ${patientGender}: ≥ ${range.min}`;
-          } else if (hasMax) {
-            return `Standard range for ${patientGender}: ≤ ${range.max}`;
-          }
-        }
-      }
-
-      if (type === "genderWithAgeBased" && ranges && patientGender && patientAge) {
-        const genderRanges = ranges[patientGender];
-        if (genderRanges && genderRanges.length > 0) {
-          const ageNum = parseFloat(patientAge);
-          if (!isNaN(ageNum)) {
-            const matchingRange = genderRanges.find((range) => {
-              const minAge = range.ageMin ? parseFloat(range.ageMin) : -Infinity;
-              const maxAge = range.ageMax ? parseFloat(range.ageMax) : Infinity;
-              return ageNum >= minAge && ageNum <= maxAge;
-            });
-
-            if (matchingRange) {
-              const hasMin = matchingRange.min && matchingRange.min !== "";
-              const hasMax = matchingRange.max && matchingRange.max !== "";
-
-              const ageRangeText = matchingRange.ageMax
-                ? `age ${matchingRange.ageMin}-${matchingRange.ageMax}`
-                : `age ${matchingRange.ageMin}+`;
-
-              if (hasMin && hasMax) {
-                return `Standard range for ${patientGender} (${ageRangeText}): ${matchingRange.min} - ${matchingRange.max}`;
-              } else if (hasMin) {
-                return `Standard range for ${patientGender} (${ageRangeText}): ≥ ${matchingRange.min}`;
-              } else if (hasMax) {
-                return `Standard range for ${patientGender} (${ageRangeText}): ≤ ${matchingRange.max}`;
-              }
-            }
-          }
-        }
-      }
-
-      return null;
-    },
-    [patientAge, patientGender]
-  );
-
-  const validateField = useCallback(
-    (field, value) => {
-      if (field.required) {
-        if (field.type === "checkbox") {
-          if (!value || value.length === 0) {
-            return { type: "error", message: "This field is required" };
-          }
-        } else if (!value || value.toString().trim() === "") {
-          return { type: "error", message: "This field is required" };
-        }
-      }
-
-      if (field.type === "number" && value) {
-        const numValue = parseFloat(value);
-        if (isNaN(numValue)) {
-          return { type: "error", message: "Please enter a valid number" };
-        }
-
-        if (field.standardRange) {
-          const { type, ranges, min, max } = field.standardRange;
-
-          if (type === "numberRange" && min !== undefined && max !== undefined) {
-            if (numValue < parseFloat(min)) {
-              const rangeText = `Standard range: ${min} - ${max}`;
-              return { type: "outOfRange", message: `Value is below standard range (${rangeText})` };
-            }
-            if (numValue > parseFloat(max)) {
-              const rangeText = `Standard range: ${min} - ${max}`;
-              return { type: "outOfRange", message: `Value is above standard range (${rangeText})` };
-            }
-            if (numValue >= parseFloat(min) && numValue <= parseFloat(max)) {
-              const rangeText = `Standard range: ${min} - ${max}`;
-              return { type: "within", message: `Value is within standard range (${rangeText})` };
-            }
-          }
-
-          if (type === "ageBased" && ranges && patientAge) {
-            const ageNum = parseFloat(patientAge);
-            if (!isNaN(ageNum)) {
-              const matchingRange = ranges.find((range) => {
-                const minAge = range.ageMin ? parseFloat(range.ageMin) : -Infinity;
-                const maxAge = range.ageMax ? parseFloat(range.ageMax) : Infinity;
-                return ageNum >= minAge && ageNum <= maxAge;
-              });
-
-              if (matchingRange) {
-                const hasMin = matchingRange.min !== undefined && matchingRange.min !== "";
-                const hasMax = matchingRange.max !== undefined && matchingRange.max !== "";
-
-                if (hasMin && numValue < parseFloat(matchingRange.min)) {
-                  const rangeText = getStandardRangeText(field);
-                  return { type: "outOfRange", message: `Value is below standard range (${rangeText})` };
-                }
-                if (hasMax && numValue > parseFloat(matchingRange.max)) {
-                  const rangeText = getStandardRangeText(field);
-                  return { type: "outOfRange", message: `Value is above standard range (${rangeText})` };
-                }
-                if (
-                  (!hasMin || numValue >= parseFloat(matchingRange.min)) &&
-                  (!hasMax || numValue <= parseFloat(matchingRange.max))
-                ) {
-                  const rangeText = getStandardRangeText(field);
-                  return { type: "within", message: `Value is within standard range (${rangeText})` };
-                }
-              }
-            }
-          }
-
-          if (type === "genderBased" && ranges && patientGender) {
-            if (ranges[patientGender]) {
-              const range = ranges[patientGender];
-              const hasMin = range.min !== undefined && range.min !== "";
-              const hasMax = range.max !== undefined && range.max !== "";
-
-              if (hasMin && numValue < parseFloat(range.min)) {
-                const rangeText = getStandardRangeText(field);
-                return { type: "outOfRange", message: `Value is below standard range (${rangeText})` };
-              }
-              if (hasMax && numValue > parseFloat(range.max)) {
-                const rangeText = getStandardRangeText(field);
-                return { type: "outOfRange", message: `Value is above standard range (${rangeText})` };
-              }
-              if ((!hasMin || numValue >= parseFloat(range.min)) && (!hasMax || numValue <= parseFloat(range.max))) {
-                const rangeText = getStandardRangeText(field);
-                return { type: "within", message: `Value is within standard range (${rangeText})` };
-              }
-            }
-          }
-
-          if (type === "genderWithAgeBased" && ranges && patientGender && patientAge) {
-            const genderRanges = ranges[patientGender];
-            if (genderRanges && genderRanges.length > 0) {
-              const ageNum = parseFloat(patientAge);
-              if (!isNaN(ageNum)) {
-                const matchingRange = genderRanges.find((range) => {
-                  const minAge = range.ageMin ? parseFloat(range.ageMin) : -Infinity;
-                  const maxAge = range.ageMax ? parseFloat(range.ageMax) : Infinity;
-                  return ageNum >= minAge && ageNum <= maxAge;
-                });
-
-                if (matchingRange) {
-                  const hasMin = matchingRange.min !== undefined && matchingRange.min !== "";
-                  const hasMax = matchingRange.max !== undefined && matchingRange.max !== "";
-
-                  if (hasMin && numValue < parseFloat(matchingRange.min)) {
-                    const rangeText = getStandardRangeText(field);
-                    return { type: "outOfRange", message: `Value is below standard range (${rangeText})` };
-                  }
-                  if (hasMax && numValue > parseFloat(matchingRange.max)) {
-                    const rangeText = getStandardRangeText(field);
-                    return { type: "outOfRange", message: `Value is above standard range (${rangeText})` };
-                  }
-                  if (
-                    (!hasMin || numValue >= parseFloat(matchingRange.min)) &&
-                    (!hasMax || numValue <= parseFloat(matchingRange.max))
-                  ) {
-                    const rangeText = getStandardRangeText(field);
-                    return { type: "within", message: `Value is within standard range (${rangeText})` };
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      return null;
-    },
-    [patientAge, patientGender, getStandardRangeText]
-  );
-
-  // Re-validate all fields when patient age or gender changes
-  const revalidateAllFields = useCallback(() => {
-    const newErrors = {};
-    const newValidationStates = {};
-
-    if (!schema) return;
-
-    const validateFields = (fields, prefix = "") => {
-      fields.forEach((field, index) => {
-        const fieldKey = prefix ? `${prefix}-field-${index}` : `field-${index}`;
-        const value = formData[fieldKey];
-        const validation = validateField(field, value);
-        if (validation) {
-          newErrors[fieldKey] = validation;
-          newValidationStates[fieldKey] = validation.type;
-        } else {
-          newValidationStates[fieldKey] = null;
-        }
-      });
-    };
-
-    if (useSections && schema.sections) {
-      schema.sections.forEach((section, sectionIndex) => {
-        validateFields(section.fields || [], `section-${sectionIndex}`);
-      });
-    } else {
-      validateFields(schema.fields || []);
-    }
-
-    setErrors(newErrors);
-    setValidationStates(newValidationStates);
-  }, [schema, useSections, formData, validateField]);
+  const needsOptions = ["select", "checkbox", "radio"].includes(fieldType);
+  const needsMaxLength = ["input", "textarea"].includes(fieldType);
+  const needsStandardRange = fieldType === "number" && standardRangeType !== "none";
 
   useEffect(() => {
-    revalidateAllFields();
-  }, [patientAge, patientGender, revalidateAllFields]);
+    if (!["select", "checkbox", "radio"].includes(fieldType)) {
+      setOptions([]);
+      setNewOption("");
+      setEditingOptionIndex(null);
+      setEditingOptionValue("");
+    }
+    if (fieldType !== "number") {
+      setUnit("");
+      setStandardRangeType("none");
+    }
+  }, [fieldType]);
 
-  const handleInputChange = (fieldKey, value) => {
-    setFormData((prev) => ({
+  useEffect(() => {
+    if (standardRangeType === "simple" && (rangeData == null || !("min" in rangeData && "max" in rangeData))) {
+      setRangeData({ min: "", max: "" });
+    } else if (
+      standardRangeType === "gender" &&
+      (rangeData == null || !("male" in rangeData && "female" in rangeData))
+    ) {
+      setRangeData({ male: { min: "", max: "" }, female: { min: "", max: "" } });
+    } else if (
+      (standardRangeType === "age" || standardRangeType === "combined") &&
+      (rangeData == null || !Array.isArray(rangeData))
+    ) {
+      setRangeData([]);
+    } else if (standardRangeType === "none" && rangeData != null) {
+      setRangeData(null);
+    }
+    setNewRangeEntry({});
+    setEditingRangeIndex(null);
+  }, [standardRangeType]);
+
+  // FieldOptionsEditor handlers
+  const handleAddOption = () => {
+    if (newOption.trim()) {
+      setOptions([...options, newOption.trim()]);
+      setNewOption("");
+    }
+  };
+
+  const handleRemoveOption = (index) => {
+    setOptions(options.filter((_, i) => i !== index));
+  };
+
+  const handleStartEditOption = (index, value) => {
+    setEditingOptionIndex(index);
+    setEditingOptionValue(value);
+  };
+
+  const handleSaveEditOption = () => {
+    if (editingOptionValue.trim()) {
+      const updatedOptions = [...options];
+      updatedOptions[editingOptionIndex] = editingOptionValue.trim();
+      setOptions(updatedOptions);
+      setEditingOptionIndex(null);
+      setEditingOptionValue("");
+    }
+  };
+
+  const handleCancelEditOption = () => {
+    setEditingOptionIndex(null);
+    setEditingOptionValue("");
+  };
+
+  // StandardRangeEditor handlers
+  const handleSimpleOrGenderChange = (key, subKey, value) => {
+    setRangeData((prev) => ({
       ...prev,
-      [fieldKey]: value,
+      [key]: subKey ? { ...prev[key], [subKey]: value } : value,
     }));
+  };
 
-    setTouchedFields((prev) => ({
-      ...prev,
-      [fieldKey]: true,
-    }));
+  const handleNewRangeChange = (key, value) => {
+    setNewRangeEntry((prev) => ({ ...prev, [key]: value }));
+  };
 
-    // Find the field to validate
-    let field = null;
-    if (fieldKey.startsWith("section-")) {
-      const [_, sectionIndex, __, fieldIndex] = fieldKey.split("-");
-      if (schema.sections && schema.sections[parseInt(sectionIndex)]) {
-        field = schema.sections[parseInt(sectionIndex)].fields[parseInt(fieldIndex)];
+  const validateRangeEntry = (entry, type) => {
+    if (type === "age") {
+      return entry.minAge && entry.minValue && entry.maxValue;
+    } else if (type === "combined") {
+      return entry.gender && entry.minAge && entry.minValue && entry.maxValue;
+    }
+    return false;
+  };
+
+  const handleAddOrUpdateRange = () => {
+    if (validateRangeEntry(newRangeEntry, standardRangeType)) {
+      const entry = { ...newRangeEntry };
+      if (!entry.maxAge) entry.maxAge = 999;
+      if (editingRangeIndex !== null) {
+        const updated = [...rangeData];
+        updated[editingRangeIndex] = entry;
+        setRangeData(updated);
+        setEditingRangeIndex(null);
+        setPopup({ type: "success", message: "Range updated successfully" });
+      } else {
+        setRangeData((prev) => [...prev, entry]);
+        setPopup({ type: "success", message: "Range added successfully" });
       }
-    } else if (fieldKey.startsWith("field-")) {
-      const [_, fieldIndex] = fieldKey.split("-");
-      field = schema.fields[parseInt(fieldIndex)];
-    }
-
-    if (field) {
-      const validation = validateField(field, value);
-      setErrors((prev) => ({
-        ...prev,
-        [fieldKey]: validation,
-      }));
-      setValidationStates((prev) => ({
-        ...prev,
-        [fieldKey]: validation ? validation.type : null,
-      }));
+      setNewRangeEntry({});
+    } else {
+      setPopup({ type: "error", message: "Please fill all required fields for the range" });
     }
   };
 
-  const handleCheckboxChange = (fieldKey, optionValue, isChecked) => {
-    const currentValues = formData[fieldKey] || [];
-    let newValues;
-
-    if (isChecked) {
-      newValues = [...currentValues, optionValue];
-    } else {
-      newValues = currentValues.filter((value) => value !== optionValue);
-    }
-
-    setTouchedFields((prev) => ({
-      ...prev,
-      [fieldKey]: true,
-    }));
-
-    handleInputChange(fieldKey, newValues);
+  const handleRemoveRange = (index) => {
+    setRangeData((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleStartEditRange = (index) => {
+    setEditingRangeIndex(index);
+    setNewRangeEntry({ ...rangeData[index] });
+  };
 
-    // Mark all fields as touched on submit
-    const allTouched = {};
+  const handleCancelEditRange = () => {
+    setEditingRangeIndex(null);
+    setNewRangeEntry({});
+  };
 
-    const markFieldsTouched = (fields, prefix = "") => {
-      fields.forEach((field, index) => {
-        const fieldKey = prefix ? `${prefix}-field-${index}` : `field-${index}`;
-        allTouched[fieldKey] = true;
-      });
-    };
+  const startEditSection = (sectionName) => {
+    setEditingSection(sectionName);
+    setNewSectionName(sectionName);
+  };
 
-    if (useSections && schema.sections) {
-      schema.sections.forEach((section, sectionIndex) => {
-        markFieldsTouched(section.fields || [], `section-${sectionIndex}`);
-      });
+  const saveSection = () => {
+    updateSection(editingSection, newSectionName);
+    setEditingSection(null);
+    setNewSectionName("");
+  };
+
+  const cancelEditSection = () => {
+    setEditingSection(null);
+    setNewSectionName("");
+  };
+
+  const startEditField = (sectionName, field) => {
+    setFieldSection(sectionName);
+    setEditingField(field.name);
+    setFieldName(field.name);
+    setFieldType(field.type);
+    setIsRequired(field.required || false);
+    setMaxLength(field.maxLength || "");
+    setOptions(field.options || []);
+    setUnit(field.unit || "");
+    if (field.standardRange) {
+      setStandardRangeType(field.standardRange.type);
+      setRangeData(field.standardRange.data);
     } else {
-      markFieldsTouched(schema.fields || []);
+      setStandardRangeType("none");
+      setRangeData(null);
     }
+    setNewOption("");
+    setEditingOptionIndex(null);
+    setEditingOptionValue("");
+    setNewRangeEntry({});
+    setEditingRangeIndex(null);
+  };
 
-    setTouchedFields(allTouched);
-
-    // Validate all fields
-    const newErrors = {};
-    const newValidationStates = {};
-
-    const validateAllFields = (fields, prefix = "") => {
-      fields.forEach((field, index) => {
-        const fieldKey = prefix ? `${prefix}-field-${index}` : `field-${index}`;
-        const validation = validateField(field, formData[fieldKey]);
-        if (validation) {
-          newErrors[fieldKey] = validation;
-          newValidationStates[fieldKey] = validation.type;
+  const handleUpdate = () => {
+    if (!fieldName.trim()) {
+      setPopup({ type: "error", message: "Field name is required" });
+      return;
+    }
+    const allFields = schema.sections.flatMap((section) => section.fields || []);
+    if (allFields.some((f) => f.name === fieldName && f.name !== editingField)) {
+      setPopup({ type: "error", message: "Field name must be unique" });
+      return;
+    }
+    if (needsOptions && options.length === 0) {
+      setPopup({ type: "error", message: "At least one option is required for this field type" });
+      return;
+    }
+    if (needsStandardRange) {
+      if (standardRangeType === "simple") {
+        if (!rangeData.min || !rangeData.max) {
+          setPopup({ type: "error", message: "Min and max required for simple range" });
+          return;
         }
-      });
-    };
-
-    if (useSections && schema.sections) {
-      schema.sections.forEach((section, sectionIndex) => {
-        validateAllFields(section.fields || [], `section-${sectionIndex}`);
-      });
-    } else {
-      validateAllFields(schema.fields || []);
-    }
-
-    setErrors(newErrors);
-    setValidationStates(newValidationStates);
-
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Form submitted successfully:", {
-        patientAge,
-        patientGender,
-        ...formData,
-      });
-      alert("Form submitted successfully! Check console for data.");
-    }
-  };
-
-  const renderInputField = (field, fieldKey) => {
-    const value = formData[fieldKey] || "";
-    const validation = errors[fieldKey];
-    const validationState = validationStates[fieldKey];
-    const isTouched = touchedFields[fieldKey];
-
-    const getLabelText = () => {
-      return (
-        <>
-          {field.label}
-          {field.required && <span className="text-red-500 ml-1">*</span>}
-        </>
-      );
-    };
-
-    const getInputStyles = () => {
-      const showRequiredError = validationState === "error" && isTouched;
-      const showRangeValidation = validationState && validationState === "outOfRange";
-
-      switch (validationState) {
-        case "within":
-          return {
-            container: "border-green-500 bg-green-50",
-            input: "text-green-700 bg-green-50",
-            unit: "text-green-700 border-green-300 bg-green-100",
-            label: "border-green-300 bg-green-100 text-green-800",
-          };
-        case "outOfRange":
-          return {
-            container: "border-red-500 bg-red-50",
-            input: "text-red-700 bg-red-50",
-            unit: "text-red-700 border-red-300 bg-red-100",
-            label: "border-red-300 bg-red-100 text-red-800",
-          };
-        case "error":
-          if (showRequiredError) {
-            return {
-              container: "border-red-500 bg-red-50",
-              input: "text-red-700 bg-red-50",
-              unit: "text-red-700 border-red-300 bg-red-100",
-              label: "border-red-300 bg-red-100 text-red-800",
-            };
-          }
-        default:
-          return {
-            container: "border-gray-300 bg-white",
-            input: "text-gray-900 bg-white",
-            unit: "text-gray-500 border-gray-300 bg-gray-50",
-            label: "border-gray-300 bg-gray-50 text-gray-700",
-          };
+      } else if (standardRangeType === "gender") {
+        if (!rangeData.male.min || !rangeData.male.max || !rangeData.female.min || !rangeData.female.max) {
+          setPopup({ type: "error", message: "Min and max required for both genders" });
+          return;
+        }
+      } else if ((standardRangeType === "age" || standardRangeType === "combined") && rangeData.length === 0) {
+        setPopup({ type: "error", message: "At least one range required" });
+        return;
       }
-    };
-
-    const getMessageStyles = () => {
-      const showRequiredError = validationState === "error" && isTouched;
-
-      switch (validationState) {
-        case "within":
-          return "text-green-800 bg-green-50 border-green-200";
-        case "outOfRange":
-          return "text-red-800 bg-red-50 border-red-200";
-        case "error":
-          if (showRequiredError) {
-            return "text-red-800 bg-red-50 border-red-200";
-          }
-        default:
-          return "text-blue-800 bg-blue-50 border-blue-200";
-      }
-    };
-
-    const getMessageIcon = () => {
-      const showRequiredError = validationState === "error" && isTouched;
-
-      switch (validationState) {
-        case "within":
-          return "✅";
-        case "outOfRange":
-          return "❌";
-        case "error":
-          if (showRequiredError) {
-            return "❌";
-          }
-        default:
-          return "ℹ️";
-      }
-    };
-
-    const styles = getInputStyles();
-    const standardRangeText = getStandardRangeText(field);
-    const showRequiredError = validationState === "error" && isTouched;
-
-    switch (field.type) {
-      case "text":
-        return (
-          <div className="space-y-2">
-            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-              <label
-                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-              >
-                {getLabelText()}
-              </label>
-              <div className="flex-1 flex items-center">
-                <input
-                  type="text"
-                  value={value}
-                  onChange={(e) => handleInputChange(fieldKey, e.target.value)}
-                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
-                  required={field.required}
-                />
-                {field.unit && (
-                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
-                )}
-              </div>
-            </div>
-
-            {showRequiredError && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {validation.message}
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      case "textarea":
-        return (
-          <div className="space-y-2">
-            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-              <label
-                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-              >
-                {getLabelText()}
-              </label>
-              <div className="flex-1 flex flex-col">
-                <textarea
-                  rows={3}
-                  value={value}
-                  onChange={(e) => handleInputChange(fieldKey, e.target.value)}
-                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm resize-none border-0 ${styles.input}`}
-                  required={field.required}
-                />
-                {field.unit && <div className={`px-3 py-2 text-sm border-t ${styles.unit}`}>Unit: {field.unit}</div>}
-              </div>
-            </div>
-
-            {showRequiredError && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {validation.message}
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      case "number":
-        return (
-          <div className="space-y-2">
-            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-              <label
-                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-              >
-                {getLabelText()}
-              </label>
-              <div className="flex-1 flex items-center">
-                <input
-                  type="number"
-                  value={value}
-                  onChange={(e) => handleInputChange(fieldKey, e.target.value)}
-                  step="any"
-                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
-                  required={field.required}
-                />
-                {field.unit && (
-                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
-                )}
-              </div>
-            </div>
-
-            {standardRangeText && !value && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {standardRangeText}
-                </div>
-              </div>
-            )}
-
-            {validation && value && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {validation.message}
-                </div>
-              </div>
-            )}
-
-            {showRequiredError && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {validation.message}
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      case "select":
-        return (
-          <div className="space-y-2">
-            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-              <label
-                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-              >
-                {getLabelText()}
-              </label>
-              <div className="flex-1 flex items-center">
-                <SelectField
-                  label=""
-                  name={fieldKey}
-                  value={value}
-                  onChange={(e) => handleInputChange(fieldKey, e.target.value)}
-                  options={field.options?.map((option) => ({ value: option, label: option })) || []}
-                  placeholder="Select an option"
-                />
-                {field.unit && (
-                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
-                )}
-              </div>
-            </div>
-
-            {showRequiredError && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {validation.message}
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      case "radio":
-        return (
-          <div className="space-y-2">
-            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-              <label
-                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-              >
-                {getLabelText()}
-              </label>
-              <div className="flex-1 px-3 py-2 sm:py-3">
-                <div className="space-y-2">
-                  {field.options?.map((option, index) => (
-                    <label key={index} className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        name={fieldKey}
-                        value={option}
-                        checked={value === option}
-                        onChange={(e) => handleInputChange(fieldKey, e.target.value)}
-                        className="text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">{option}</span>
-                    </label>
-                  ))}
-                </div>
-                {field.unit && (
-                  <div className="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-500">Unit: {field.unit}</div>
-                )}
-              </div>
-            </div>
-
-            {showRequiredError && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {validation.message}
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      case "checkbox":
-        return (
-          <div className="space-y-2">
-            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-              <label
-                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-              >
-                {getLabelText()}
-              </label>
-              <div className="flex-1 px-3 py-2 sm:py-3">
-                <div className="space-y-2">
-                  {field.options?.map((option, index) => {
-                    const isChecked = Array.isArray(value) && value.includes(option);
-                    return (
-                      <label key={index} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          value={option}
-                          checked={isChecked}
-                          onChange={(e) => handleCheckboxChange(fieldKey, option, e.target.checked)}
-                          className="text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700">{option}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-                {field.unit && (
-                  <div className="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-500">Unit: {field.unit}</div>
-                )}
-                {Array.isArray(value) && value.length > 0 && (
-                  <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
-                    <p className="text-sm text-blue-800">
-                      <strong>Selected:</strong> {value.join(", ")}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {showRequiredError && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {validation.message}
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      default:
-        return (
-          <div className="space-y-2">
-            <div className={`flex flex-col sm:flex-row border rounded-lg overflow-hidden ${styles.container}`}>
-              <label
-                className={`w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r flex items-center ${styles.label}`}
-              >
-                {getLabelText()}
-              </label>
-              <div className="flex-1 flex items-center">
-                <input
-                  type="text"
-                  value={value}
-                  onChange={(e) => handleInputChange(fieldKey, e.target.value)}
-                  className={`flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm border-0 ${styles.input}`}
-                  required={field.required}
-                />
-                {field.unit && (
-                  <span className={`px-3 py-2 text-sm whitespace-nowrap border-l ${styles.unit}`}>{field.unit}</span>
-                )}
-              </div>
-            </div>
-
-            {showRequiredError && (
-              <div className={`p-3 rounded-lg border ${getMessageStyles()}`}>
-                <div className="text-sm">
-                  {getMessageIcon()} {validation.message}
-                </div>
-              </div>
-            )}
-          </div>
-        );
     }
+    const updatedField = {
+      name: fieldName,
+      type: fieldType,
+      required: isRequired,
+    };
+    if (needsOptions) updatedField.options = options;
+    if (needsMaxLength && maxLength) updatedField.maxLength = parseInt(maxLength, 10);
+    if (needsStandardRange) {
+      updatedField.standardRange = { type: standardRangeType, data: rangeData };
+    }
+    if (fieldType === "number" && unit.trim()) {
+      updatedField.unit = unit.trim();
+    }
+    updateField(fieldSection, editingField, updatedField);
+    resetFieldForm();
   };
 
-  const renderTestStandardRange = () => {
-    if (!useStandardRange || !testStandardRange) return null;
-
-    const { type, options, text } = testStandardRange;
-
-    if (type === "options" && options && options.length > 0) {
-      return (
-        <div className="mb-4 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h4 className="text-lg font-semibold text-blue-800 mb-3">Test Standard Range</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {options.map((option, index) => (
-              <div key={index} className="flex justify-between items-center text-sm">
-                <span className="text-blue-700 font-medium">{option.key}:</span>
-                <span className="text-blue-900">{option.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    if (type === "text" && text) {
-      return (
-        <div className="mb-4 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h4 className="text-lg font-semibold text-blue-800 mb-2">Test Standard Range</h4>
-          <p className="text-sm text-blue-900">{text}</p>
-        </div>
-      );
-    }
-
-    return null;
+  const resetFieldForm = () => {
+    setEditingField(null);
+    setFieldSection("");
+    setFieldName("");
+    setFieldType("input");
+    setIsRequired(false);
+    setMaxLength("");
+    setOptions([]);
+    setStandardRangeType("none");
+    setRangeData(null);
+    setUnit("");
+    setNewOption("");
+    setEditingOptionIndex(null);
+    setEditingOptionValue("");
+    setNewRangeEntry({});
+    setEditingRangeIndex(null);
   };
 
-  const renderFormField = (field, sectionIndex = null, fieldIndex) => {
-    if (!field) return null;
-
-    const fieldKey = generateFieldKey(field, sectionIndex, fieldIndex);
-    const validation = errors[fieldKey];
-    const isTouched = touchedFields[fieldKey];
-
-    return (
-      <div key={fieldKey} className="space-y-2">
-        {renderInputField(field, fieldKey)}
-
-        <div className="flex justify-end space-x-2">
-          <button
-            type="button"
-            onClick={() => startEditingField(fieldIndex, sectionIndex)}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors px-3 py-1 rounded hover:bg-blue-50 border border-blue-200"
-          >
-            Edit Field
-          </button>
-          <button
-            type="button"
-            onClick={() => removeField(fieldIndex, sectionIndex)}
-            className="text-red-600 hover:text-red-800 text-sm font-medium transition-colors px-3 py-1 rounded hover:bg-red-50 border border-red-200"
-          >
-            Remove Field
-          </button>
-        </div>
-      </div>
-    );
+  const handleCancelField = () => {
+    resetFieldForm();
   };
-
-  const genderOptions = [
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
-  ];
 
   return (
-    <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
-      <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Form Preview</h3>
-          <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-            {getFieldsCount()} field(s) configured
-          </div>
-        </div>
-      </div>
-
-      <div className="p-3 sm:p-4 lg:p-6">
-        {renderTestStandardRange()}
-
-        {/* Patient Information Section */}
-        <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h4 className="text-lg font-semibold text-blue-800 mb-4">Patient Information</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Age Input */}
-            <div className="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white">
-              <label className="w-full sm:w-32 px-3 py-2 sm:py-3 text-sm font-medium border-b sm:border-b-0 sm:border-r border-gray-300 bg-gray-50 text-gray-700 flex items-center">
-                Patient Age
-              </label>
-              <div className="flex-1 flex items-center">
-                <input
-                  type="number"
-                  value={patientAge}
-                  onChange={(e) => setPatientAge(e.target.value)}
-                  className="flex-1 px-3 py-2 sm:py-3 focus:outline-none text-sm bg-white border-0"
-                  placeholder="Enter age in years"
-                  min="0"
-                  max="120"
-                />
-                <span className="px-3 py-2 text-sm text-gray-500 whitespace-nowrap border-l border-gray-300 bg-gray-50">
-                  years
-                </span>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">Form Preview</h3>
+      {schema?.sections?.map((section) => (
+        <div key={section.name} className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            {editingSection === section.name ? (
+              <div className="flex items-center gap-2">
+                <InputField value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} />
+                <button
+                  onClick={saveSection}
+                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={cancelEditSection}
+                  className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
+                >
+                  Cancel
+                </button>
               </div>
+            ) : (
+              <h4 className="text-md font-medium text-gray-800">{section.name}</h4>
+            )}
+            <div className="flex gap-2">
+              <button onClick={() => startEditSection(section.name)} className="text-sm text-blue-600 hover:underline">
+                Edit Section
+              </button>
+              <button onClick={() => deleteSection(section.name)} className="text-sm text-red-600 hover:underline">
+                Delete Section
+              </button>
             </div>
-
-            {/* Gender Selection using SelectField */}
-            <SelectField
-              label="Patient Gender"
-              name="patientGender"
-              value={patientGender}
-              onChange={(e) => setPatientGender(e.target.value)}
-              options={genderOptions}
-              placeholder="Select gender"
-            />
           </div>
-          {(patientAge || patientGender) && (
-            <div className="mt-3 p-3 bg-green-50 rounded border border-green-200">
-              <p className="text-sm text-green-800">
-                <strong>Current Selection:</strong>
-                {patientAge && ` Age: ${patientAge} years`}
-                {patientGender && ` Gender: ${patientGender}`}
-              </p>
-            </div>
+          {section.fields.length === 0 ? (
+            <p className="text-sm text-gray-600">No fields in this section</p>
+          ) : (
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="p-2 text-left text-sm font-medium text-gray-700">Field Name</th>
+                  <th className="p-2 text-left text-sm font-medium text-gray-700">Type</th>
+                  <th className="p-2 text-left text-sm font-medium text-gray-700">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {section.fields.map((field) => (
+                  <tr key={field.name} className="border-t border-gray-200">
+                    <td className="p-2 text-sm text-gray-900">{field.name}</td>
+                    <td className="p-2 text-sm text-gray-900">{field.type}</td>
+                    <td className="p-2 flex gap-2">
+                      <button
+                        onClick={() => startEditField(section.name, field)}
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteField(section.name, field.name)}
+                        className="text-sm text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-6">
-            {useSections && schema?.sections
-              ? schema.sections.map((section, sectionIndex) => (
-                  <div key={sectionIndex} className="border border-gray-200 rounded-lg p-4 sm:p-6 bg-gray-50">
-                    <div className="mb-4 pb-4 border-b border-gray-200">
-                      <h4 className="text-lg font-semibold text-gray-800">{section.name}</h4>
-                      {section.description && <p className="text-sm text-gray-600 mt-1">{section.description}</p>}
-                    </div>
-                    <div className="space-y-4">
-                      {(section.fields || []).map((field, fieldIndex) =>
-                        renderFormField(field, sectionIndex, fieldIndex)
-                      )}
-                    </div>
+      ))}
+      {editingField && (
+        <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="text-md font-semibold mb-3 text-gray-800">Edit Field</h4>
+          <div className="space-y-4">
+            <InputField label="Field Name" value={fieldName} onChange={(e) => setFieldName(e.target.value)} />
+            <SelectField
+              label="Type"
+              value={fieldType}
+              onChange={(e) => setFieldType(e.target.value)}
+              options={[
+                { value: "input", label: "Text Input" },
+                { value: "select", label: "Select Dropdown" },
+                { value: "checkbox", label: "Checkbox Group" },
+                { value: "radio", label: "Radio Group" },
+                { value: "textarea", label: "Textarea" },
+                { value: "number", label: "Number Input" },
+              ]}
+            />
+            {needsMaxLength && (
+              <InputField
+                label="Max Length"
+                type="number"
+                value={maxLength}
+                onChange={(e) => setMaxLength(e.target.value)}
+              />
+            )}
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={isRequired}
+                onChange={(e) => setIsRequired(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">Mark as required</span>
+            </label>
+            {needsOptions && (
+              <div className="space-y-3">
+                <h5 className="text-sm font-medium text-gray-800">Options</h5>
+                {options.length > 0 && (
+                  <div className="space-y-2">
+                    {options.map((opt, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                        {editingOptionIndex === index ? (
+                          <>
+                            <input
+                              type="text"
+                              value={editingOptionValue}
+                              onChange={(e) => setEditingOptionValue(e.target.value)}
+                              className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                              autoFocus
+                            />
+                            <button onClick={handleSaveEditOption} className="text-xs text-green-600 hover:underline">
+                              Save
+                            </button>
+                            <button onClick={handleCancelEditOption} className="text-xs text-gray-600 hover:underline">
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <span className="flex-1 text-sm text-gray-900">{opt}</span>
+                            <button
+                              onClick={() => handleStartEditOption(index, opt)}
+                              className="text-xs text-blue-600 hover:underline"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleRemoveOption(index)}
+                              className="text-xs text-red-600 hover:underline"
+                            >
+                              Remove
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))
-              : (schema?.fields || []).map((field, fieldIndex) => renderFormField(field, null, fieldIndex))}
+                )}
+                <div className="flex items-center gap-2">
+                  <InputField
+                    label="New Option"
+                    value={newOption}
+                    onChange={(e) => setNewOption(e.target.value)}
+                    className="flex-1"
+                  />
+                  <button
+                    onClick={handleAddOption}
+                    disabled={!newOption.trim()}
+                    className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 text-sm"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            )}
+            {fieldType === "number" && (
+              <>
+                <InputField label="Unit (optional)" value={unit} onChange={(e) => setUnit(e.target.value)} />
+                <div className="space-y-4">
+                  <SelectField
+                    label="Standard Range Type"
+                    value={standardRangeType}
+                    onChange={(e) => setStandardRangeType(e.target.value)}
+                    options={[
+                      { value: "none", label: "No Standard Range" },
+                      { value: "simple", label: "Simple Range" },
+                      { value: "age", label: "Age Based" },
+                      { value: "gender", label: "Gender Based" },
+                      { value: "combined", label: "Combined (Age and Gender)" },
+                    ]}
+                  />
+                  {standardRangeType === "simple" && rangeData && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        label="Min Value"
+                        type="number"
+                        value={rangeData.min || ""}
+                        onChange={(e) => handleSimpleOrGenderChange("min", null, e.target.value)}
+                      />
+                      <InputField
+                        label="Max Value"
+                        type="number"
+                        value={rangeData.max || ""}
+                        onChange={(e) => handleSimpleOrGenderChange("max", null, e.target.value)}
+                      />
+                    </div>
+                  )}
+                  {standardRangeType === "gender" && rangeData && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <InputField
+                          label="Male Min"
+                          type="number"
+                          value={rangeData.male?.min || ""}
+                          onChange={(e) => handleSimpleOrGenderChange("male", "min", e.target.value)}
+                        />
+                        <InputField
+                          label="Male Max"
+                          type="number"
+                          value={rangeData.male?.max || ""}
+                          onChange={(e) => handleSimpleOrGenderChange("male", "max", e.target.value)}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <InputField
+                          label="Female Min"
+                          type="number"
+                          value={rangeData.female?.min || ""}
+                          onChange={(e) => handleSimpleOrGenderChange("female", "min", e.target.value)}
+                        />
+                        <InputField
+                          label="Female Max"
+                          type="number"
+                          value={rangeData.female?.max || ""}
+                          onChange={(e) => handleSimpleOrGenderChange("female", "max", e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {(standardRangeType === "age" || standardRangeType === "combined") && rangeData && (
+                    <div className="space-y-3">
+                      <h5 className="text-sm font-medium text-gray-800">Ranges</h5>
+                      {rangeData.length > 0 && (
+                        <div className="space-y-2">
+                          {rangeData.map((range, index) => (
+                            <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                              <span className="flex-1 text-sm text-gray-900">
+                                {standardRangeType === "combined"
+                                  ? `${range.gender.charAt(0).toUpperCase() + range.gender.slice(1)} `
+                                  : ""}
+                                Age {range.minAge}-{range.maxAge === 999 ? "+" : range.maxAge}: {range.minValue}-
+                                {range.maxValue}
+                              </span>
+                              <button
+                                onClick={() => handleStartEditRange(index)}
+                                className="text-xs text-blue-600 hover:underline"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleRemoveRange(index)}
+                                className="text-xs text-red-600 hover:underline"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        <div
+                          className={`grid gap-2 ${standardRangeType === "combined" ? "grid-cols-4" : "grid-cols-3"}`}
+                        >
+                          {standardRangeType === "combined" && (
+                            <SelectField
+                              label="Gender"
+                              value={newRangeEntry.gender || ""}
+                              onChange={(e) => handleNewRangeChange("gender", e.target.value)}
+                              options={[
+                                { value: "male", label: "Male" },
+                                { value: "female", label: "Female" },
+                              ]}
+                            />
+                          )}
+                          <InputField
+                            label="Min Age"
+                            type="number"
+                            value={newRangeEntry.minAge || ""}
+                            onChange={(e) => handleNewRangeChange("minAge", e.target.value)}
+                          />
+                          <InputField
+                            label="Max Age"
+                            type="number"
+                            value={newRangeEntry.maxAge || ""}
+                            onChange={(e) => handleNewRangeChange("maxAge", e.target.value)}
+                          />
+                          <InputField
+                            label="Min Value"
+                            type="number"
+                            value={newRangeEntry.minValue || ""}
+                            onChange={(e) => handleNewRangeChange("minValue", e.target.value)}
+                          />
+                          <InputField
+                            label="Max Value"
+                            type="number"
+                            value={newRangeEntry.maxValue || ""}
+                            onChange={(e) => handleNewRangeChange("maxValue", e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          onClick={handleAddOrUpdateRange}
+                          className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                          disabled={!validateRangeEntry(newRangeEntry, standardRangeType)}
+                        >
+                          {editingRangeIndex !== null ? "Update Range" : "Add Range"}
+                        </button>
+                        {editingRangeIndex !== null && (
+                          <button
+                            onClick={handleCancelEditRange}
+                            className="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleUpdate}
+                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+              >
+                Update Field
+              </button>
+              <button
+                onClick={handleCancelField}
+                className="flex-1 px-4 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium text-sm"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-
-          {getFieldsCount() === 0 ? (
-            <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
-              No fields added yet. Add fields to see the preview.
-            </div>
-          ) : (
-            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={() => {
-                  setFormData({});
-                  setErrors({});
-                  setValidationStates({});
-                  setTouchedFields({});
-                  setPatientAge("");
-                  setPatientGender("");
-                }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Clear Form
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Submit Form
-              </button>
-            </div>
-          )}
-        </form>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default FormPreview;
+export default PreviewForm;

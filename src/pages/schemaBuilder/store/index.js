@@ -1,12 +1,24 @@
 import { create } from "zustand";
-import { schemaSlice } from "./schemaSlice";
-import { uiSlice } from "./uiSlice";
-import { formSlice } from "./formSlice";
-import { selectionSlice } from "./selectionSlice";
 
-export const useSchemaBuilderStore = create((set, get) => ({
+import loadingSlice from "../../../store/common/loadingSlice";
+import modalSlice from "../../../store/common/modalSlice";
+import popupSlice from "../../../store/common/popupSlice";
+import schemaSlice  from "./schemaSlice";
+
+const useStore = create((set, get) => ({
+  ...loadingSlice(set, get),
+  ...modalSlice(set, get),
+  ...popupSlice(set, get),
+
+  // domain data after UI slices
   ...schemaSlice(set, get),
-  ...uiSlice(set, get),
-  ...formSlice(set, get),
-  ...selectionSlice(set, get),
+
+  clearState: () =>
+    set({
+      loading: false,
+      popup: { type: null, action: null, message: null, data: null },
+      modal: { view: null, data: null },
+    }),
 }));
+
+export default useStore;

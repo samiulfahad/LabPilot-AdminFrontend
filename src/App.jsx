@@ -10,7 +10,7 @@ import SchemaList from "./pages/schemaList";
 import SchemaBuilder from "./pages/schemaBuilder";
 import SchemaRenderer from "./pages/schemaRenderer";
 
-import UnderConstruction from "./pages/underConstruction";
+import UnderConstruction from "./pages/schemaBuilder";
 
 function App() {
   return (
@@ -22,8 +22,8 @@ function App() {
         <Route path="/test-list" element={<TestList />} />
         <Route path="/lab-management" element={<LabManagement />} />
         <Route path="/schema-builder" element={<SchemaBuilder />} />
-        <Route path="/render-schema/:schemaId" element={<SchemaRenderer />} />
         <Route path="/schema-builder/:schemaId" element={<SchemaBuilder />} />
+        <Route path="/render-schema/:schemaId" element={<SchemaRenderer />} />
         <Route path="/schema-list" element={<SchemaList />} />
         <Route path="/underConstruction" element={<UnderConstruction />} />
       </Routes>

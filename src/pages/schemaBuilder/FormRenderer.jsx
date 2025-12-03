@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import useStore from "./store";
+import InputField from "../../components/html/InputField";
+import SelectField from "../../components/html/SelectField";
+import TextAreaField from "../../components/html/TextAreaField";
 
 const FormRenderer = () => {
   const { schema } = useStore();
@@ -132,47 +135,45 @@ const FormRenderer = () => {
     const value = formData[name] || (type === "checkbox" ? [] : "");
     const range = standardRange ? getApplicableRange(standardRange, gender, age) : null;
     const status = statuses[name] || "";
+    const label = `${name}${unit ? ` (${unit})` : ""}${required ? " *" : ""}`;
 
     let inputElement;
     switch (type) {
       case "input":
         inputElement = (
-          <input
-            type="text"
+          <InputField
+            label={label}
+            name={name}
             value={value}
             onChange={(e) => handleChange(name, e.target.value)}
+            type="text"
             maxLength={maxLength}
             required={required}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
           />
         );
         break;
       case "textarea":
         inputElement = (
-          <textarea
+          <TextAreaField
+            label={label}
+            name={name}
             value={value}
             onChange={(e) => handleChange(name, e.target.value)}
             maxLength={maxLength}
             required={required}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm min-h-[100px]"
           />
         );
         break;
       case "select":
         inputElement = (
-          <select
+          <SelectField
+            label={label}
+            name={name}
             value={value}
             onChange={(e) => handleChange(name, e.target.value)}
-            required={required}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none"
-          >
-            <option value="">Select an option</option>
-            {options.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+            options={options.map((opt) => ({ value: opt, label: opt }))}
+            placeholder="Select an option"
+          />
         );
         break;
       case "radio":
@@ -215,16 +216,14 @@ const FormRenderer = () => {
         break;
       case "number":
         inputElement = (
-          <div className="flex items-center">
-            <input
-              type="number"
-              value={value}
-              onChange={(e) => handleChange(name, e.target.value)}
-              required={required}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
-            />
-            {unit && <span className="ml-3 text-gray-600 font-medium">{unit}</span>}
-          </div>
+          <InputField
+            label={label}
+            name={name}
+            value={value}
+            onChange={(e) => handleChange(name, e.target.value)}
+            type="number"
+            required={required}
+          />
         );
         break;
       default:
@@ -233,9 +232,11 @@ const FormRenderer = () => {
 
     return (
       <div key={name} className="mb-6">
-        <label className="block mb-2 font-semibold text-gray-800">
-          {name} {required ? <span className="text-red-500">*</span> : ""}
-        </label>
+        {type === "radio" || type === "checkbox" ? (
+          <label className="block mb-2 font-semibold text-gray-800">
+            {name} {required ? <span className="text-red-500">*</span> : ""}
+          </label>
+        ) : null}
         {inputElement}
         {range && (
           <p className="mt-2 text-sm text-gray-500">
@@ -258,33 +259,23 @@ const FormRenderer = () => {
         <h3 className="text-xl font-semibold text-gray-900 mb-6">Patient Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block mb-2 font-semibold text-gray-800">
-              Gender <span className="text-red-500">*</span>
-            </label>
-            <select
+            <SelectField
+              label="Gender *"
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm appearance-none"
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
+              options={[
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+              ]}
+              placeholder="Select Gender"
+            />
           </div>
           <div>
-            <label className="block mb-2 font-semibold text-gray-800">
-              Age <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
-            />
+            <InputField label="Age *" value={age} onChange={(e) => setAge(e.target.value)} type="number" />
           </div>
         </div>
       </div>
-      {schema.sections.map((section) => (
+      {schema?.sections?.map((section) => (
         <div key={section.name} className="mb-10">
           {hasMultipleSections && (
             <h3 className="text-xl font-semibold text-gray-900 mb-6 border-b border-gray-200 pb-4">{section.name}</h3>

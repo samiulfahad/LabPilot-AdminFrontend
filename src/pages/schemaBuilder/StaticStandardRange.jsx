@@ -15,7 +15,7 @@ const StaticStandardRange = () => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">Standard Range</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Static Standard Range</h3>
           <p className="text-sm text-gray-600 mt-1">Add static reference values for this test</p>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">

@@ -32,10 +32,10 @@ const SchemaPreview = () => {
           </span>
           <span
             className={`px-3 py-1 rounded-full text-xs ${
-              schema.hasStandardRange ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
+              schema.hasStaticStandardRange ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
             }`}
           >
-            {schema.hasStandardRange ? "Standard Range" : "No Range"}
+            {schema.hasStaticStandardRange ? "No Static Standard Range" : "No Range"}
           </span>
         </div>
       </div>

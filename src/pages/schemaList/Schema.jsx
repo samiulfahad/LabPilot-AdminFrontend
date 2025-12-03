@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Icons from "../../components/icons";
 
 const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault }) => {
+  console.log(input);
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 my-3 hover:shadow-md transition-all duration-300 group">
       {/* Mobile Compact View */}
@@ -13,7 +14,7 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 text-sm">{input.name}</h3>
-              {input.description && <p className="text-xs text-gray-500 mt-0.5">{input.description}</p>}
+              {input.testName && <p className="text-xs text-gray-500 mt-0.5">{input.testName}</p>}
             </div>
           </div>
           <span
@@ -52,7 +53,7 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
         {/* Mobile Actions */}
         <div className="flex gap-2 mt-3">
           <Link
-            to={`/render-schema/${input._id}`}
+            to={`/render-form/${input._id}`}
             className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200 text-sm font-medium"
           >
             <Icons.View className="w-4 h-4" />
