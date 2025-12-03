@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Icons from "../../components/icons";
 
 const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault }) => {
-  console.log(input);
+  // console.log(input);
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 my-3 hover:shadow-md transition-all duration-300 group">
       {/* Mobile Compact View */}
