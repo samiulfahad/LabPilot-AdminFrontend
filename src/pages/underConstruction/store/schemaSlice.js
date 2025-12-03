@@ -9,18 +9,16 @@ const schemaSlice = (set, get) => ({
     testId: "",
     categoryId: "",
     isActive: false,
-    hasStandardRange: false,
-    standardRange: "",
+    hasStaticStandardRange: false,
+    staticStandardRange: "",
     sections: [{ name: "Default", fields: [] }],
     currentSectionName: "",
   },
-
   setSchema: (field, value) => {
     set((state) => ({
       schema: { ...state.schema, [field]: value },
     }));
   },
-
   loadTestList: async () => {
     try {
       get().startLoading();
@@ -35,7 +33,6 @@ const schemaSlice = (set, get) => ({
       get().stopLoading();
     }
   },
-
   isSectionNameUnique: (name, excludeName = null) => {
     const sections = get().schema.sections;
     const normalized = name.toLowerCase().trim();
@@ -44,11 +41,9 @@ const schemaSlice = (set, get) => ({
       return s.name.toLowerCase().trim() === normalized;
     });
   },
-
   addSection: () => {
     const name = get().schema.currentSectionName.trim();
     if (!name) return;
-
     if (!get().isSectionNameUnique(name)) {
       get().setPopup({
         type: "error",
@@ -58,7 +53,6 @@ const schemaSlice = (set, get) => ({
       });
       return false;
     }
-
     set((state) => ({
       schema: {
         ...state.schema,
@@ -66,14 +60,12 @@ const schemaSlice = (set, get) => ({
         currentSectionName: "",
       },
     }));
-
     get().setPopup({
       type: "success",
       message: `Section "${name}" added successfully!`,
     });
     return true;
   },
-
   deleteSection: (sectionName) => {
     if (get().schema.sections.length === 1) {
       get().setPopup({
@@ -82,24 +74,20 @@ const schemaSlice = (set, get) => ({
       });
       return;
     }
-
     set((state) => ({
       schema: {
         ...state.schema,
         sections: state.schema.sections.filter((s) => s.name !== sectionName),
       },
     }));
-
     get().setPopup({
       type: "success",
       message: `Section "${sectionName}" deleted!`,
     });
   },
-
   updateSection: (oldName, newName) => {
     const trimmed = newName.trim();
     if (!trimmed) return;
-
     if (!get().isSectionNameUnique(trimmed, oldName)) {
       get().setPopup({
         type: "error",
@@ -107,21 +95,18 @@ const schemaSlice = (set, get) => ({
       });
       return;
     }
-
     set((state) => ({
       schema: {
         ...state.schema,
         sections: state.schema.sections.map((s) => (s.name === oldName ? { ...s, name: trimmed } : s)),
       },
     }));
-
     get().setPopup({
       type: "success",
       message: `Section renamed successfully!`,
     });
   },
-
-  confirmRemoveStandardRange: () => {
+  confirmRemoveStaticStandardRange: () => {
     get().setPopup({
       type: "confirmation",
       message: "This will delete all reference values. Continue?",
@@ -129,8 +114,8 @@ const schemaSlice = (set, get) => ({
         set((state) => ({
           schema: {
             ...state.schema,
-            hasStandardRange: false,
-            standardRange: "",
+            hasStaticStandardRange: false,
+            staticStandardRange: "",
           },
         }));
         get().setPopup({
@@ -140,7 +125,6 @@ const schemaSlice = (set, get) => ({
       },
     });
   },
-
   addField: (sectionName, newField) =>
     set((state) => {
       const updatedSections = state.schema.sections.map((sec) => {
@@ -159,7 +143,6 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
-
   updateField: (sectionName, oldFieldName, updatedField) =>
     set((state) => {
       const updatedSections = state.schema.sections.map((sec) => {
@@ -179,7 +162,6 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
-
   deleteField: (sectionName, fieldName) =>
     set((state) => {
       const updatedSections = state.schema.sections.map((sec) => {
@@ -198,10 +180,9 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
-
-  clearStandardRange: () => {
+  clearStaticStandardRange: () => {
     set((state) => ({
-      schema: { ...state.schema, standardRange: "" },
+      schema: { ...state.schema, staticStandardRange: "" },
     }));
   },
 });

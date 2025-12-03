@@ -6,8 +6,10 @@ import SelectTest from "./SelectTest";
 import Status from "./Status";
 import Section from "./Section";
 import SchemaPreview from "./SchemaPreview";
-import StandardRange from "./StandardRange";
-import AddField from "./addField"; // Updated component
+import StaticStandardRange from "./StaticStandardRange";
+import AddField from "./AddField"; // Updated component
+import FormPreview from "./FormPreview";
+import FormRenderer from "./FormRenderer";
 
 const UnderConstruction = () => {
   const { deleteSection, popup, closePopup, loading, modal } = useStore();
@@ -53,9 +55,15 @@ const UnderConstruction = () => {
         <AddField />
 
         {/* Row 5: Standard Range */}
-        <StandardRange />
+        <StaticStandardRange />
 
-        {/* Row 6: Schema Preview */}
+        {/* Row 6: Preview Form */}
+        <FormPreview />
+
+        {/* Row 7: Preview Form */}
+        <FormRenderer />
+
+        {/* Row 8: Schema Preview */}
         <SchemaPreview />
       </div>
     </div>
