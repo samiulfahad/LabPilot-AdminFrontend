@@ -53,7 +53,7 @@ const Schema = ({ input, index, onDelete, onActivate, onDeactivate, onSetDefault
         {/* Mobile Actions */}
         <div className="flex gap-2 mt-3">
           <Link
-            to={`/render-form/${input._id}`}
+            to={`/render-schema/${input._id}`}
             className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200 text-sm font-medium"
           >
             <Icons.View className="w-4 h-4" />
