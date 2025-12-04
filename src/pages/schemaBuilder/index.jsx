@@ -117,7 +117,7 @@ const UnderConstruction = () => {
         {/* Row 6: Preview Form */}
         <FormPreview />
         {/* Row 7: Preview Form */}
-        {/* <FormRenderer /> */}
+        <FormRenderer />
         {/* Row 8: Schema Preview */}
         <SchemaPreview />
       </div>
