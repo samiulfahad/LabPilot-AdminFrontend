@@ -304,7 +304,6 @@ const PreviewForm = () => {
                 title="Edit Section"
               >
                 <Icons.Edit className="w-4 h-4" />
-                Edit Section
               </button>
               <button
                 onClick={() => deleteSection(section.name)}
@@ -312,7 +311,6 @@ const PreviewForm = () => {
                 title="Delete Section"
               >
                 <Icons.Delete className="w-4 h-4" />
-                Delete Section
               </button>
             </div>
           </div>
