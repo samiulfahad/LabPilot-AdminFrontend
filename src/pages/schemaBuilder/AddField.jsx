@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import useStore from "./store";
 import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
-import Icons from "../../path/to/Icons"; // Update this path
+import Icons from "../../components/icons"; // Update this path
 
 const AddField = () => {
   const { Add: AddIcon, Edit: EditIcon, Delete: DeleteIcon, Close: CloseIcon } = Icons;
@@ -342,7 +342,7 @@ const AddField = () => {
                   </div>
                 ))}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <InputField value={newOption} onChange={(e) => setNewOption(e.target.value)} className="flex-1" />
+                  <InputField label="Option" value={newOption} onChange={(e) => setNewOption(e.target.value)} className="flex-1" />
                   <button
                     onClick={handleAddOption}
                     disabled={!newOption.trim()}
