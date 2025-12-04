@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import useStore from "./store";
 import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
+import Icons from "../../components/icons"; // Import the icons
 
 const PreviewForm = () => {
   const { schema, updateSection, deleteSection, updateField, deleteField, setPopup } = useStore();
@@ -199,15 +200,18 @@ const PreviewForm = () => {
       setPopup({ type: "error", message: "Field name is required" });
       return;
     }
+
     const allFields = schema.sections.flatMap((section) => section.fields || []);
     if (allFields.some((f) => f.name === fieldName && f.name !== editingField)) {
       setPopup({ type: "error", message: "Field name must be unique" });
       return;
     }
+
     if (needsOptions && options.length === 0) {
       setPopup({ type: "error", message: "At least one option is required for this field type" });
       return;
     }
+
     if (needsStandardRange) {
       if (standardRangeType === "simple") {
         if (!rangeData.min || !rangeData.max) {
@@ -224,11 +228,13 @@ const PreviewForm = () => {
         return;
       }
     }
+
     const updatedField = {
       name: fieldName,
       type: fieldType,
       required: isRequired,
     };
+
     if (needsOptions) updatedField.options = options;
     if (needsMaxLength && maxLength) updatedField.maxLength = parseInt(maxLength, 10);
     if (needsStandardRange) {
@@ -237,6 +243,7 @@ const PreviewForm = () => {
     if (fieldType === "number" && unit.trim()) {
       updatedField.unit = unit.trim();
     }
+
     updateField(fieldSection, editingField, updatedField);
     resetFieldForm();
   };
@@ -274,14 +281,16 @@ const PreviewForm = () => {
                 <InputField value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} />
                 <button
                   onClick={saveSection}
-                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm flex items-center gap-1"
                 >
+                  <Icons.Edit className="w-4 h-4" />
                   Save
                 </button>
                 <button
                   onClick={cancelEditSection}
-                  className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
+                  className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm flex items-center gap-1"
                 >
+                  <Icons.Close className="w-4 h-4" />
                   Cancel
                 </button>
               </div>
@@ -289,10 +298,20 @@ const PreviewForm = () => {
               <h4 className="text-md font-medium text-gray-800">{section.name}</h4>
             )}
             <div className="flex gap-2">
-              <button onClick={() => startEditSection(section.name)} className="text-sm text-blue-600 hover:underline">
+              <button
+                onClick={() => startEditSection(section.name)}
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                title="Edit Section"
+              >
+                <Icons.Edit className="w-4 h-4" />
                 Edit Section
               </button>
-              <button onClick={() => deleteSection(section.name)} className="text-sm text-red-600 hover:underline">
+              <button
+                onClick={() => deleteSection(section.name)}
+                className="text-sm text-red-600 hover:text-red-800 flex items-center gap-1"
+                title="Delete Section"
+              >
+                <Icons.Delete className="w-4 h-4" />
                 Delete Section
               </button>
             </div>
@@ -316,14 +335,18 @@ const PreviewForm = () => {
                     <td className="p-2 flex gap-2">
                       <button
                         onClick={() => startEditField(section.name, field)}
-                        className="text-sm text-blue-600 hover:underline"
+                        className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                        title="Edit Field"
                       >
+                        <Icons.Edit className="w-4 h-4" />
                         Edit
                       </button>
                       <button
                         onClick={() => deleteField(section.name, field.name)}
-                        className="text-sm text-red-600 hover:underline"
+                        className="text-sm text-red-600 hover:text-red-800 flex items-center gap-1"
+                        title="Delete Field"
                       >
+                        <Icons.Delete className="w-4 h-4" />
                         Delete
                       </button>
                     </td>
@@ -334,6 +357,7 @@ const PreviewForm = () => {
           )}
         </div>
       ))}
+
       {editingField && (
         <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h4 className="text-md font-semibold mb-3 text-gray-800">Edit Field</h4>
@@ -385,10 +409,18 @@ const PreviewForm = () => {
                               className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
                               autoFocus
                             />
-                            <button onClick={handleSaveEditOption} className="text-xs text-green-600 hover:underline">
+                            <button
+                              onClick={handleSaveEditOption}
+                              className="text-xs text-green-600 hover:underline flex items-center gap-1"
+                            >
+                              <Icons.Edit className="w-3 h-3" />
                               Save
                             </button>
-                            <button onClick={handleCancelEditOption} className="text-xs text-gray-600 hover:underline">
+                            <button
+                              onClick={handleCancelEditOption}
+                              className="text-xs text-gray-600 hover:underline flex items-center gap-1"
+                            >
+                              <Icons.Close className="w-3 h-3" />
                               Cancel
                             </button>
                           </>
@@ -397,14 +429,16 @@ const PreviewForm = () => {
                             <span className="flex-1 text-sm text-gray-900">{opt}</span>
                             <button
                               onClick={() => handleStartEditOption(index, opt)}
-                              className="text-xs text-blue-600 hover:underline"
+                              className="text-xs text-blue-600 hover:underline flex items-center gap-1"
                             >
+                              <Icons.Edit className="w-3 h-3" />
                               Edit
                             </button>
                             <button
                               onClick={() => handleRemoveOption(index)}
-                              className="text-xs text-red-600 hover:underline"
+                              className="text-xs text-red-600 hover:underline flex items-center gap-1"
                             >
+                              <Icons.Delete className="w-3 h-3" />
                               Remove
                             </button>
                           </>
@@ -423,8 +457,9 @@ const PreviewForm = () => {
                   <button
                     onClick={handleAddOption}
                     disabled={!newOption.trim()}
-                    className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 text-sm"
+                    className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 text-sm flex items-center gap-1"
                   >
+                    <Icons.Add className="w-4 h-4" />
                     Add
                   </button>
                 </div>
@@ -510,14 +545,16 @@ const PreviewForm = () => {
                               </span>
                               <button
                                 onClick={() => handleStartEditRange(index)}
-                                className="text-xs text-blue-600 hover:underline"
+                                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
                               >
+                                <Icons.Edit className="w-3 h-3" />
                                 Edit
                               </button>
                               <button
                                 onClick={() => handleRemoveRange(index)}
-                                className="text-xs text-red-600 hover:underline"
+                                className="text-xs text-red-600 hover:underline flex items-center gap-1"
                               >
+                                <Icons.Delete className="w-3 h-3" />
                                 Remove
                               </button>
                             </div>
@@ -568,16 +605,27 @@ const PreviewForm = () => {
                       <div className="flex gap-2 mt-2">
                         <button
                           onClick={handleAddOrUpdateRange}
-                          className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                          className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm flex items-center gap-1"
                           disabled={!validateRangeEntry(newRangeEntry, standardRangeType)}
                         >
-                          {editingRangeIndex !== null ? "Update Range" : "Add Range"}
+                          {editingRangeIndex !== null ? (
+                            <>
+                              <Icons.Edit className="w-4 h-4" />
+                              Update Range
+                            </>
+                          ) : (
+                            <>
+                              <Icons.Add className="w-4 h-4" />
+                              Add Range
+                            </>
+                          )}
                         </button>
                         {editingRangeIndex !== null && (
                           <button
                             onClick={handleCancelEditRange}
-                            className="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm"
+                            className="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm flex items-center gap-1"
                           >
+                            <Icons.Close className="w-4 h-4" />
                             Cancel
                           </button>
                         )}
@@ -590,14 +638,16 @@ const PreviewForm = () => {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleUpdate}
-                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm flex items-center justify-center gap-2"
               >
+                <Icons.Edit className="w-4 h-4" />
                 Update Field
               </button>
               <button
                 onClick={handleCancelField}
-                className="flex-1 px-4 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium text-sm"
+                className="flex-1 px-4 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium text-sm flex items-center justify-center gap-2"
               >
+                <Icons.Close className="w-4 h-4" />
                 Cancel
               </button>
             </div>
