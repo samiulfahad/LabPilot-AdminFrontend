@@ -342,7 +342,7 @@ const AddField = () => {
                   </div>
                 ))}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <InputField label="Option" value={newOption} onChange={(e) => setNewOption(e.target.value)} className="flex-1" />
+                  <InputField label="Option" value={newOption} onChange={(e) => setNewOption(e.target.value)} className="flex-1 pl-2" />
                   <button
                     onClick={handleAddOption}
                     disabled={!newOption.trim()}
