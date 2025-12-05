@@ -69,6 +69,15 @@ const PreviewForm = () => {
     setEditingRangeIndex(null);
   }, [standardRangeType]);
 
+  useEffect(() => {
+    if (editingField && fieldSection) {
+      const section = schema.sections.find((s) => s.name === fieldSection);
+      if (!section || !section.fields.find((f) => f.name === editingField)) {
+        resetFieldForm();
+      }
+    }
+  }, [schema, editingField, fieldSection]);
+
   // FieldOptionsEditor handlers
   const handleAddOption = () => {
     if (newOption.trim()) {
