@@ -277,7 +277,7 @@ const PreviewForm = () => {
         <div key={section.name} className="mb-6">
           <div className="flex items-center justify-between mb-2">
             {editingSection === section.name ? (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <InputField label="Title" value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} />
                 <button
                   onClick={saveSection}
@@ -296,19 +296,11 @@ const PreviewForm = () => {
               <h4 className="text-md font-medium text-gray-800">{section.name}</h4>
             )}
             <div className="flex gap-2">
-              <button
-                onClick={() => startEditSection(section.name)}
-                className="btn-sm"
-                title="Edit Section"
-              >
+              <button onClick={() => startEditSection(section.name)} className="btn-sm" title="Edit Section">
                 Edit
               </button>
-              <button
-                onClick={() => deleteSection(section.name)}
-                className="delete-btn-sm"
-                title="Delete Section"
-              >
-               Delete
+              <button onClick={() => deleteSection(section.name)} className="delete-btn-sm" title="Delete Section">
+                Delete
               </button>
             </div>
           </div>
@@ -329,11 +321,7 @@ const PreviewForm = () => {
                     <td className="p-2 text-sm text-gray-900">{field.name}</td>
                     <td className="p-2 text-sm text-gray-900">{field.type}</td>
                     <td className="p-2 flex gap-2">
-                      <button
-                        onClick={() => startEditField(section.name, field)}
-                        className="btn-sm"
-                        title="Edit Field"
-                      >
+                      <button onClick={() => startEditField(section.name, field)} className="btn-sm" title="Edit Field">
                         Edit
                       </button>
                       <button
