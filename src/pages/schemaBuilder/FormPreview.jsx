@@ -271,11 +271,11 @@ const PreviewForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Form Preview</h3>
       {schema?.sections?.map((section) => (
         <div key={section.name} className="mb-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex flex-wrap items-center justify-between mb-2 gap-2">
             {editingSection === section.name ? (
               <div className="flex flex-wrap items-center gap-2">
                 <InputField label="Title" value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} />
@@ -293,49 +293,57 @@ const PreviewForm = () => {
                 </button>
               </div>
             ) : (
-              <h4 className="text-md font-medium text-gray-800">{section.name}</h4>
+              <>
+                <h4 className="text-md font-medium text-gray-800">{section.name}</h4>
+                <div className="flex gap-2">
+                  <button onClick={() => startEditSection(section.name)} className="btn-sm" title="Edit Section">
+                    Edit
+                  </button>
+                  <button onClick={() => deleteSection(section.name)} className="delete-btn-sm" title="Delete Section">
+                    Delete
+                  </button>
+                </div>
+              </>
             )}
-            <div className="flex gap-2">
-              <button onClick={() => startEditSection(section.name)} className="btn-sm" title="Edit Section">
-                Edit
-              </button>
-              <button onClick={() => deleteSection(section.name)} className="delete-btn-sm" title="Delete Section">
-                Delete
-              </button>
-            </div>
           </div>
           {section.fields.length === 0 ? (
             <p className="text-sm text-gray-600">No fields in this section</p>
           ) : (
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="p-2 text-left text-sm font-medium text-gray-700">Field Name</th>
-                  <th className="p-2 text-left text-sm font-medium text-gray-700">Type</th>
-                  <th className="p-2 text-left text-sm font-medium text-gray-700">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {section.fields.map((field) => (
-                  <tr key={field.name} className="border-t border-gray-200">
-                    <td className="p-2 text-sm text-gray-900">{field.name}</td>
-                    <td className="p-2 text-sm text-gray-900">{field.type}</td>
-                    <td className="p-2 flex gap-2">
-                      <button onClick={() => startEditField(section.name, field)} className="btn-sm" title="Edit Field">
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => deleteField(section.name, field.name)}
-                        className="delete-btn-sm"
-                        title="Delete Field"
-                      >
-                        Delete
-                      </button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse min-w-[400px]">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="p-2 text-left text-sm font-medium text-gray-700">Field Name</th>
+                    <th className="p-2 text-left text-sm font-medium text-gray-700">Type</th>
+                    <th className="p-2 text-left text-sm font-medium text-gray-700">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {section.fields.map((field) => (
+                    <tr key={field.name} className="border-t border-gray-200">
+                      <td className="p-2 text-sm text-gray-900">{field.name}</td>
+                      <td className="p-2 text-sm text-gray-900">{field.type}</td>
+                      <td className="p-2 flex gap-2">
+                        <button
+                          onClick={() => startEditField(section.name, field)}
+                          className="btn-sm"
+                          title="Edit Field"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteField(section.name, field.name)}
+                          className="delete-btn-sm"
+                          title="Delete Field"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       ))}
@@ -381,7 +389,7 @@ const PreviewForm = () => {
                 {options.length > 0 && (
                   <div className="space-y-2">
                     {options.map((opt, index) => (
-                      <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                      <div key={index} className="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded">
                         {editingOptionIndex === index ? (
                           <>
                             <input
@@ -429,7 +437,7 @@ const PreviewForm = () => {
                     ))}
                   </div>
                 )}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-end gap-2">
                   <InputField
                     label="New Option"
                     value={newOption}
@@ -464,7 +472,7 @@ const PreviewForm = () => {
                     ]}
                   />
                   {standardRangeType === "simple" && rangeData && (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <InputField
                         label="Min Value"
                         type="number"
@@ -481,7 +489,7 @@ const PreviewForm = () => {
                   )}
                   {standardRangeType === "gender" && rangeData && (
                     <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <InputField
                           label="Male Min"
                           type="number"
@@ -495,7 +503,7 @@ const PreviewForm = () => {
                           onChange={(e) => handleSimpleOrGenderChange("male", "max", e.target.value)}
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <InputField
                           label="Female Min"
                           type="number"
@@ -517,7 +525,7 @@ const PreviewForm = () => {
                       {rangeData.length > 0 && (
                         <div className="space-y-2">
                           {rangeData.map((range, index) => (
-                            <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                            <div key={index} className="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded">
                               <span className="flex-1 text-sm text-gray-900">
                                 {standardRangeType === "combined"
                                   ? `${range.gender.charAt(0).toUpperCase() + range.gender.slice(1)} `
@@ -545,7 +553,9 @@ const PreviewForm = () => {
                       )}
                       <div className="space-y-2">
                         <div
-                          className={`grid gap-2 ${standardRangeType === "combined" ? "grid-cols-4" : "grid-cols-3"}`}
+                          className={`grid gap-2 grid-cols-1 sm:grid-cols-${
+                            standardRangeType === "combined" ? "5" : "4"
+                          }`}
                         >
                           {standardRangeType === "combined" && (
                             <SelectField
@@ -584,7 +594,7 @@ const PreviewForm = () => {
                           />
                         </div>
                       </div>
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2 mt-2">
                         <button
                           onClick={handleAddOrUpdateRange}
                           className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm flex items-center gap-1"
@@ -617,7 +627,7 @@ const PreviewForm = () => {
                 </div>
               </>
             )}
-            <div className="flex gap-3 mt-6">
+            <div className="flex flex-wrap gap-3 mt-6">
               <button
                 onClick={handleUpdate}
                 className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm flex items-center justify-center gap-2"
