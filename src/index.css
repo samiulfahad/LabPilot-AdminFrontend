@@ -22,8 +22,14 @@
     @apply px-2 py-1 text-white text-sm bg-gradient-to-r from-green-500 to-emerald-600 rounded-md hover:bg-white hover:text-slate-500 duration-200;
 }
 
+
+
 .delete-btn {
     @apply px-3 py-1 text-white bg-red-800 hover:bg-red-600 rounded text-sm;
+}
+
+.delete-btn-sm {
+    @apply px-2 py-1 text-white bg-red-800 hover:bg-red-600 rounded text-sm;
 }
 
 .add-btn-sm {

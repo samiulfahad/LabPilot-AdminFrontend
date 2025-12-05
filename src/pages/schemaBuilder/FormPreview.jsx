@@ -298,17 +298,17 @@ const PreviewForm = () => {
             <div className="flex gap-2">
               <button
                 onClick={() => startEditSection(section.name)}
-                className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                className="btn-sm"
                 title="Edit Section"
               >
-                <Icons.Edit className="w-4 h-4" />
+                Edit
               </button>
               <button
                 onClick={() => deleteSection(section.name)}
-                className="text-sm text-red-600 hover:text-red-800 flex items-center gap-1"
+                className="delete-btn-sm"
                 title="Delete Section"
               >
-                <Icons.Delete className="w-4 h-4" />
+               Delete
               </button>
             </div>
           </div>
@@ -331,17 +331,17 @@ const PreviewForm = () => {
                     <td className="p-2 flex gap-2">
                       <button
                         onClick={() => startEditField(section.name, field)}
-                        className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                        className="btn-sm"
                         title="Edit Field"
                       >
-                        <Icons.Edit className="w-4 h-4" />
+                        Edit
                       </button>
                       <button
                         onClick={() => deleteField(section.name, field.name)}
-                        className="text-sm text-red-600 hover:text-red-800 flex items-center gap-1"
+                        className="delete-btn-sm"
                         title="Delete Field"
                       >
-                        <Icons.Delete className="w-4 h-4" />
+                        Delete
                       </button>
                     </td>
                   </tr>
