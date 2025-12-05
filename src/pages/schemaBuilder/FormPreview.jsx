@@ -278,19 +278,17 @@ const PreviewForm = () => {
           <div className="flex items-center justify-between mb-2">
             {editingSection === section.name ? (
               <div className="flex items-center gap-2">
-                <InputField value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} />
+                <InputField label="Title" value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} />
                 <button
                   onClick={saveSection}
                   className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm flex items-center gap-1"
                 >
-                  <Icons.Edit className="w-4 h-4" />
                   Save
                 </button>
                 <button
                   onClick={cancelEditSection}
                   className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm flex items-center gap-1"
                 >
-                  <Icons.Close className="w-4 h-4" />
                   Cancel
                 </button>
               </div>

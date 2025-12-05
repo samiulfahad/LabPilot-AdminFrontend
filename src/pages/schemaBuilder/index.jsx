@@ -14,7 +14,7 @@ import FormPreview from "./FormPreview";
 import FormRenderer from "./FormRenderer";
 import { useParams } from "react-router-dom";
 
-const UnderConstruction = () => {
+const SchemaBuilder = () => {
   const {
     schema,
     setSchema,
@@ -124,4 +124,4 @@ const UnderConstruction = () => {
     </div>
   );
 };
-export default UnderConstruction;
+export default SchemaBuilder

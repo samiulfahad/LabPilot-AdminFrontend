@@ -9,7 +9,7 @@ const Layout = ({ children }) => {
 
       {/* Main content - Adjusted for simpler sidebar */}
       <main className="lg:ml-64 flex-1 min-h-screen bg-white">
-        <div className="space-y-8 pt-20 lg:pt-3 bg-white max-w-7xl mx-auto p-4">{children}</div>
+        <div className="space-y-8 pt-20 lg:pt-3 bg-white w-full max-w-full mx-auto p-4">{children}</div>
       </main>
     </div>
   );
