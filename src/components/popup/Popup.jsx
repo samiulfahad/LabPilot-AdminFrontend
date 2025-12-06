@@ -77,7 +77,9 @@ const Popup = ({
       >
         <div className="bg-gray-100 rounded-2xl shadow-xl max-w-sm w-full mx-auto animate-in fade-in zoom-in-95 duration-200">
           <div className="px-12 py-8 text-center">
-            <IconComponent />
+            <div className="flex justify-center mb-4">
+              <IconComponent className="w-8 h-8" />
+            </div>
             <h3 className={`text-xl font-semibold mb-2 ${config.titleColor}`}>{config.title}</h3>
             <div className="text-gray-600 mb-6 font-semibold text-black">{message}</div>
 
