@@ -186,11 +186,6 @@ const TestList = () => {
                   <Icons.Refresh className="w-4 h-4" />
                   Refresh
                 </button>
-
-                <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-                  <Icons.Download className="w-4 h-4" />
-                  Export
-                </button>
               </div>
             </div>
           </div>
