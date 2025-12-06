@@ -103,7 +103,7 @@ const Container = ({ list }) => {
   };
 
   return (
-    <div className="p-2 sm:p-4">
+    <div className="p-4 sm:p-6">
       {/* Compact Header */}
       <div className="mb-6">
         {/* Desktop: Single row layout */}
