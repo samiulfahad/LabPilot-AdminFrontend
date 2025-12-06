@@ -46,6 +46,15 @@ const TestList = () => {
     setIsAddMenuOpen(false);
   };
 
+  // Calculate totals from populatedList which is loaded on mount
+  const totalCategories = populatedList?.length || 0;
+  const totalTests = populatedList?.reduce((sum, category) => sum + (category.testList?.length || 0), 0) || 0;
+  const liveTests =
+    populatedList?.reduce((sum, category) => {
+      const liveInCategory = category.testList?.filter((test) => test.schemaId)?.length || 0;
+      return sum + liveInCategory;
+    }, 0) || 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
       {loading && <LoadingScreen />}
@@ -181,23 +190,21 @@ const TestList = () => {
             <div className="flex items-center gap-4 md:gap-6">
               <div className="text-center">
                 <div className="text-xs md:text-sm text-gray-500">Categories</div>
-                <div className="text-base md:text-lg font-bold text-gray-900">{categoryList?.length || 0}</div>
+                <div className="text-base md:text-lg font-bold text-gray-900">{totalCategories}</div>
               </div>
 
               <div className="w-px h-5 md:h-6 bg-gray-200"></div>
 
               <div className="text-center">
                 <div className="text-xs md:text-sm text-gray-500">Tests</div>
-                <div className="text-base md:text-lg font-bold text-gray-900">{testList?.length || 0}</div>
+                <div className="text-base md:text-lg font-bold text-gray-900">{totalTests}</div>
               </div>
 
               <div className="w-px h-5 md:h-6 bg-gray-200"></div>
 
               <div className="text-center">
                 <div className="text-xs md:text-sm text-gray-500">Live</div>
-                <div className="text-base md:text-lg font-bold text-gray-900">
-                  {testList?.filter((t) => t.schemaId)?.length || 0}
-                </div>
+                <div className="text-base md:text-lg font-bold text-gray-900">{liveTests}</div>
               </div>
             </div>
 
