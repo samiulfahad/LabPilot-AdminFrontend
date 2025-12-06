@@ -123,7 +123,10 @@ const TestList = () => {
               {isAddMenuOpen && (
                 <div className="md:hidden fixed inset-0 z-50">
                   {/* Backdrop */}
-                  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsAddMenuOpen(false)} />
+                  <div
+                    className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                    onClick={() => setIsAddMenuOpen(false)}
+                  />
                   {/* Sheet */}
                   <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl border border-gray-200 overflow-hidden">
                     <div className="p-4">
@@ -203,8 +206,8 @@ const TestList = () => {
                 onClick={() => window.location.reload()}
                 className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
               >
-                <Icons.Refresh className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Refresh</span>
+                <Icons.Refresh className="w-3.5 h-3.5 hidden sm:block" />
+                <span>Refresh</span>
               </button>
             </div>
           </div>
