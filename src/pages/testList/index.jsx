@@ -123,7 +123,7 @@ const TestList = () => {
               {isAddMenuOpen && (
                 <div className="md:hidden fixed inset-0 z-50">
                   {/* Backdrop */}
-                  <div className="absolute inset-0 bg-black bg-opacity-10" onClick={() => setIsAddMenuOpen(false)} />
+                  <div className="absolute inset-0 bg-white bg-opacity-60" onClick={() => setIsAddMenuOpen(false)} />
                   {/* Sheet */}
                   <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl border border-gray-200 overflow-hidden">
                     <div className="p-4">
