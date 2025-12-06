@@ -206,8 +206,7 @@ const TestList = () => {
                 onClick={() => window.location.reload()}
                 className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
               >
-                <Icons.Refresh className="w-3.5 h-3.5 hidden sm:block" />
-                <span>Refresh</span>
+                <span className="btn-sm"> Refresh</span>
               </button>
             </div>
           </div>
