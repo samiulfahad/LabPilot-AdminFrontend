@@ -63,30 +63,69 @@ const TestList = () => {
       {/* Header */}
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          {/* Title and Add Button on same line for mobile */}
+          {/* Title and Add Button - Same line for both mobile and desktop */}
           <div className="flex items-center justify-between gap-4 mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Test Management</h1>
 
-            {/* Add Menu - Mobile optimized */}
-            <div className="relative md:hidden">
+            {/* Add Menu */}
+            <div className="relative">
               <button
                 onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
-                className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 text-sm"
+                className="px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
               >
-                <Icons.Add className="w-4 h-4" />
+                <Icons.Add className="w-4 h-4 md:w-5 md:h-5" />
                 Add New
               </button>
 
-              {/* Mobile Dropdown - Better positioning */}
+              {/* Desktop Dropdown */}
               {isAddMenuOpen && (
-                <>
+                <div className="hidden md:block absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+                  <div className="p-1">
+                    <button
+                      onClick={() => {
+                        setModal({ view: "addTest" });
+                        setIsAddMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-colors flex items-center gap-3 rounded-lg"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <Icons.Add className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium">Add New Test</div>
+                        <div className="text-xs text-gray-500">Create a new diagnostic test</div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setModal({ view: "addCategory" });
+                        setIsAddMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-purple-50 text-gray-700 hover:text-purple-700 transition-colors flex items-center gap-3 rounded-lg"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                        <Icons.Folder className="w-4 h-4 text-purple-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium">Add New Category</div>
+                        <div className="text-xs text-gray-500">Create a test category</div>
+                      </div>
+                    </button>
+                  </div>
+                  <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 text-xs text-gray-500">
+                    Quick add options
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile Bottom Sheet */}
+              {isAddMenuOpen && (
+                <div className="md:hidden fixed inset-0 z-50">
                   {/* Backdrop */}
-                  <div
-                    className="fixed inset-0 bg-black bg-opacity-10 z-40 md:hidden"
-                    onClick={() => setIsAddMenuOpen(false)}
-                  />
-                  {/* Menu */}
-                  <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl border border-gray-200 z-50 overflow-hidden md:hidden transform transition-transform duration-300">
+                  <div className="absolute inset-0 bg-black bg-opacity-10" onClick={() => setIsAddMenuOpen(false)} />
+                  {/* Sheet */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl border border-gray-200 overflow-hidden">
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-gray-900">Add New</h3>
@@ -129,70 +168,8 @@ const TestList = () => {
                       </div>
                     </div>
                   </div>
-                </>
+                </div>
               )}
-            </div>
-          </div>
-
-          {/* Desktop Add Menu */}
-          <div className="hidden md:block relative">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              <div></div> {/* Empty div for spacing */}
-              <div className="relative">
-                <button
-                  onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 text-base"
-                >
-                  <Icons.Add className="w-5 h-5" />
-                  Add New
-                </button>
-
-                {isAddMenuOpen && (
-                  <>
-                    {/* Backdrop for desktop */}
-                    <div className="fixed inset-0 z-40 hidden md:block" onClick={() => setIsAddMenuOpen(false)} />
-                    {/* Desktop Menu - Positioned below button */}
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
-                      <div className="p-1">
-                        <button
-                          onClick={() => {
-                            setModal({ view: "addTest" });
-                            setIsAddMenuOpen(false);
-                          }}
-                          className="w-full px-4 py-3 text-left hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-colors flex items-center gap-3 rounded-lg"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <Icons.Add className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <div className="font-medium">Add New Test</div>
-                            <div className="text-xs text-gray-500">Create a new diagnostic test</div>
-                          </div>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setModal({ view: "addCategory" });
-                            setIsAddMenuOpen(false);
-                          }}
-                          className="w-full px-4 py-3 text-left hover:bg-purple-50 text-gray-700 hover:text-purple-700 transition-colors flex items-center gap-3 rounded-lg"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                            <Icons.Folder className="w-4 h-4 text-purple-600" />
-                          </div>
-                          <div>
-                            <div className="font-medium">Add New Category</div>
-                            <div className="text-xs text-gray-500">Create a test category</div>
-                          </div>
-                        </button>
-                      </div>
-                      <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 text-xs text-gray-500">
-                        Quick add options
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
             </div>
           </div>
 
@@ -216,7 +193,7 @@ const TestList = () => {
                   <span className="text-base md:text-lg">🧪</span>
                 </div>
                 <div>
-                  <div className="text-xs md:text-sm text-gray-500">Total Tests</div>
+                  <div className="text-xs md:text-sm text-gray-500">Tests</div>
                   <div className="text-base md:text-lg font-bold text-gray-900">{testList?.length || 0}</div>
                 </div>
               </div>
@@ -228,7 +205,7 @@ const TestList = () => {
                   <Icons.PowerOn className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-600" />
                 </div>
                 <div>
-                  <div className="text-xs md:text-sm text-gray-500">Active</div>
+                  <div className="text-xs md:text-sm text-gray-500">Live</div>
                   <div className="text-base md:text-lg font-bold text-gray-900">
                     {testList?.filter((t) => t.schemaId)?.length || 0}
                   </div>
@@ -260,7 +237,7 @@ const TestList = () => {
                   className={`w-2 h-2 rounded-full ${activeView === "container" ? "bg-blue-500" : "bg-gray-300"}`}
                 ></div>
                 <span className="hidden sm:inline">Category View</span>
-                <span className="sm:hidden">Categories</span>
+                <span className="sm:hidden">Category</span>
                 {activeView === "container" && (
                   <span className="px-1.5 py-0.5 bg-blue-200 text-blue-800 text-xs rounded-full">
                     {populatedList?.length || 0}
