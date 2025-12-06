@@ -236,34 +236,32 @@ const TestList = () => {
 
         {/* Main Content Area */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          {/* Content Header */}
-          <div className="border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg md:text-xl font-semibold text-gray-900">
-                  {activeView === "container" && "Category-wise Tests"}
-                  {activeView === "testList" && "All Tests"}
-                  {activeView === "categoryList" && "Categories"}
-                </h2>
-                <p className="text-xs md:text-sm text-gray-500 mt-1">
-                  {activeView === "container" && "Tests organized by categories"}
-                  {activeView === "testList" && "Complete list of all diagnostic tests"}
-                  {activeView === "categoryList" && "Manage test categories"}
-                </p>
-              </div>
+          {/* Content Header - Only show for testList and categoryList */}
+          {activeView !== "container" && (
+            <div className="border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900">
+                    {activeView === "testList" && "All Tests"}
+                    {activeView === "categoryList" && "Categories"}
+                  </h2>
+                  <p className="text-xs md:text-sm text-gray-500 mt-1">
+                    {activeView === "testList" && "Complete list of all diagnostic tests"}
+                    {activeView === "categoryList" && "Manage test categories"}
+                  </p>
+                </div>
 
-              <div className="flex items-center gap-3">
-                {activeView !== "container" && (
+                <div className="flex items-center gap-3">
                   <div className="text-xs md:text-sm text-gray-500">
                     {(activeView === "testList" ? testList : categoryList)?.length || 0} items
                   </div>
-                )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Content Body */}
-          <div className="p-4 md:p-6">
+          <div className={`${activeView === "container" ? "p-0" : "p-4 md:p-6"}`}>
             {activeView === "container" && <Container list={populatedList} />}
 
             {activeView === "testList" && (
