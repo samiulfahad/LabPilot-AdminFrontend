@@ -123,7 +123,7 @@ const TestList = () => {
               {isAddMenuOpen && (
                 <div className="md:hidden fixed inset-0 z-50">
                   {/* Backdrop */}
-                  <div className="absolute inset-0 bg-white bg-opacity-60" onClick={() => setIsAddMenuOpen(false)} />
+                  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsAddMenuOpen(false)} />
                   {/* Sheet */}
                   <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl border border-gray-200 overflow-hidden">
                     <div className="p-4">
@@ -173,42 +173,27 @@ const TestList = () => {
             </div>
           </div>
 
-          {/* Compact Stats Overview */}
+          {/* Compact Stats Overview - Without icons */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4 px-1">
             <div className="flex items-center gap-4 md:gap-6">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Icons.Folder className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600" />
-                </div>
-                <div>
-                  <div className="text-xs md:text-sm text-gray-500">Categories</div>
-                  <div className="text-base md:text-lg font-bold text-gray-900">{categoryList?.length || 0}</div>
-                </div>
+              <div className="text-center">
+                <div className="text-xs md:text-sm text-gray-500">Categories</div>
+                <div className="text-base md:text-lg font-bold text-gray-900">{categoryList?.length || 0}</div>
               </div>
 
               <div className="w-px h-5 md:h-6 bg-gray-200"></div>
 
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                  <span className="text-base md:text-lg">🧪</span>
-                </div>
-                <div>
-                  <div className="text-xs md:text-sm text-gray-500">Tests</div>
-                  <div className="text-base md:text-lg font-bold text-gray-900">{testList?.length || 0}</div>
-                </div>
+              <div className="text-center">
+                <div className="text-xs md:text-sm text-gray-500">Tests</div>
+                <div className="text-base md:text-lg font-bold text-gray-900">{testList?.length || 0}</div>
               </div>
 
               <div className="w-px h-5 md:h-6 bg-gray-200"></div>
 
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-yellow-100 flex items-center justify-center">
-                  <Icons.PowerOn className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-600" />
-                </div>
-                <div>
-                  <div className="text-xs md:text-sm text-gray-500">Live</div>
-                  <div className="text-base md:text-lg font-bold text-gray-900">
-                    {testList?.filter((t) => t.schemaId)?.length || 0}
-                  </div>
+              <div className="text-center">
+                <div className="text-xs md:text-sm text-gray-500">Live</div>
+                <div className="text-base md:text-lg font-bold text-gray-900">
+                  {testList?.filter((t) => t.schemaId)?.length || 0}
                 </div>
               </div>
             </div>
