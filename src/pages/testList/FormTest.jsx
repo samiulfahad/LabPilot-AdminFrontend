@@ -1,19 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InputField from "../../components/html/InputField";
+import SelectField from "../../components/html/SelectField";
 import useStore from "./store";
 import Icons from "../../components/icons";
 
 const TestForm = () => {
-  const { addTest, editTest, modal, closeModal } = useStore();
-  const categoryId = modal.data.categoryId;
-  const testId = modal.data.testId;
-  const [name, setName] = useState(modal.view === "editTestForm" ? modal.data.testName : "");
+  const { addTest, editTest, categoryList, loadCategoryList, modal, closeModal } = useStore();
+  const [name, setName] = useState(modal?.data?.name || "");
+  const [selectedCategoryId, setSelectedCategoryId] = useState(modal?.data?.categoryId || "");
+
+  useEffect(() => {
+    loadCategoryList();
+  }, []);
+
+
+  
+  const categoryOptions = categoryList.map((category) => ({
+    value: category._id,
+    label: category.name,
+  }));
 
   const handleSubmit = () => {
-    if (modal.view === "addTestForm") {
-      addTest(categoryId, name);
-    } else {
-      editTest(categoryId, testId, name);
+    if (modal.view === "addTest") {
+      addTest(selectedCategoryId, name);
+    } else if (modal.view === "editTest") {
+      console.log("Test Id- " + modal.data.testId);
+      console.log("Category Id- " + selectedCategoryId);
+      console.log("Name- " + modal.data.name);
+      editTest(modal.data.testId, selectedCategoryId, name);
     }
   };
 
@@ -25,31 +39,59 @@ const TestForm = () => {
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900">
-            {modal.view === "addTestForm" ? "Create New Test" : "Edit Test"}
+            {modal.view === "addTest" ? "Create New Test" : "Edit Test"}
           </h2>
-          <p className="text-gray-600 text-sm mt-1">
-            {modal.view === "addTestForm" ? "Add a new test to this category" : "Update test details"}
-          </p>
         </div>
       </div>
 
       <div className="space-y-4">
-        <InputField
-          value={name}
-          onChange={(e) => setName(e.target.value.toUpperCase())}
-          label="Test Name"
-          type="text"
-          placeholder="Enter test name"
-        />
+        {modal.view === "addTest" && (
+          <div className="flex flex-col space-y-2">
+            <InputField
+              value={name}
+              onChange={(e) => setName(e.target.value.toUpperCase())}
+              label="Test Name"
+              type="text"
+              placeholder="Enter test name"
+            />
+            <SelectField
+              label="Category"
+              name="category"
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              options={categoryOptions}
+              placeholder="Select category"
+            />
+          </div>
+        )}
+
+        {modal.view === "editTest" && (
+          <div className="flex flex-col space-y-2">
+            <InputField
+              value={name}
+              onChange={(e) => setName(e.target.value.toUpperCase())}
+              label="Test Name"
+              type="text"
+              placeholder="Enter test name"
+            />
+            <SelectField
+              label="Category"
+              name="category"
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              options={categoryOptions}
+              placeholder="Select category"
+            />
+          </div>
+        )}
 
         <div className="flex gap-3 pt-4">
           <button
             onClick={handleSubmit}
-            disabled={!name.trim()}
             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 justify-center"
           >
             <Icons.Add className="w-4 h-4" />
-            {modal.view === "addTestForm" ? "Create Test" : "Update Test"}
+            {modal.view === "addTest" ? "Create Test" : "Update Test"}
           </button>
 
           <button

@@ -4,14 +4,16 @@ import loadingSlice from "../../../store/common/loadingSlice";
 import modalSlice from "../../../store/common/modalSlice";
 import popupSlice from "../../../store/common/popupSlice";
 
-import labTestSlice from "./labTestSlice";
+import testSlice from "./testSlice";
+import categorySlice from "./categorySlice";
 
 const useStore = create((set, get) => ({
   ...loadingSlice(set, get),
   ...modalSlice(set, get),
   ...popupSlice(set, get),
 
-  ...labTestSlice(set, get),
+  ...testSlice(set, get),
+  ...categorySlice(set, get),
 
   clearState: () =>
     set({
