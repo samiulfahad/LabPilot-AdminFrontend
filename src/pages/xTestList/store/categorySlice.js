@@ -1,8 +1,10 @@
 import testCategoryService from "../../../services/testCategoryService";
+
 const categorySlice = (set, get) => ({
   categoryList: [],
-  populatedList: []
-  ,
+
+  populatedList: [],
+
   loadCategoryList: async () => {
     try {
       get().startLoading();
@@ -15,16 +17,29 @@ const categorySlice = (set, get) => ({
     }
   },
 
+  populateCategory: async () => {
+    try {
+      get().startLoading();
+      const response = await testCategoryService.getPopulatedList();
+      console.log(response.data);
+      set((state) => ({ populatedList: [...response.data] }));
+    } catch (e) {
+      set({ popup: { type: "error", message: "Failed to load populated test list" } });
+    } finally {
+      get().stopLoading();
+    }
+  },
+
   addCategory: async (name) => {
     try {
       get().startLoading();
       const response = await testCategoryService.addCategory({ name });
       console.log(response.data);
+
       set((state) => ({
         categoryList: [...state.categoryList, response.data],
         popup: { type: "success", message: "Category added successfully" },
       }));
-      get().populate();
       get().closeModal();
     } catch (e) {
       let message = "Failed to add test";
@@ -36,7 +51,6 @@ const categorySlice = (set, get) => ({
       get().stopLoading();
     }
   },
-
   editCategory: async (categoryId, name) => {
     try {
       get().startLoading();
@@ -47,7 +61,6 @@ const categorySlice = (set, get) => ({
         categoryList: state.categoryList.map((item) => (item._id === categoryId ? { _id: categoryId, name } : item)),
         popup: { type: "success", message: "Category updated successfully", data: null, action: null },
       }));
-      get().populate();
     } catch (e) {
       let message = "Failed to update category";
       if (e.response?.data?.duplicate) {
@@ -58,7 +71,7 @@ const categorySlice = (set, get) => ({
       get().stopLoading();
     }
   },
-  
+
   deleteCategory: async () => {
     try {
       get().startLoading();
@@ -68,7 +81,6 @@ const categorySlice = (set, get) => ({
         popup: { type: "success", message: "Category deleted successfully", data: null, action: null },
         categoryList: state.categoryList.filter((item) => item._id !== categoryId),
       }));
-      get().populate();
       get().closeModal();
     } catch (e) {
       console.log(e);
@@ -80,4 +92,5 @@ const categorySlice = (set, get) => ({
     }
   },
 });
+
 export default categorySlice;

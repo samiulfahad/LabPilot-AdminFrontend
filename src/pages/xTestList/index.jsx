@@ -3,23 +3,26 @@ import LoadingScreen from "../../components/loadingPage";
 import Popup from "../../components/popup/Popup";
 import Modal from "../../components/modal";
 import useStore from "./store";
-import Icons from "../../components/icons";
+import Icons from "../../components/icons"; // Import the icons
+
 import TestCard from "./TestCard";
 import TestForm from "./FormTest";
 import CategoryForm from "./FormCategory";
 import CategoryCard from "./CategoryCard";
 import Container from "./Container";
+
 const TestList = () => {
   const [activeView, setActiveView] = useState("container"); // container, testList, categoryList
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+
   const {
     populatedList,
+    populateCategory,
     testList,
-    categoryList,
     loadTestList,
-    loadCategoryList,
-    populate,
     deleteTest,
+    categoryList,
+    loadCategoryList,
     deleteCategory,
     loading,
     modal,
@@ -27,26 +30,35 @@ const TestList = () => {
     popup,
     closePopup,
   } = useStore();
+
   useEffect(() => {
-    const loadData = async () => {
-      await loadCategoryList();
-      await loadTestList();
-      populate();
-    };
-    loadData();
+    populateCategory();
   }, []);
+
   // Handle view changes
   const switchView = (view) => {
     setActiveView(view);
+    if (view === "testList") {
+      loadTestList();
+    } else if (view === "categoryList") {
+      loadCategoryList();
+    }
     setIsAddMenuOpen(false);
   };
-  // Calculate totals from categoryList and testList
-  const totalCategories = categoryList?.length || 0;
-  const totalTests = testList?.length || 0;
-  const liveTests = testList?.filter((test) => !!test.schemaId)?.length || 0;
+
+  // Calculate totals from populatedList which is loaded on mount
+  const totalCategories = populatedList?.length || 0;
+  const totalTests = populatedList?.reduce((sum, category) => sum + (category.testList?.length || 0), 0) || 0;
+  const liveTests =
+    populatedList?.reduce((sum, category) => {
+      const liveInCategory = category.testList?.filter((test) => test.schemaId)?.length || 0;
+      return sum + liveInCategory;
+    }, 0) || 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
       {loading && <LoadingScreen />}
+
       {/* Popups */}
       {popup && popup.type === "confirmation" && popup.action === "deleteTest" && (
         <Popup type="confirmation" message={popup.message} onConfirm={deleteTest} onClose={closePopup} />
@@ -56,12 +68,14 @@ const TestList = () => {
       )}
       {popup && popup.type === "success" && <Popup type="success" message={popup.message} onClose={closePopup} />}
       {popup && popup.type === "error" && <Popup type="error" message={popup.message} onClose={closePopup} />}
+
       {/* Header */}
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           {/* Title and Add Button - Same line for both mobile and desktop */}
           <div className="flex items-center justify-between gap-4 mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Test Management</h1>
+
             {/* Add Menu */}
             <div className="relative">
               <button
@@ -71,6 +85,7 @@ const TestList = () => {
                 <Icons.Add className="w-4 h-4 md:w-5 md:h-5" />
                 Add New
               </button>
+
               {/* Desktop Dropdown */}
               {isAddMenuOpen && (
                 <div className="hidden md:block absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
@@ -90,6 +105,7 @@ const TestList = () => {
                         <div className="text-xs text-gray-500">Create a new diagnostic test</div>
                       </div>
                     </button>
+
                     <button
                       onClick={() => {
                         setModal({ view: "addCategory" });
@@ -111,6 +127,7 @@ const TestList = () => {
                   </div>
                 </div>
               )}
+
               {/* Mobile Bottom Sheet */}
               {isAddMenuOpen && (
                 <div className="md:hidden fixed inset-0 z-50">
@@ -144,6 +161,7 @@ const TestList = () => {
                             <div className="text-xs text-gray-600">Create a new diagnostic test</div>
                           </div>
                         </button>
+
                         <button
                           onClick={() => {
                             setModal({ view: "addCategory" });
@@ -166,6 +184,7 @@ const TestList = () => {
               )}
             </div>
           </div>
+
           {/* Compact Stats Overview - Without icons */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4 px-1">
             <div className="flex items-center gap-4 md:gap-6">
@@ -173,18 +192,32 @@ const TestList = () => {
                 <div className="text-xs md:text-sm text-gray-500">Categories</div>
                 <div className="text-base md:text-lg font-bold text-gray-900">{totalCategories}</div>
               </div>
+
               <div className="w-px h-5 md:h-6 bg-gray-200"></div>
+
               <div className="text-center">
                 <div className="text-xs md:text-sm text-gray-500">Tests</div>
                 <div className="text-base md:text-lg font-bold text-gray-900">{totalTests}</div>
               </div>
+
               <div className="w-px h-5 md:h-6 bg-gray-200"></div>
+
               <div className="text-center">
                 <div className="text-xs md:text-sm text-gray-500">Live</div>
                 <div className="text-base md:text-lg font-bold text-gray-900">{liveTests}</div>
               </div>
             </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => window.location.reload()}
+                className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
+              >
+                <span className="btn-sm"> Refresh</span>
+              </button>
+            </div>
           </div>
+
           {/* Tab Navigation */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-2">
             <div className="flex flex-wrap gap-2">
@@ -205,6 +238,7 @@ const TestList = () => {
                   </span>
                 )}
               </button>
+
               <button
                 onClick={() => switchView("testList")}
                 className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
@@ -223,6 +257,7 @@ const TestList = () => {
                   </span>
                 )}
               </button>
+
               <button
                 onClick={() => switchView("categoryList")}
                 className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
@@ -245,6 +280,7 @@ const TestList = () => {
             </div>
           </div>
         </div>
+
         {/* Main Content Area */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           {/* Content Header - Only show for testList and categoryList */}
@@ -261,6 +297,7 @@ const TestList = () => {
                     {activeView === "categoryList" && "Manage test categories"}
                   </p>
                 </div>
+
                 <div className="flex items-center gap-3">
                   <div className="text-xs md:text-sm text-gray-500">
                     {(activeView === "testList" ? testList : categoryList)?.length || 0} items
@@ -269,9 +306,11 @@ const TestList = () => {
               </div>
             </div>
           )}
+
           {/* Content Body */}
           <div className={`${activeView === "container" ? "p-0" : "p-4 md:p-6"}`}>
             {activeView === "container" && <Container list={populatedList} />}
+
             {activeView === "testList" && (
               <div>
                 {testList.length === 0 ? (
@@ -297,6 +336,7 @@ const TestList = () => {
                 )}
               </div>
             )}
+
             {activeView === "categoryList" && (
               <div>
                 {categoryList.length === 0 ? (
@@ -325,14 +365,17 @@ const TestList = () => {
           </div>
         </div>
       </div>
+
       {/* Modals */}
       <Modal isOpen={modal.view === "addTest" || modal.view === "editTest"}>
         <TestForm />
       </Modal>
+
       <Modal isOpen={modal.view === "addCategory" || modal.view === "editCategory"}>
         <CategoryForm />
       </Modal>
     </div>
   );
 };
+
 export default TestList;

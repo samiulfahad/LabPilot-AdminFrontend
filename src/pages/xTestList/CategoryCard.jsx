@@ -1,7 +1,9 @@
 import useStore from "./store";
 import Icons from "../../components/icons";
+
 const CategoryCard = ({ category }) => {
   const { setPopup, setModal } = useStore();
+
   const handleDelete = () => {
     setPopup({
       type: "confirmation",
@@ -10,12 +12,14 @@ const CategoryCard = ({ category }) => {
       data: { categoryId: category._id },
     });
   };
+
   const handleEdit = () => {
     setModal({
       view: "editCategory",
       data: { categoryId: category._id, name: category.name },
     });
   };
+
   return (
     <div className="group bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 shadow-sm hover:shadow-md p-4">
       <div className="flex items-center justify-between">
@@ -28,6 +32,7 @@ const CategoryCard = ({ category }) => {
             <h3 className="font-medium text-gray-900">{category.name}</h3>
           </div>
         </div>
+
         {/* Action Buttons - Fixed for mobile */}
         <div className="flex items-center space-x-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
           <button
@@ -49,4 +54,5 @@ const CategoryCard = ({ category }) => {
     </div>
   );
 };
+
 export default CategoryCard;

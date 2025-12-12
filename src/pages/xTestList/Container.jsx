@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import TestCard from "./TestCard";
 import Icons from "../../components/icons";
+
 const getCategoryTheme = (categoryName) => {
   const colorSchemes = [
     { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200" },
@@ -14,11 +15,13 @@ const getCategoryTheme = (categoryName) => {
     Math.abs(categoryName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)) % colorSchemes.length;
   return colorSchemes[schemeIndex];
 };
+
 const Container = ({ list }) => {
   const [expandedCategories, setExpandedCategories] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [sortConfig, setSortConfig] = useState({ key: "name", direction: "asc" });
+
   useEffect(() => {
     if (searchTerm.trim() || activeCategory !== "ALL") {
       const newExpanded = {};
@@ -30,41 +33,50 @@ const Container = ({ list }) => {
       setExpandedCategories({});
     }
   }, [searchTerm, activeCategory]);
+
   const filteredList = useMemo(() => {
     let result = [...list];
+
     if (searchTerm.trim()) {
       result = result
         .map((category) => {
           const filteredTests = category.testList.filter(
             (test) =>
               test.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              category.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
               test._id.toLowerCase().includes(searchTerm.toLowerCase())
           );
           return filteredTests.length > 0 ? { ...category, testList: filteredTests } : null;
         })
         .filter(Boolean);
     }
+
     if (activeCategory !== "ALL") {
-      result = result.filter((category) => category.name === activeCategory);
+      result = result.filter((category) => category.categoryName === activeCategory);
     }
+
     if (sortConfig.key === "name") {
       result.sort((a, b) =>
-        sortConfig.direction === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+        sortConfig.direction === "asc"
+          ? a.categoryName.localeCompare(b.categoryName)
+          : b.categoryName.localeCompare(a.categoryName)
       );
     } else if (sortConfig.key === "count") {
       result.sort((a, b) =>
         sortConfig.direction === "asc" ? a.testList.length - b.testList.length : b.testList.length - a.testList.length
       );
     }
+
     return result;
   }, [list, searchTerm, activeCategory, sortConfig]);
+
   const toggleCategory = (categoryId) => {
     setExpandedCategories((prev) => ({
       ...prev,
       [categoryId]: !prev[categoryId],
     }));
   };
+
   const expandAll = () => {
     const allExpanded = {};
     list.forEach((category) => {
@@ -72,20 +84,24 @@ const Container = ({ list }) => {
     });
     setExpandedCategories(allExpanded);
   };
+
   const collapseAll = () => {
     setExpandedCategories({});
   };
+
   const handleSort = (key) => {
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
   };
+
   const clearAllFilters = () => {
     setSearchTerm("");
     setActiveCategory("ALL");
     setExpandedCategories({});
   };
+
   return (
     <div className="p-4 sm:p-6">
       {/* Compact Header */}
@@ -112,6 +128,7 @@ const Container = ({ list }) => {
               Collapse
             </button>
           </div>
+
           <div className="flex-1 max-w-md">
             <div className="relative">
               <input
@@ -126,6 +143,7 @@ const Container = ({ list }) => {
               </div>
             </div>
           </div>
+
           <button
             onClick={() => handleSort("name")}
             className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-sm transition-colors flex items-center gap-1.5"
@@ -141,6 +159,7 @@ const Container = ({ list }) => {
             Sort {sortConfig.key === "name" && (sortConfig.direction === "asc" ? "A-Z" : "Z-A")}
           </button>
         </div>
+
         {/* Mobile: Two rows layout */}
         <div className="sm:hidden space-y-3 mb-4">
           {/* Row 1: Expand/Collapse and Sort */}
@@ -180,6 +199,7 @@ const Container = ({ list }) => {
               Sort
             </button>
           </div>
+
           {/* Row 2: Search */}
           <div className="relative">
             <input
@@ -194,6 +214,7 @@ const Container = ({ list }) => {
             </div>
           </div>
         </div>
+
         {/* Filter chips and clear button */}
         {(searchTerm || activeCategory !== "ALL") && (
           <div className="mt-3 flex items-center justify-between">
@@ -220,12 +241,14 @@ const Container = ({ list }) => {
             </button>
           </div>
         )}
+
         {/* Summary text */}
         <div className="text-sm text-gray-500 mb-4">
           Showing {filteredList.reduce((acc, cat) => acc + cat.testList.length, 0)} tests
           {filteredList.length > 0 && ` in ${filteredList.length} categories`}
         </div>
       </div>
+
       {filteredList.length === 0 ? (
         <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -246,8 +269,9 @@ const Container = ({ list }) => {
         <div className="space-y-4">
           {filteredList.map((category) => {
             const isExpanded = expandedCategories[category._id] || false;
-            const theme = getCategoryTheme(category.name);
+            const theme = getCategoryTheme(category.categoryName);
             const liveTests = category.testList.filter((test) => test.schemaId).length;
+
             return (
               <div key={category._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <div
@@ -260,12 +284,12 @@ const Container = ({ list }) => {
                         className={`w-10 h-10 rounded-lg flex items-center justify-center ${theme.bg} border ${theme.border}`}
                       >
                         <span className="text-lg">
-                          {category.name === "BLOOD" ? "🩸" : category.name === "URINE" ? "🧪" : "📋"}
+                          {category.categoryName === "BLOOD" ? "🩸" : category.categoryName === "URINE" ? "🧪" : "📋"}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h2 className="text-lg font-semibold text-gray-900 truncate">{category.name}</h2>
+                          <h2 className="text-lg font-semibold text-gray-900 truncate">{category.categoryName}</h2>
                           <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium rounded">
                             {category.testList.length} tests
                           </span>
@@ -293,6 +317,7 @@ const Container = ({ list }) => {
                     />
                   </div>
                 </div>
+
                 <div
                   className={`transition-all duration-300 border-t border-gray-100 ${
                     isExpanded ? "max-h-[5000px]" : "max-h-0"
@@ -318,6 +343,7 @@ const Container = ({ list }) => {
           })}
         </div>
       )}
+
       <div className="mt-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
         <div className="text-center text-xs text-gray-500">
           Total: {list.reduce((acc, cat) => acc + cat.testList.length, 0)} tests •
@@ -328,4 +354,5 @@ const Container = ({ list }) => {
     </div>
   );
 };
+
 export default Container;

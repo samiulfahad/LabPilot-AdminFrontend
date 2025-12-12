@@ -1,35 +1,20 @@
 import { create } from "zustand";
+
 import loadingSlice from "../../../store/common/loadingSlice";
 import modalSlice from "../../../store/common/modalSlice";
 import popupSlice from "../../../store/common/popupSlice";
+
 import testSlice from "./testSlice";
 import categorySlice from "./categorySlice";
+
 const useStore = create((set, get) => ({
   ...loadingSlice(set, get),
   ...modalSlice(set, get),
   ...popupSlice(set, get),
+
   ...testSlice(set, get),
   ...categorySlice(set, get),
-  populate: () => {
-    const categories = get().categoryList;
-    const tests = get().testList;
-    const catMap = new Map(categories.map((cat) => [cat._id, { ...cat, testList: [] }]));
-    const uncat = { _id: "uncategorized", name: "Uncategorized", testList: [] };
-    tests.forEach((test) => {
-      const catId = test.categoryId?.$oid || test.categoryId;
-      const cat = catMap.get(catId);
-      if (cat) {
-        cat.testList.push(test);
-      } else {
-        uncat.testList.push(test);
-      }
-    });
-    const populated = [...catMap.values()];
-    if (uncat.testList.length > 0) {
-      populated.push(uncat);
-    }
-    set({ populatedList: populated });
-  },
+
   clearState: () =>
     set({
       loading: false,
@@ -37,4 +22,5 @@ const useStore = create((set, get) => ({
       modal: { view: null, data: null },
     }),
 }));
+
 export default useStore;

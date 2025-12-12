@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import useStore from "./store";
 import Icons from "../../components/icons";
+
 const TestCard = ({ test }) => {
   const { setPopup, setModal } = useStore();
+
   if (!test) {
     return (
       <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-lg">
@@ -11,6 +13,7 @@ const TestCard = ({ test }) => {
       </div>
     );
   }
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-all group">
       {/* Header with status and test name */}
@@ -25,6 +28,7 @@ const TestCard = ({ test }) => {
           </div>
           <h4 className="font-medium text-gray-900 text-base truncate">{test.name}</h4>
         </div>
+
         {/* Status badge - moved to top right */}
         {test.schemaId ? (
           <span className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium shrink-0 ml-2">
@@ -37,6 +41,7 @@ const TestCard = ({ test }) => {
           </span>
         )}
       </div>
+
       {/* Icon Actions */}
       <div className="flex justify-between gap-2">
         {test.schemaId ? (
@@ -84,6 +89,7 @@ const TestCard = ({ test }) => {
             <Icons.PowerOn className="w-5 h-5" />
           </button>
         )}
+
         <button
           onClick={() => {
             setModal({
@@ -96,6 +102,7 @@ const TestCard = ({ test }) => {
         >
           <Icons.Edit className="w-5 h-5" />
         </button>
+
         <button
           onClick={() => {
             setPopup({
@@ -114,4 +121,5 @@ const TestCard = ({ test }) => {
     </div>
   );
 };
+
 export default TestCard;
