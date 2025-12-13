@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import schemaService from "../../services/schemaService";
 import testService from "../../services/testService";
 import Popup from "../../components/popup/Popup";
-import SearchAndSelect from "../../components/html/searchAndSelect";
+import SelectField from "../../components/html/SelectField";
 import LoadingScreen from "../../components/loadingPage";
 import Schema from "./Schema";
 
@@ -11,19 +11,20 @@ const SchemaList = () => {
   const [schemas, setSchemas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [popup, setPopup] = useState({});
-  const [tests, setTests] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedTest, setSelectedTest] = useState("");
+  const [availableTests, setAvailableTests] = useState([]);
 
-  // Fetch tests
-  const fetchTests = async () => {
+  // Fetch categories
+  const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await testService.getTestList();
-      setTests(response.data || []);
-      console.log(response.data);
+      const response = await testService.getTestList()
+      setCategories(response.data || []);
     } catch (error) {
-      console.error("Error fetching tests:", error);
-      setPopup({ type: "error", message: "Failed to load tests" });
+      console.error("Error fetching categories:", error);
+      setPopup({ type: "error", message: "Failed to load categories" });
     } finally {
       setLoading(false);
     }
@@ -66,6 +67,23 @@ const SchemaList = () => {
     }
   };
 
+  // Fetch schemas by category
+  const fetchSchemasByCategory = async (categoryId) => {
+    try {
+      setLoading(true);
+      const response = await schemaService.getByCategoryId(categoryId);
+      setSchemas(response.data || []);
+      if (response.data?.length === 0) {
+        setPopup({ type: "error", message: "No schemas found for this category" });
+      }
+    } catch (error) {
+      console.error("Error fetching schemas:", error);
+      setPopup({ type: "error", message: "Failed to load schemas" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle schema deletion
   const handleDelete = async () => {
     try {
@@ -86,8 +104,10 @@ const SchemaList = () => {
     try {
       setLoading(true);
       await schemaService.activate(popup._id);
+
       // Update the local state to reflect the activation
       setSchemas((prev) => prev.map((schema) => (schema._id === popup._id ? { ...schema, isActive: true } : schema)));
+
       setPopup({ type: "success", message: "Schema activated successfully" });
     } catch (error) {
       console.error("Error activating schema:", error);
@@ -103,8 +123,10 @@ const SchemaList = () => {
       console.log(popup._id);
       setLoading(true);
       await schemaService.deactivate(popup._id);
+
       // Update the local state to reflect the deactivation
       setSchemas((prev) => prev.map((schema) => (schema._id === popup._id ? { ...schema, isActive: false } : schema)));
+
       setPopup({ type: "success", message: "Schema deactivated successfully" });
     } catch (error) {
       console.error("Error deactivating schema:", error);
@@ -118,6 +140,7 @@ const SchemaList = () => {
   const handleSetDefault = async () => {
     try {
       setLoading(true);
+
       // First, deactivate all other schemas (assuming only one can be default/active at a time)
       // If your backend handles this differently, adjust accordingly
       await Promise.all(
@@ -125,8 +148,10 @@ const SchemaList = () => {
           schema._id !== popup._id && schema.isActive ? schemaService.deactivate(schema._id) : Promise.resolve()
         )
       );
+
       // Then activate the selected schema
       await schemaService.activate(popup._id);
+
       // Update all schemas in local state
       setSchemas((prev) =>
         prev.map((schema) => ({
@@ -134,12 +159,27 @@ const SchemaList = () => {
           isActive: schema._id === popup._id,
         }))
       );
+
       setPopup({ type: "success", message: "Schema set as default successfully" });
     } catch (error) {
       console.error("Error setting default schema:", error);
       setPopup({ type: "error", message: "Failed to set schema as default" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle category selection
+  const handleCategoryChange = (e) => {
+    const categoryId = e.target.value;
+    setSelectedCategory(categoryId);
+    setSelectedTest("");
+
+    if (categoryId) {
+      const category = categories.find((cat) => cat._id === categoryId);
+      setAvailableTests(category?.tests || []);
+    } else {
+      setAvailableTests([]);
     }
   };
 
@@ -152,51 +192,67 @@ const SchemaList = () => {
   const handleFetch = () => {
     if (selectedTest) {
       fetchSchemaByTest(selectedTest);
+    } else if (selectedCategory) {
+      fetchSchemasByCategory(selectedCategory);
     } else {
-      setPopup({ type: "error", message: "Please select a test first" });
+      setPopup({ type: "error", message: "Please select a category first" });
     }
   };
 
   // Reset filters
   const resetFilters = () => {
+    setSelectedCategory("");
     setSelectedTest("");
-    setSchemas([]);
+    setAvailableTests([]);
   };
 
   useEffect(() => {
-    fetchTests();
+    fetchCategories();
   }, []);
 
-  const testOptions = tests.map((test) => ({
-    value: test._id,
-    label: test.name || `Test ${test._id}`,
+  // Prepare options for SelectField components
+  const categoryOptions = categories.map((category) => ({
+    value: category._id,
+    label: category.categoryName,
   }));
 
-  const selectedTestName = tests.find((t) => t._id === selectedTest)?.name;
+  const testOptions = availableTests.map((test) => ({
+    value: test._id,
+    label: test.name,
+  }));
+
+  const selectedCategoryName = categories.find((c) => c._id === selectedCategory)?.categoryName;
+  const selectedTestName = availableTests.find((t) => t._id === selectedTest)?.name;
 
   return (
     <div className="min-h-screen bg-gray-50/30 py-2">
       {loading && <LoadingScreen />}
+
       {/* Popup for delete confirmation */}
       {popup.type === "confirmation" && popup.action === "delete" && (
         <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} onConfirm={handleDelete} />
       )}
+
       {/* Popup for activate confirmation */}
       {popup.type === "confirmation" && popup.action === "activate" && (
         <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} onConfirm={handleActivate} />
       )}
+
       {/* Popup for deactivate confirmation */}
       {popup.type === "confirmation" && popup.action === "deactivate" && (
         <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} onConfirm={handleDeactivate} />
       )}
+
       {/* Popup for set default confirmation */}
       {popup.type === "confirmation" && popup.action === "setDefault" && (
         <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} onConfirm={handleSetDefault} />
       )}
+
       {/* Success/Error popup */}
       {(popup.type === "success" || popup.type === "error") && (
         <Popup type={popup.type} message={popup.message} onClose={() => setPopup({})} />
       )}
+
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
         <div className="flex justify-between items-center">
@@ -214,46 +270,65 @@ const SchemaList = () => {
           </Link>
         </div>
       </div>
+
       {/* Filters Card */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            {/* Category Dropdown */}
+            <div className="md:col-span-4">
+              <SelectField
+                label="Category"
+                name="category"
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                options={categoryOptions}
+                placeholder="Select Category"
+              />
+            </div>
+
             {/* Test Dropdown */}
-            <div className="md:col-span-6">
-              <SearchAndSelect
+            <div className="md:col-span-4">
+              <SelectField
                 label="Test"
                 name="test"
                 value={selectedTest}
                 onChange={handleTestChange}
+                disabled={!selectedCategory}
                 options={testOptions}
                 placeholder="Select Test"
               />
             </div>
-            {/* Fetch Button */}
-            <div className="md:col-span-3">
+
+            {/* Action Buttons */}
+            <div className="md:col-span-4 flex gap-3">
               <button
                 onClick={handleFetch}
-                disabled={!selectedTest}
-                className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+                disabled={!selectedCategory}
+                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
               >
                 Fetch
               </button>
-            </div>
-            {/* View All Button */}
-            <div className="md:col-span-3">
               <button
                 onClick={fetchAllSchemas}
-                className="w-full px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
               >
                 View All
               </button>
             </div>
           </div>
+
           {/* Active Filters */}
-          {selectedTest && (
+          {(selectedCategory || selectedTest) && (
             <div className="mt-4 flex items-center justify-between p-3 bg-blue-50 rounded-lg">
               <div className="text-sm text-blue-800">
-                <span className="font-medium">{selectedTestName}</span>
+                {selectedCategoryName && (
+                  <>
+                    <span className="font-medium">{selectedCategoryName}</span>
+                    {selectedTest && <span className="mx-2">•</span>}
+                  </>
+                )}
+                {selectedTest && <span className="font-medium">{selectedTestName}</span>}
               </div>
               <button onClick={resetFilters} className="text-sm text-blue-600 hover:text-blue-800 font-medium">
                 Clear
@@ -262,14 +337,14 @@ const SchemaList = () => {
           )}
         </div>
       </div>
+
       {/* Results Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {schemas.length === 0 ? (
           <div className="text-center py-16">
+            {/* <h3 className="text-lg font-medium text-gray-900 mb-2">No schema</h3> */}
             <p className="text-gray-500 max-w-md mx-auto mb-6">
-              {selectedTest
-                ? "No schemas match your current selection."
-                : "Select a test and click Fetch to view its schemas or click View All."}
+              {selectedCategory || selectedTest ? "No schemas match your current selection." : ""}
             </p>
           </div>
         ) : (
@@ -280,15 +355,17 @@ const SchemaList = () => {
                 <h2 className="text-lg font-medium text-gray-900">Schemas</h2>
                 <p className="text-gray-500 text-sm mt-1">
                   {schemas.length} schema{schemas.length !== 1 ? "s" : ""} found
-                  {selectedTest && ` • Filtered by ${selectedTestName}`}
+                  {selectedCategoryName && ` • Filtered by ${selectedCategoryName}`}
+                  {selectedTest && ` • ${selectedTest}`}
                 </p>
               </div>
-              {selectedTest && (
+              {(selectedCategory || selectedTest) && (
                 <button onClick={resetFilters} className="text-sm text-gray-600 hover:text-gray-800 font-medium">
                   Clear filters
                 </button>
               )}
             </div>
+
             {/* Schemas Grid */}
             <div className="space-y-4">
               {schemas.map((schema, index) => (
@@ -320,16 +397,10 @@ const SchemaList = () => {
                       action: "deactivate",
                     })
                   }
-                  onSetDefault={() =>
-                    setPopup({
-                      type: "confirmation",
-                      message: `Do you want to set the schema "${schema.name}" as default?`,
-                      _id: schema._id,
-                      action: "setDefault",
-                    })
-                  }
                   onRenderForm={() => {
+                    // Add your form rendering logic here
                     console.log("Render form for schema:", schema._id);
+                    // You can navigate to form render page or open a modal
                   }}
                 />
               ))}
@@ -342,3 +413,9 @@ const SchemaList = () => {
 };
 
 export default SchemaList;
+
+
+
+use it here,,, categories will be no more there.... only one input select fied search and select....
+use effect will be used to fetch testlist... and then search....
+component will be like,,,, 
