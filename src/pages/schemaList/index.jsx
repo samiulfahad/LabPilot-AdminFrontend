@@ -20,7 +20,7 @@ const SchemaList = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await testService.geTestList()
+      const response = await testService.getTestList()
       setCategories(response.data || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
