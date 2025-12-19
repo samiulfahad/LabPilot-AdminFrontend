@@ -5,6 +5,7 @@ const initialSchema = {
   name: "",
   testName: "",
   testId: "",
+  categoryId: "",
   isActive: false,
   hasStaticStandardRange: false,
   staticStandardRange: "",
@@ -15,22 +16,26 @@ const initialSchema = {
 const schemaSlice = (set, get) => ({
   testList: [],
   schema: { ...initialSchema },
+
   // Reset schema to initial state
   resetSchema: () => {
     set({ schema: { ...initialSchema } });
   },
+
   setFullSchema: (newSchema) => {
     set({ schema: { ...initialSchema, ...newSchema } });
   },
+
   setSchema: (field, value) => {
     set((state) => ({
       schema: { ...state.schema, [field]: value },
     }));
   },
+
   loadTestList: async () => {
     try {
       get().startLoading();
-      const response = await labTestService.getTestList();
+      const response = await labTestService.getTestList()
       set({ testList: response.data });
     } catch (e) {
       get().setPopup({
@@ -41,6 +46,7 @@ const schemaSlice = (set, get) => ({
       get().stopLoading();
     }
   },
+
   isSectionNameUnique: (name, excludeName = null) => {
     const sections = get().schema.sections;
     const normalized = name.toLowerCase().trim();
@@ -49,6 +55,7 @@ const schemaSlice = (set, get) => ({
       return s.name.toLowerCase().trim() === normalized;
     });
   },
+
   addSection: () => {
     const name = get().schema.currentSectionName.trim();
     if (!name) return;
@@ -72,6 +79,7 @@ const schemaSlice = (set, get) => ({
     });
     return true;
   },
+
   deleteSection: (sectionName) => {
     if (get().schema.sections.length === 1) {
       get().setPopup({
@@ -91,6 +99,7 @@ const schemaSlice = (set, get) => ({
       message: `Section "${sectionName}" deleted!`,
     });
   },
+
   updateSection: (oldName, newName) => {
     const trimmed = newName.trim();
     if (!trimmed) return;
@@ -112,6 +121,7 @@ const schemaSlice = (set, get) => ({
       message: "Section renamed successfully!",
     });
   },
+
   confirmRemoveStaticStandardRange: () => {
     get().setPopup({
       type: "confirmation",
@@ -131,6 +141,7 @@ const schemaSlice = (set, get) => ({
       },
     });
   },
+
   addField: (sectionName, newField) =>
     set((state) => {
       const updatedSections = state.schema?.sections?.map((sec) => {
@@ -149,6 +160,7 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
+
   updateField: (sectionName, oldFieldName, updatedField) =>
     set((state) => {
       const updatedSections = state.schema.sections.map((sec) => {
@@ -165,6 +177,7 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
+
   deleteField: (sectionName, fieldName) =>
     set((state) => {
       const updatedSections = state.schema.sections.map((sec) => {
@@ -183,6 +196,7 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
+
   clearStaticStandardRange: () => {
     set((state) => ({
       schema: { ...state.schema, staticStandardRange: "" },

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import SelectField from "../../components/html/SelectField";
+import SearchAndSelect from "../../components/html/SearchAndSelect";
 import useStore from "./store";
+
 const SelectTest = () => {
   const { loadTestList, testList, schema, setSchema } = useStore();
 
@@ -8,39 +9,26 @@ const SelectTest = () => {
     loadTestList();
   }, []);
 
-  const handleCategoryChange = (e) => {
-    setSchema("categoryId", e.target.value);
-    setSchema("testId", "");
-  };
+  const allTests = testList.map((test) => ({
+    value: test._id,
+    label: `${test.name}${test.schemaId ? " (Attached)" : ""}`,
+  }));
 
-  const testsForSelectedCategory = schema.categoryId
-    ? testList.find((cat) => cat._id === schema.categoryId)?.tests || []
-    : [];
+  const handleChange = (e) => {
+    setSchema("testId", e.target.value);
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Test Selection</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SelectField
-          label="Test Category"
-          value={schema.categoryId}
-          onChange={handleCategoryChange}
-          options={testList.map((category) => ({
-            value: category._id,
-            label: category.categoryName,
-          }))}
-          placeholder="Select a category"
-        />
-        <SelectField
+      <div className="grid grid-cols-1 gap-4">
+        <SearchAndSelect
           label="Specific Test"
+          name="testId"
           value={schema.testId}
-          onChange={(e) => setSchema("testId", e.target.value)}
-          options={testsForSelectedCategory.map((test) => ({
-            value: test._id,
-            label: `${test.name}${test.schemaId ? " (Attached)" : ""}`,
-          }))}
+          onChange={handleChange}
+          options={allTests}
           placeholder="Select a test"
-          disabled={!schema.categoryId}
         />
       </div>
     </div>

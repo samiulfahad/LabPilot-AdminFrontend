@@ -11,6 +11,7 @@ const testSlice = (set, get) => ({
       get().startLoading();
       const response = await testService.getTestList();
       set({ testList: response.data });
+      console.log(response.data);
     } catch (e) {
       set({ popup: { type: "error", message: "Failed to load test list", action: null, data: null } });
     } finally {
