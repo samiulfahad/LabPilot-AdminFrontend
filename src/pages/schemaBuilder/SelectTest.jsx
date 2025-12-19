@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import SearchAndSelect from "../../components/html/SearchAndSelect";
+import SearchAndSelect from "../../components/html/searchAndSelect";
 import useStore from "./store";
 
 const SelectTest = () => {
@@ -33,7 +33,7 @@ const SelectTest = () => {
       </div>
     </div>
   );
-  
+
 };
 
 export default SelectTest;
