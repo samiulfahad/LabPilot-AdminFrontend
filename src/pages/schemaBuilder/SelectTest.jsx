@@ -33,7 +33,6 @@ const SelectTest = () => {
       </div>
     </div>
   );
-
 };
 
 export default SelectTest;
