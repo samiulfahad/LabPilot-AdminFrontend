@@ -67,18 +67,17 @@ const FormRenderer = () => {
     return null;
   };
   const getApplicableRange = (sr, g, a) => {
-    if (!g || !a) return null;
-    const ageNum = parseFloat(a);
-    if (isNaN(ageNum)) return null;
     const { type, data } = sr;
     let min,
       max,
       info = "";
+    const ageNum = parseFloat(a);
     if (type === "simple") {
       min = parseFloat(data.min);
       max = parseFloat(data.max);
       info = "";
     } else if (type === "gender") {
+      if (!g) return null;
       const gd = data[g.toLowerCase()];
       if (gd) {
         min = parseFloat(gd.min);
@@ -86,6 +85,7 @@ const FormRenderer = () => {
         info = `for ${g.charAt(0).toUpperCase() + g.slice(1)}`;
       }
     } else if (type === "age") {
+      if (!a || isNaN(ageNum)) return null;
       for (let entry of data) {
         const minA = parseFloat(entry.minAge);
         const maxA = entry.maxAge !== 999 ? parseFloat(entry.maxAge) : Infinity;
@@ -98,6 +98,7 @@ const FormRenderer = () => {
         }
       }
     } else if (type === "combined") {
+      if (!g || !a || isNaN(ageNum)) return null;
       for (let entry of data) {
         if (entry.gender.toLowerCase() === g.toLowerCase()) {
           const minA = parseFloat(entry.minAge);
@@ -112,7 +113,7 @@ const FormRenderer = () => {
         }
       }
     }
-    if (min !== undefined && max !== undefined) {
+    if (!isNaN(min) && !isNaN(max)) {
       return { min, max, info };
     }
     return null;
@@ -250,6 +251,14 @@ const FormRenderer = () => {
         {isFormOpen && (
           <>
             <div className="p-4 mb-10">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{schema.name}</h2>
+              {schema.description && <p className="text-gray-600 mb-6">{schema.description}</p>}
+              {schema.hasStaticStandardRange && schema.staticStandardRange && (
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-semibold mb-2">Reference Values</h4>
+                  <p className="text-gray-700">{schema.staticStandardRange}</p>
+                </div>
+              )}
               <h3 className="text-xl font-semibold text-gray-900 mb-6">Patient Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

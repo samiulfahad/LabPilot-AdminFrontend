@@ -55,10 +55,10 @@ const SchemaBuilder = () => {
   const handleSubmit = async () => {
     try {
       setSchema("currentSectionName", undefined); // Fixed: Use setter instead of delete/mutation
+      startLoading();
       if (!schemaId) {
         // Add new schema
-        startLoading();
-        console.log(schema);
+        // console.log(schema);
         const response = await schemaService.addNew(schema);
         // console.log(response.data);
         setPopup({ type: "success", message: "Schema added successfully", data: null, action: null });

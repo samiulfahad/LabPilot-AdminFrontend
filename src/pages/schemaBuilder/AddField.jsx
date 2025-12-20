@@ -136,7 +136,6 @@ const AddField = () => {
         setPopup({ type: "success", message: "Range updated" });
       } else {
         setRangeData((prev) => [...prev, entry]);
-        setPopup({ type: "success", message: "Range added" });
       }
       setNewRangeEntry({});
     } else {

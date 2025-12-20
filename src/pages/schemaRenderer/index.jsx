@@ -5,6 +5,7 @@ import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
 import TextAreaField from "../../components/html/TextAreaField";
 import schemaService from "../../services/schemaService";
+import LoadingScreen from "../../components/loadingPage";
 
 const FormRenderer = () => {
   const [schema, setSchema] = useState(null);
@@ -16,6 +17,7 @@ const FormRenderer = () => {
   const [activeSection, setActiveSection] = useState(0);
 
   const { schemaId } = useParams();
+
   if (!schemaId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
@@ -50,9 +52,7 @@ const FormRenderer = () => {
   };
 
   useEffect(() => {
-    if (schemaId) {
-      fetchSchema();
-    }
+    if (schemaId) fetchSchema();
   }, [schemaId]);
 
   const hasMultipleSections = schema?.sections?.length > 1;
@@ -64,8 +64,8 @@ const FormRenderer = () => {
         const numValue = parseFloat(value);
         if (!isNaN(numValue)) {
           if (numValue < range.min) return "below";
-          else if (numValue > range.max) return "above";
-          else return "within";
+          if (numValue > range.max) return "above";
+          return "within";
         }
       }
     }
@@ -87,51 +87,34 @@ const FormRenderer = () => {
 
   useEffect(() => {
     updateAllStatuses();
-  }, [age, gender, schema]);
+  }, [age, gender, formData, schema]);
 
   const handleChange = (fieldName, value, isCheckbox = false) => {
     setFormData((prev) => {
       if (isCheckbox) {
-        const currentValues = prev[fieldName] || [];
-        const newValues = currentValues.includes(value)
-          ? currentValues.filter((v) => v !== value)
-          : [...currentValues, value];
-        return { ...prev, [fieldName]: newValues };
+        const current = prev[fieldName] || [];
+        return {
+          ...prev,
+          [fieldName]: current.includes(value) ? current.filter((v) => v !== value) : [...current, value],
+        };
       }
       return { ...prev, [fieldName]: value };
     });
-
-    const field = findField(fieldName);
-    if (field) {
-      const newStatus = computeStatus(field, value, gender, age);
-      setStatuses((prev) => ({ ...prev, [fieldName]: newStatus }));
-    }
-  };
-
-  const findField = (name) => {
-    for (let section of schema?.sections || []) {
-      for (let field of section.fields || []) {
-        if (field.name === name) return field;
-      }
-    }
-    return null;
   };
 
   const getApplicableRange = (sr, g, a) => {
-    if (!g || !a) return null;
-    const ageNum = parseFloat(a);
-    if (isNaN(ageNum)) return null;
     const { type, data } = sr;
-
     let min,
       max,
       info = "";
+    const ageNum = parseFloat(a);
 
     if (type === "simple") {
       min = parseFloat(data.min);
       max = parseFloat(data.max);
       info = "";
     } else if (type === "gender") {
+      if (!g) return null;
       const gd = data[g.toLowerCase()];
       if (gd) {
         min = parseFloat(gd.min);
@@ -139,6 +122,7 @@ const FormRenderer = () => {
         info = `for ${g.charAt(0).toUpperCase() + g.slice(1)}`;
       }
     } else if (type === "age") {
+      if (!a || isNaN(ageNum)) return null;
       for (let entry of data) {
         const minA = parseFloat(entry.minAge);
         const maxA = entry.maxAge !== 999 ? parseFloat(entry.maxAge) : Infinity;
@@ -151,6 +135,7 @@ const FormRenderer = () => {
         }
       }
     } else if (type === "combined") {
+      if (!g || !a || isNaN(ageNum)) return null;
       for (let entry of data) {
         if (entry.gender.toLowerCase() === g.toLowerCase()) {
           const minA = parseFloat(entry.minAge);
@@ -166,10 +151,36 @@ const FormRenderer = () => {
       }
     }
 
-    if (min !== undefined && max !== undefined) {
+    if (!isNaN(min) && !isNaN(max)) {
       return { min, max, info };
     }
     return null;
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "within":
+        return (
+          <span className="flex items-center text-emerald-600 text-sm">
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Within range
+          </span>
+        );
+      case "above":
+      case "below":
+        return (
+          <span className="flex items-center text-rose-600 text-sm">
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            {status === "above" ? "Above range" : "Below range"}
+          </span>
+        );
+      default:
+        return null;
+    }
   };
 
   const renderField = (field) => {
@@ -179,39 +190,12 @@ const FormRenderer = () => {
     const status = statuses[name] || "";
     const labelText = `${name}${unit ? ` (${unit})` : ""}${required ? " *" : ""}`;
 
-    const getStatusIcon = (status) => {
-      switch (status) {
-        case "within":
-          return (
-            <span className="flex items-center text-emerald-600">
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Within range
-            </span>
-          );
-        case "above":
-        case "below":
-          return (
-            <span className="flex items-center text-rose-600">
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              {status === "above" ? "Above range" : "Below range"}
-            </span>
-          );
-        default:
-          return null;
-      }
-    };
-
     let inputElement;
     switch (type) {
       case "input":
         inputElement = (
           <InputField
             label={labelText}
-            name={name}
             value={value}
             onChange={(e) => handleChange(name, e.target.value)}
             type="text"
@@ -225,13 +209,12 @@ const FormRenderer = () => {
         inputElement = (
           <TextAreaField
             label={labelText}
-            name={name}
             value={value}
             onChange={(e) => handleChange(name, e.target.value)}
             maxLength={maxLength}
             required={required}
-            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
             rows={4}
+            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
           />
         );
         break;
@@ -239,7 +222,6 @@ const FormRenderer = () => {
         inputElement = (
           <SelectField
             label={labelText}
-            name={name}
             value={value}
             onChange={(e) => handleChange(name, e.target.value)}
             options={options.map((opt) => ({ value: opt, label: opt }))}
@@ -264,17 +246,17 @@ const FormRenderer = () => {
                     checked={value === opt}
                     onChange={(e) => handleChange(name, e.target.value)}
                     required={required}
-                    className="w-5 h-5 text-blue-600 border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full transition-all duration-200 appearance-none checked:border-blue-600"
+                    className="w-5 h-5 text-blue-600 border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 rounded-full appearance-none checked:border-blue-600"
                   />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div
-                      className={`w-2 h-2 rounded-full bg-blue-600 transform scale-0 transition-transform duration-200 ${
+                      className={`w-2 h-2 rounded-full bg-blue-600 scale-0 transition ${
                         value === opt ? "scale-100" : ""
                       }`}
                     />
                   </div>
                 </div>
-                <span className="text-gray-700 group-hover:text-gray-900 transition-colors duration-200">{opt}</span>
+                <span className="text-gray-700 group-hover:text-gray-900">{opt}</span>
               </label>
             ))}
           </div>
@@ -294,13 +276,11 @@ const FormRenderer = () => {
                     value={opt}
                     checked={value.includes(opt)}
                     onChange={(e) => handleChange(name, opt, true)}
-                    className="w-5 h-5 text-blue-600 border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md transition-all duration-200 appearance-none checked:border-blue-600 checked:bg-blue-50"
+                    className="w-5 h-5 text-blue-600 border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 rounded-md appearance-none checked:bg-blue-600"
                   />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <svg
-                      className={`w-3 h-3 text-blue-600 transform scale-0 transition-transform duration-200 ${
-                        value.includes(opt) ? "scale-100" : ""
-                      }`}
+                      className={`w-3 h-3 text-white scale-0 transition ${value.includes(opt) ? "scale-100" : ""}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -309,7 +289,7 @@ const FormRenderer = () => {
                     </svg>
                   </div>
                 </div>
-                <span className="text-gray-700 group-hover:text-gray-900 transition-colors duration-200">{opt}</span>
+                <span className="text-gray-700 group-hover:text-gray-900">{opt}</span>
               </label>
             ))}
           </div>
@@ -319,7 +299,6 @@ const FormRenderer = () => {
         inputElement = (
           <InputField
             label={labelText}
-            name={name}
             value={value}
             onChange={(e) => handleChange(name, e.target.value)}
             type="number"
@@ -345,22 +324,17 @@ const FormRenderer = () => {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Standard range {range.info}: {range.min} - {range.max} {unit}
+            Standard range{range.info && ` ${range.info}`}: {range.min} - {range.max} {unit}
           </p>
         )}
-        {status && <div className="flex items-center text-sm mt-2">{getStatusIcon(status)}</div>}
+        {status && <div className="mt-2">{getStatusIcon(status)}</div>}
       </div>
     );
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading form...</p>
-        </div>
-      </div>
+      <LoadingScreen/>
     );
   }
 
@@ -393,20 +367,19 @@ const FormRenderer = () => {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{schema.name || "Medical Form"}</h1>
+              {schema.description && <p className="text-lg text-gray-600 mt-2">{schema.description}</p>}
               <p className="text-gray-600 mt-2">Please fill in all required fields marked with *</p>
             </div>
-            <div className="hidden md:flex items-center space-x-2 bg-white px-4 py-2 rounded-xl shadow-sm">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="text-sm font-medium text-gray-700">Auto-save enabled</span>
-            </div>
+            
           </div>
+
+          {/* Static Reference Values */}
+          {schema.hasStaticStandardRange && schema.staticStandardRange && (
+            <div className="mb-8 p-6 bg-blue-50 rounded-2xl border border-blue-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Reference Values</h3>
+              <p className="text-gray-700 whitespace-pre-line">{schema.staticStandardRange}</p>
+            </div>
+          )}
 
           {/* Progress Bar */}
           {hasMultipleSections && (
@@ -452,30 +425,26 @@ const FormRenderer = () => {
             <h2 className="text-xl font-semibold text-gray-900">Patient Information</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <SelectField
-                label="Gender *"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                options={[
-                  { value: "", label: "Select Gender" },
-                  { value: "male", label: "Male" },
-                  { value: "female", label: "Female" },
-                  { value: "other", label: "Other" },
-                ]}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <InputField
-                label="Age *"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                type="number"
-                placeholder="Enter age"
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-              />
-            </div>
+            <SelectField
+              label="Gender *"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              options={[
+                { value: "", label: "Select Gender" },
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+                { value: "other", label: "Other" },
+              ]}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+            />
+            <InputField
+              label="Age *"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              type="number"
+              placeholder="Enter age"
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+            />
           </div>
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
             <p className="text-sm text-blue-700 flex items-center">
@@ -498,7 +467,7 @@ const FormRenderer = () => {
             <div
               key={section.name}
               className={`bg-white rounded-2xl shadow-lg p-6 border border-gray-100 transition-all duration-300 ${
-                hasMultipleSections && activeSection !== sectionIndex ? "opacity-50" : ""
+                hasMultipleSections && activeSection !== sectionIndex ? "opacity-60 pointer-events-none" : ""
               }`}
             >
               {hasMultipleSections && (
@@ -509,7 +478,7 @@ const FormRenderer = () => {
                   <h3 className="text-lg font-semibold text-gray-900">{section.name}</h3>
                 </div>
               )}
-              <div className="space-y-8">{(section.fields || []).map((field) => renderField(field))}</div>
+              <div className="space-y-8">{(section.fields || []).map(renderField)}</div>
             </div>
           ))}
         </div>
