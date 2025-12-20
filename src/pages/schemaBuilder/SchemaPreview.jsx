@@ -32,7 +32,7 @@ const SchemaPreview = () => {
         <div className="p-4 flex justify-between items-center border-b border-gray-200">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200"
+            className="text-blue-600 text-center w-full hover:text-blue-800 font-medium text-sm transition-colors duration-200"
           >
             {isExpanded ? "Hide Schema" : "Show Schema"}
           </button>

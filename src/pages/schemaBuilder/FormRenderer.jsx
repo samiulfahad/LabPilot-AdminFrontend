@@ -254,12 +254,12 @@ const FormRenderer = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white/30 ro shadow-sm unded-2xl shadow-xl border border-white/20">
+    <div className=" bg-white/30 ro shadow-sm rounded-xl">
       <div className="bg-gray-50 rounded-lg border border-gray-200">
         <div className="p-4 flex justify-between items-center border-b border-gray-200">
           <button
             onClick={() => setIsFormOpen(!isFormOpen)}
-            className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200"
+            className="text-blue-600 text-center w-full hover:text-blue-800 font-medium text-sm transition-colors duration-200"
           >
             {isFormOpen ? "Hide Form" : "Interact with Form"}
           </button>
