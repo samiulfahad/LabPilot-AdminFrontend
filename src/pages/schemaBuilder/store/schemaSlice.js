@@ -1,5 +1,5 @@
 // schemaSlice.js
-import labTestService from "../../../services/testService";
+import testService from "../../../services/testService";
 
 const initialSchema = {
   name: "",
@@ -30,7 +30,7 @@ const schemaSlice = (set, get) => ({
   loadTestList: async () => {
     try {
       get().startLoading();
-      const response = await labTestService.getTestList();
+      const response = await testService.getTestList();
       set({ testList: response.data });
     } catch (e) {
       get().setPopup({
@@ -66,10 +66,6 @@ const schemaSlice = (set, get) => ({
         currentSectionName: "",
       },
     }));
-    get().setPopup({
-      type: "success",
-      message: `Section "${name}" added successfully!`,
-    });
     return true;
   },
   deleteSection: (sectionName) => {
@@ -86,10 +82,6 @@ const schemaSlice = (set, get) => ({
         sections: state.schema.sections.filter((s) => s.name !== sectionName),
       },
     }));
-    get().setPopup({
-      type: "success",
-      message: `Section "${sectionName}" deleted!`,
-    });
   },
   updateSection: (oldName, newName) => {
     const trimmed = newName.trim();
