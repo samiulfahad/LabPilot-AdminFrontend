@@ -254,7 +254,7 @@ const FormRenderer = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20">
+    <div className="max-w-3xl mx-auto bg-white/30 ro shadow-sm unded-2xl shadow-xl border border-white/20">
       <div className="bg-gray-50 rounded-lg border border-gray-200">
         <div className="p-4 flex justify-between items-center border-b border-gray-200">
           <button
