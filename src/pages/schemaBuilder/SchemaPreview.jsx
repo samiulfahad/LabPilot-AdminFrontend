@@ -27,33 +27,7 @@ const SchemaPreview = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800">Schema Preview</h3>
-          <p className="text-sm text-gray-600">Live preview of schema data structure</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <span className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
-            {schema.sections?.length || 0} section(s)
-          </span>
-          <span
-            className={`px-3 py-1 rounded-full text-xs ${
-              schema.isActive ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-            }`}
-          >
-            {schema.isActive ? "Active" : "Draft"}
-          </span>
-          <span
-            className={`px-3 py-1 rounded-full text-xs ${
-              schema.hasStaticStandardRange ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
-            }`}
-          >
-            {schema.hasStaticStandardRange ? "Has Static Standard Range" : "No Range"}
-          </span>
-        </div>
-      </div>
-
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       <div className="bg-gray-50 rounded-lg border border-gray-200">
         <div className="p-4 flex justify-between items-center border-b border-gray-200">
           <button

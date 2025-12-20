@@ -254,9 +254,8 @@ const FormRenderer = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white/30 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-white/20 my-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-8">{schema.name || "Form Renderer"}</h2>
-      <div className="bg-gray-50 rounded-lg border border-gray-200 mb-10">
+    <div className="max-w-3xl mx-auto bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20">
+      <div className="bg-gray-50 rounded-lg border border-gray-200">
         <div className="p-4 flex justify-between items-center border-b border-gray-200">
           <button
             onClick={() => setIsFormOpen(!isFormOpen)}
