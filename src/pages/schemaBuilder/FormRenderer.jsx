@@ -11,6 +11,7 @@ const FormRenderer = () => {
   const [age, setAge] = useState("");
   const [formData, setFormData] = useState({});
   const [statuses, setStatuses] = useState({});
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const hasMultipleSections = schema.sections?.length > 1;
 
@@ -255,34 +256,50 @@ const FormRenderer = () => {
   return (
     <div className="max-w-3xl mx-auto bg-white/30 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-white/20 my-8">
       <h2 className="text-2xl font-bold text-gray-900 mb-8">{schema.name || "Form Renderer"}</h2>
-      <div className="mb-10">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Patient Details</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <SelectField
-              label="Gender *"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              options={[
-                { value: "male", label: "Male" },
-                { value: "female", label: "Female" },
-              ]}
-              placeholder="Select Gender"
-            />
-          </div>
-          <div>
-            <InputField label="Age *" value={age} onChange={(e) => setAge(e.target.value)} type="number" />
-          </div>
+      <div className="bg-gray-50 rounded-lg border border-gray-200 mb-10">
+        <div className="p-4 flex justify-between items-center border-b border-gray-200">
+          <button
+            onClick={() => setIsFormOpen(!isFormOpen)}
+            className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200"
+          >
+            {isFormOpen ? "Hide Form" : "Interact with Form"}
+          </button>
         </div>
+        {isFormOpen && (
+          <>
+            <div className="p-4 mb-10">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Patient Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <SelectField
+                    label="Gender *"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    options={[
+                      { value: "male", label: "Male" },
+                      { value: "female", label: "Female" },
+                    ]}
+                    placeholder="Select Gender"
+                  />
+                </div>
+                <div>
+                  <InputField label="Age *" value={age} onChange={(e) => setAge(e.target.value)} type="number" />
+                </div>
+              </div>
+            </div>
+            {schema?.sections?.map((section) => (
+              <div key={section.name} className="p-4 mb-10">
+                {hasMultipleSections && (
+                  <h3 className="text-xl font-semibold text-gray-900 mb-6 border-b border-gray-200 pb-4">
+                    {section.name}
+                  </h3>
+                )}
+                {(section.fields || []).map((field) => renderField(field))}
+              </div>
+            ))}
+          </>
+        )}
       </div>
-      {schema?.sections?.map((section) => (
-        <div key={section.name} className="mb-10">
-          {hasMultipleSections && (
-            <h3 className="text-xl font-semibold text-gray-900 mb-6 border-b border-gray-200 pb-4">{section.name}</h3>
-          )}
-          {(section.fields || []).map((field) => renderField(field))}
-        </div>
-      ))}
     </div>
   );
 };

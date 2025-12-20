@@ -97,31 +97,42 @@ const SchemaBuilder = () => {
         <div className="text-center mb-2">
           <h1 className="text-lg md:text-xl font-bold text-gray-800">Schema Engine</h1>
         </div>
+        
         {/* Row 1: Schema Name and Test Name */}
         <SchemaInfo />
+
         {/* Row 2: Test Category & Test Selection */}
         <SelectTest />
+
         {/* Row 3: Status Toggle */}
         <Status />
+
         {/* Row 4: Sections */}
         <Section />
-        {/* Row 4.5: Add Field (now with inline form) */}
+
+        {/* Row 5: Add Field (now with inline form) */}
         <AddField />
-        {/* Row 5: Standard Range */}
+
+        {/* Row 6: Standard Range */}
         <StaticStandardRange />
+
+        {/* Row 7: Preview Form */}
+        <FormPreview />
+
+        {/* Row 8: Save Schema Button */}
         <div className="w-full flex justify-center items-center">
           <button onClick={handleSubmit} className="btn">
             Save Schema
           </button>
         </div>
-        {/* Row 6: Preview Form */}
-        <FormPreview />
-        {/* Row 7: Preview Form */}
+
+        {/* Row 9: Form Renderer */}
         <FormRenderer />
-        {/* Row 8: Schema Preview */}
+
+        {/* Row 10: Schema Preview */}
         <SchemaPreview />
       </div>
     </div>
   );
 };
-export default SchemaBuilder
+export default SchemaBuilder;
