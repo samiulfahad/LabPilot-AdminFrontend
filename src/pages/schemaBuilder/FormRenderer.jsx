@@ -256,7 +256,7 @@ const FormRenderer = () => {
   return (
     <div className=" bg-white/30 ro shadow-sm rounded-xl">
       <div className="bg-gray-50 rounded-lg border border-gray-200">
-        <div className="p-4 flex justify-between items-center border-b border-gray-200">
+        <div className="p-4 bg-gray-200 flex justify-between items-center border-b border-gray-200">
           <button
             onClick={() => setIsFormOpen(!isFormOpen)}
             className="text-blue-600 text-center w-full hover:text-blue-800 font-medium text-sm transition-colors duration-200"

@@ -29,7 +29,7 @@ const SchemaPreview = () => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       <div className="bg-gray-50 rounded-lg border border-gray-200">
-        <div className="p-4 flex justify-between items-center border-b border-gray-200">
+        <div className="p-4 flex bg-gray-200 justify-between items-center border-b border-gray-200">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-blue-600 text-center w-full hover:text-blue-800 font-medium text-sm transition-colors duration-200"
