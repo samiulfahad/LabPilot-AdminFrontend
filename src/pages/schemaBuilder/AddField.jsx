@@ -239,9 +239,9 @@ const AddField = () => {
                 Attaching to: <span className="font-medium">{sections[0].name}</span>
               </p>
             )}
-            <InputField label="Field Name" value={fieldName} onChange={(e) => setFieldName(e.target.value)} />
+            <InputField label="Name" value={fieldName} onChange={(e) => setFieldName(e.target.value)} />
             <SelectField
-              label="Field Type"
+              label="Type"
               value={fieldType}
               onChange={(e) => setFieldType(e.target.value)}
               options={[
@@ -255,7 +255,7 @@ const AddField = () => {
             />
             {needsMaxLength && (
               <InputField
-                label="Max Length"
+                label="Max"
                 type="number"
                 value={maxLength}
                 onChange={(e) => setMaxLength(e.target.value)}
