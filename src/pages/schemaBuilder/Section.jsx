@@ -53,7 +53,7 @@ const Section = () => {
       {showAddSectionInput && (
         <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <InputField
-            label="Section Title"
+            label="Title"
             value={schema.currentSectionName || ""}
             onChange={(e) => setSchema("currentSectionName", e.target.value)}
             autoFocus
