@@ -2,7 +2,6 @@ import useStore from "./store";
 import TextAreaField from "../../components/html/TextAreaField";
 const StaticStandardRange = () => {
   const { schema, setSchema, confirmRemoveStaticStandardRange, clearStaticStandardRange } = useStore();
-
   const handleStandardRangeToggle = (value) => {
     if (!value && schema.staticStandardRange?.trim() !== "") {
       confirmRemoveStaticStandardRange();
@@ -31,7 +30,6 @@ const StaticStandardRange = () => {
           </span>
         </label>
       </div>
-
       {schema.hasStaticStandardRange && (
         <div className="mt-4">
           <TextAreaField
@@ -45,5 +43,4 @@ const StaticStandardRange = () => {
     </div>
   );
 };
-
 export default StaticStandardRange;

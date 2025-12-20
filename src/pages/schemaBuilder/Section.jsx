@@ -1,19 +1,15 @@
 import { useState } from "react";
 import useStore from "./store";
 import InputField from "../../components/html/InputField";
-
 const Section = () => {
   const [editingSectionName, setEditingSectionName] = useState(null);
   const [editingNewSectionName, setEditingNewSectionName] = useState("");
   const [showAddSectionInput, setShowAddSectionInput] = useState(false);
-
   const { schema, setSchema, addSection, updateSection, setPopup } = useStore();
-
   const startEditing = (section) => {
     setEditingSectionName(section.name);
     setEditingNewSectionName(section.name);
   };
-
   const saveEditing = () => {
     if (editingSectionName && editingNewSectionName.trim()) {
       updateSection(editingSectionName, editingNewSectionName);
@@ -21,12 +17,10 @@ const Section = () => {
       setEditingNewSectionName("");
     }
   };
-
   const cancelEditing = () => {
     setEditingSectionName(null);
     setEditingNewSectionName("");
   };
-
   const handleAddSectionClick = () => {
     const success = addSection();
     if (success) {
@@ -35,12 +29,10 @@ const Section = () => {
       setShowAddSectionInput(true);
     }
   };
-
   const handleCancelAddSection = () => {
     setSchema("currentSectionName", "");
     setShowAddSectionInput(false);
   };
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
       <div className="flex items-center justify-between mb-4">
@@ -57,7 +49,6 @@ const Section = () => {
           </button>
         )}
       </div>
-
       {/* Add Section Input */}
       {showAddSectionInput && (
         <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -84,7 +75,6 @@ const Section = () => {
           </div>
         </div>
       )}
-
       {/* Existing Sections List */}
       {schema.sections?.length > 0 && (
         <div>
@@ -160,5 +150,4 @@ const Section = () => {
     </div>
   );
 };
-
 export default Section;

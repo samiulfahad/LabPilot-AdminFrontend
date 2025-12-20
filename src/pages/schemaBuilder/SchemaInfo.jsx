@@ -1,6 +1,5 @@
 import useStore from "./store";
 import InputField from "../../components/html/InputField";
-
 const Schema = () => {
   const { schema, setSchema } = useStore();
   return (
@@ -8,10 +7,13 @@ const Schema = () => {
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Basic Information</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputField label="Schema Name" value={schema.name} onChange={(e) => setSchema("name", e.target.value)} />
-        <InputField label="Test Name" value={schema.testName} onChange={(e) => setSchema("testName", e.target.value)} />
+        <InputField
+          label="Description"
+          value={schema.description}
+          onChange={(e) => setSchema("description", e.target.value)}
+        />
       </div>
     </div>
   );
 };
-
-export default Schema
+export default Schema;

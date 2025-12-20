@@ -13,7 +13,6 @@ import AddField from "./AddField"; // Updated component
 import FormPreview from "./FormPreview";
 import FormRenderer from "./FormRenderer";
 import { useParams } from "react-router-dom";
-
 const SchemaBuilder = () => {
   const {
     schema,
@@ -97,38 +96,29 @@ const SchemaBuilder = () => {
         <div className="text-center mb-2">
           <h1 className="text-lg md:text-xl font-bold text-gray-800">Schema Engine</h1>
         </div>
-        
+
         {/* Row 1: Schema Name and Test Name */}
         <SchemaInfo />
-
         {/* Row 2: Test Category & Test Selection */}
         <SelectTest />
-
         {/* Row 3: Status Toggle */}
         <Status />
-
         {/* Row 4: Sections */}
         <Section />
-
         {/* Row 5: Add Field (now with inline form) */}
         <AddField />
-
         {/* Row 6: Standard Range */}
         <StaticStandardRange />
-
         {/* Row 7: Preview Form */}
         <FormPreview />
-
         {/* Row 8: Save Schema Button */}
         <div className="w-full flex justify-center items-center">
           <button onClick={handleSubmit} className="btn">
             Save Schema
           </button>
         </div>
-
         {/* Row 9: Form Renderer */}
         <FormRenderer />
-
         {/* Row 10: Schema Preview */}
         <SchemaPreview />
       </div>

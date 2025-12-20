@@ -1,9 +1,8 @@
 // schemaSlice.js
 import testService from "../../../services/testService";
-
 const initialSchema = {
   name: "",
-  testName: "",
+  description: "",
   testId: "",
   isActive: false,
   hasStaticStandardRange: false,
@@ -11,7 +10,6 @@ const initialSchema = {
   sections: [{ name: "Default", fields: [] }],
   currentSectionName: "",
 };
-
 const schemaSlice = (set, get) => ({
   testList: [],
   schema: { ...initialSchema },
@@ -181,5 +179,4 @@ const schemaSlice = (set, get) => ({
     }));
   },
 });
-
 export default schemaSlice;

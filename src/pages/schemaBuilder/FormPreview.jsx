@@ -3,14 +3,11 @@ import useStore from "./store";
 import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
 import Icons from "../../components/icons"; // Import the icons
-
 const PreviewForm = () => {
   const { schema, updateSection, deleteSection, updateField, deleteField, setPopup } = useStore();
-
   // Section editing states
   const [editingSection, setEditingSection] = useState(null);
   const [newSectionName, setNewSectionName] = useState("");
-
   // Field editing states
   const [editingField, setEditingField] = useState(null);
   const [fieldSection, setFieldSection] = useState("");
@@ -22,20 +19,16 @@ const PreviewForm = () => {
   const [standardRangeType, setStandardRangeType] = useState("none");
   const [rangeData, setRangeData] = useState(null);
   const [unit, setUnit] = useState("");
-
   // FieldOptionsEditor states
   const [newOption, setNewOption] = useState("");
   const [editingOptionIndex, setEditingOptionIndex] = useState(null);
   const [editingOptionValue, setEditingOptionValue] = useState("");
-
   // StandardRangeEditor states
   const [newRangeEntry, setNewRangeEntry] = useState({});
   const [editingRangeIndex, setEditingRangeIndex] = useState(null);
-
   const needsOptions = ["select", "checkbox", "radio"].includes(fieldType);
   const needsMaxLength = ["input", "textarea"].includes(fieldType);
   const needsStandardRange = fieldType === "number" && standardRangeType !== "none";
-
   useEffect(() => {
     if (!["select", "checkbox", "radio"].includes(fieldType)) {
       setOptions([]);
@@ -48,7 +41,6 @@ const PreviewForm = () => {
       setStandardRangeType("none");
     }
   }, [fieldType]);
-
   useEffect(() => {
     if (standardRangeType === "simple" && (rangeData == null || !("min" in rangeData && "max" in rangeData))) {
       setRangeData({ min: "", max: "" });
@@ -68,7 +60,6 @@ const PreviewForm = () => {
     setNewRangeEntry({});
     setEditingRangeIndex(null);
   }, [standardRangeType]);
-
   useEffect(() => {
     if (editingField && fieldSection) {
       const section = schema.sections.find((s) => s.name === fieldSection);
@@ -77,7 +68,6 @@ const PreviewForm = () => {
       }
     }
   }, [schema, editingField, fieldSection]);
-
   // FieldOptionsEditor handlers
   const handleAddOption = () => {
     if (newOption.trim()) {
@@ -85,16 +75,13 @@ const PreviewForm = () => {
       setNewOption("");
     }
   };
-
   const handleRemoveOption = (index) => {
     setOptions(options.filter((_, i) => i !== index));
   };
-
   const handleStartEditOption = (index, value) => {
     setEditingOptionIndex(index);
     setEditingOptionValue(value);
   };
-
   const handleSaveEditOption = () => {
     if (editingOptionValue.trim()) {
       const updatedOptions = [...options];
@@ -104,12 +91,10 @@ const PreviewForm = () => {
       setEditingOptionValue("");
     }
   };
-
   const handleCancelEditOption = () => {
     setEditingOptionIndex(null);
     setEditingOptionValue("");
   };
-
   // StandardRangeEditor handlers
   const handleSimpleOrGenderChange = (key, subKey, value) => {
     setRangeData((prev) => ({
@@ -117,11 +102,9 @@ const PreviewForm = () => {
       [key]: subKey ? { ...prev[key], [subKey]: value } : value,
     }));
   };
-
   const handleNewRangeChange = (key, value) => {
     setNewRangeEntry((prev) => ({ ...prev, [key]: value }));
   };
-
   const validateRangeEntry = (entry, type) => {
     if (type === "age") {
       return entry.minAge && entry.minValue && entry.maxValue;
@@ -130,7 +113,6 @@ const PreviewForm = () => {
     }
     return false;
   };
-
   const handleAddOrUpdateRange = () => {
     if (validateRangeEntry(newRangeEntry, standardRangeType)) {
       const entry = { ...newRangeEntry };
@@ -150,37 +132,30 @@ const PreviewForm = () => {
       setPopup({ type: "error", message: "Please fill all required fields for the range" });
     }
   };
-
   const handleRemoveRange = (index) => {
     setRangeData((prev) => prev.filter((_, i) => i !== index));
   };
-
   const handleStartEditRange = (index) => {
     setEditingRangeIndex(index);
     setNewRangeEntry({ ...rangeData[index] });
   };
-
   const handleCancelEditRange = () => {
     setEditingRangeIndex(null);
     setNewRangeEntry({});
   };
-
   const startEditSection = (sectionName) => {
     setEditingSection(sectionName);
     setNewSectionName(sectionName);
   };
-
   const saveSection = () => {
     updateSection(editingSection, newSectionName);
     setEditingSection(null);
     setNewSectionName("");
   };
-
   const cancelEditSection = () => {
     setEditingSection(null);
     setNewSectionName("");
   };
-
   const startEditField = (sectionName, field) => {
     setFieldSection(sectionName);
     setEditingField(field.name);
@@ -203,24 +178,20 @@ const PreviewForm = () => {
     setNewRangeEntry({});
     setEditingRangeIndex(null);
   };
-
   const handleUpdate = () => {
     if (!fieldName.trim()) {
       setPopup({ type: "error", message: "Field name is required" });
       return;
     }
-
     const allFields = schema.sections.flatMap((section) => section.fields || []);
     if (allFields.some((f) => f.name === fieldName && f.name !== editingField)) {
       setPopup({ type: "error", message: "Field name must be unique" });
       return;
     }
-
     if (needsOptions && options.length === 0) {
       setPopup({ type: "error", message: "At least one option is required for this field type" });
       return;
     }
-
     if (needsStandardRange) {
       if (standardRangeType === "simple") {
         if (!rangeData.min || !rangeData.max) {
@@ -237,13 +208,11 @@ const PreviewForm = () => {
         return;
       }
     }
-
     const updatedField = {
       name: fieldName,
       type: fieldType,
       required: isRequired,
     };
-
     if (needsOptions) updatedField.options = options;
     if (needsMaxLength && maxLength) updatedField.maxLength = parseInt(maxLength, 10);
     if (needsStandardRange) {
@@ -252,11 +221,9 @@ const PreviewForm = () => {
     if (fieldType === "number" && unit.trim()) {
       updatedField.unit = unit.trim();
     }
-
     updateField(fieldSection, editingField, updatedField);
     resetFieldForm();
   };
-
   const resetFieldForm = () => {
     setEditingField(null);
     setFieldSection("");
@@ -274,11 +241,9 @@ const PreviewForm = () => {
     setNewRangeEntry({});
     setEditingRangeIndex(null);
   };
-
   const handleCancelField = () => {
     resetFieldForm();
   };
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Form Preview</h3>
@@ -356,7 +321,6 @@ const PreviewForm = () => {
           )}
         </div>
       ))}
-
       {editingField && (
         <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h4 className="text-md font-semibold mb-3 text-gray-800">Edit Field</h4>
@@ -658,5 +622,4 @@ const PreviewForm = () => {
     </div>
   );
 };
-
 export default PreviewForm;

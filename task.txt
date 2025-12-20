@@ -1,12 +1,11 @@
-the store code is here:
+here is the store
 // schemaSlice.js
-import labTestService from "../../../services/testService";
+import testService from "../../../services/testService";
 
 const initialSchema = {
   name: "",
   testName: "",
   testId: "",
-  categoryId: "",
   isActive: false,
   hasStaticStandardRange: false,
   staticStandardRange: "",
@@ -17,26 +16,22 @@ const initialSchema = {
 const schemaSlice = (set, get) => ({
   testList: [],
   schema: { ...initialSchema },
-
   // Reset schema to initial state
   resetSchema: () => {
     set({ schema: { ...initialSchema } });
   },
-
   setFullSchema: (newSchema) => {
     set({ schema: { ...initialSchema, ...newSchema } });
   },
-
   setSchema: (field, value) => {
     set((state) => ({
       schema: { ...state.schema, [field]: value },
     }));
   },
-
   loadTestList: async () => {
     try {
       get().startLoading();
-      const response = await labTestService.getTestList()
+      const response = await testService.getTestList();
       set({ testList: response.data });
     } catch (e) {
       get().setPopup({
@@ -47,7 +42,6 @@ const schemaSlice = (set, get) => ({
       get().stopLoading();
     }
   },
-
   isSectionNameUnique: (name, excludeName = null) => {
     const sections = get().schema.sections;
     const normalized = name.toLowerCase().trim();
@@ -56,7 +50,6 @@ const schemaSlice = (set, get) => ({
       return s.name.toLowerCase().trim() === normalized;
     });
   },
-
   addSection: () => {
     const name = get().schema.currentSectionName.trim();
     if (!name) return;
@@ -74,13 +67,8 @@ const schemaSlice = (set, get) => ({
         currentSectionName: "",
       },
     }));
-    get().setPopup({
-      type: "success",
-      message: `Section "${name}" added successfully!`,
-    });
     return true;
   },
-
   deleteSection: (sectionName) => {
     if (get().schema.sections.length === 1) {
       get().setPopup({
@@ -95,12 +83,7 @@ const schemaSlice = (set, get) => ({
         sections: state.schema.sections.filter((s) => s.name !== sectionName),
       },
     }));
-    get().setPopup({
-      type: "success",
-      message: `Section "${sectionName}" deleted!`,
-    });
   },
-
   updateSection: (oldName, newName) => {
     const trimmed = newName.trim();
     if (!trimmed) return;
@@ -122,7 +105,6 @@ const schemaSlice = (set, get) => ({
       message: "Section renamed successfully!",
     });
   },
-
   confirmRemoveStaticStandardRange: () => {
     get().setPopup({
       type: "confirmation",
@@ -142,7 +124,6 @@ const schemaSlice = (set, get) => ({
       },
     });
   },
-
   addField: (sectionName, newField) =>
     set((state) => {
       const updatedSections = state.schema?.sections?.map((sec) => {
@@ -161,7 +142,6 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
-
   updateField: (sectionName, oldFieldName, updatedField) =>
     set((state) => {
       const updatedSections = state.schema.sections.map((sec) => {
@@ -178,7 +158,6 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
-
   deleteField: (sectionName, fieldName) =>
     set((state) => {
       const updatedSections = state.schema.sections.map((sec) => {
@@ -197,7 +176,6 @@ const schemaSlice = (set, get) => ({
         },
       };
     }),
-
   clearStaticStandardRange: () => {
     set((state) => ({
       schema: { ...state.schema, staticStandardRange: "" },
@@ -207,10 +185,7 @@ const schemaSlice = (set, get) => ({
 
 export default schemaSlice;
 
-
-
-and the parent component is:
-
+Here is the parent component:
 import { useEffect } from "react";
 import schemaService from "../../services/schemaService";
 import useStore from "./store";
@@ -310,37 +285,48 @@ const SchemaBuilder = () => {
         <div className="text-center mb-2">
           <h1 className="text-lg md:text-xl font-bold text-gray-800">Schema Engine</h1>
         </div>
+        
         {/* Row 1: Schema Name and Test Name */}
         <SchemaInfo />
+
         {/* Row 2: Test Category & Test Selection */}
         <SelectTest />
+
         {/* Row 3: Status Toggle */}
         <Status />
+
         {/* Row 4: Sections */}
         <Section />
-        {/* Row 4.5: Add Field (now with inline form) */}
+
+        {/* Row 5: Add Field (now with inline form) */}
         <AddField />
-        {/* Row 5: Standard Range */}
+
+        {/* Row 6: Standard Range */}
         <StaticStandardRange />
+
+        {/* Row 7: Preview Form */}
+        <FormPreview />
+
+        {/* Row 8: Save Schema Button */}
         <div className="w-full flex justify-center items-center">
           <button onClick={handleSubmit} className="btn">
             Save Schema
           </button>
         </div>
-        {/* Row 6: Preview Form */}
-        <FormPreview />
-        {/* Row 7: Preview Form */}
+
+        {/* Row 9: Form Renderer */}
         <FormRenderer />
-        {/* Row 8: Schema Preview */}
+
+        {/* Row 10: Schema Preview */}
         <SchemaPreview />
       </div>
     </div>
   );
 };
-export default SchemaBuilder
+export default SchemaBuilder;
 
 
-and the children components are:
+Here are the the children:
 import { useState, useEffect } from "react";
 import useStore from "./store";
 import InputField from "../../components/html/InputField";
@@ -1564,6 +1550,7 @@ const PreviewForm = () => {
 
 export default PreviewForm;
 
+
 import { useState, useEffect } from "react";
 import useStore from "./store";
 import InputField from "../../components/html/InputField";
@@ -1577,6 +1564,7 @@ const FormRenderer = () => {
   const [age, setAge] = useState("");
   const [formData, setFormData] = useState({});
   const [statuses, setStatuses] = useState({});
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const hasMultipleSections = schema.sections?.length > 1;
 
@@ -1819,36 +1807,51 @@ const FormRenderer = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white/30 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-white/20 my-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-8">{schema.name || "Form Renderer"}</h2>
-      <div className="mb-10">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Patient Details</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <SelectField
-              label="Gender *"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              options={[
-                { value: "male", label: "Male" },
-                { value: "female", label: "Female" },
-              ]}
-              placeholder="Select Gender"
-            />
-          </div>
-          <div>
-            <InputField label="Age *" value={age} onChange={(e) => setAge(e.target.value)} type="number" />
-          </div>
+    <div className=" bg-white/30 ro shadow-sm rounded-xl">
+      <div className="bg-gray-50 rounded-lg border border-gray-200">
+        <div className="p-4 bg-gray-200 flex justify-between items-center border-b border-gray-200">
+          <button
+            onClick={() => setIsFormOpen(!isFormOpen)}
+            className="text-blue-600 text-center w-full hover:text-blue-800 font-medium text-sm transition-colors duration-200"
+          >
+            {isFormOpen ? "Hide Form" : "Interact with Form"}
+          </button>
         </div>
+        {isFormOpen && (
+          <>
+            <div className="p-4 mb-10">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Patient Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <SelectField
+                    label="Gender *"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    options={[
+                      { value: "male", label: "Male" },
+                      { value: "female", label: "Female" },
+                    ]}
+                    placeholder="Select Gender"
+                  />
+                </div>
+                <div>
+                  <InputField label="Age *" value={age} onChange={(e) => setAge(e.target.value)} type="number" />
+                </div>
+              </div>
+            </div>
+            {schema?.sections?.map((section) => (
+              <div key={section.name} className="p-4 mb-10">
+                {hasMultipleSections && (
+                  <h3 className="text-xl font-semibold text-gray-900 mb-6 border-b border-gray-200 pb-4">
+                    {section.name}
+                  </h3>
+                )}
+                {(section.fields || []).map((field) => renderField(field))}
+              </div>
+            ))}
+          </>
+        )}
       </div>
-      {schema?.sections?.map((section) => (
-        <div key={section.name} className="mb-10">
-          {hasMultipleSections && (
-            <h3 className="text-xl font-semibold text-gray-900 mb-6 border-b border-gray-200 pb-4">{section.name}</h3>
-          )}
-          {(section.fields || []).map((field) => renderField(field))}
-        </div>
-      ))}
     </div>
   );
 };
@@ -1873,9 +1876,13 @@ const Schema = () => {
 
 export default Schema
 
+import { useState } from "react";
 import useStore from "./store";
+
 const SchemaPreview = () => {
   const { schema } = useStore();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const safeStringify = (obj) => {
     return JSON.stringify(
@@ -1887,40 +1894,42 @@ const SchemaPreview = () => {
       2
     );
   };
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800">Schema Preview</h3>
-          <p className="text-sm text-gray-600">Live preview of schema data structure</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <span className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
-            {schema.sections?.length || 0} section(s)
-          </span>
-          <span
-            className={`px-3 py-1 rounded-full text-xs ${
-              schema.isActive ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-            }`}
-          >
-            {schema.isActive ? "Active" : "Draft"}
-          </span>
-          <span
-            className={`px-3 py-1 rounded-full text-xs ${
-              schema.hasStaticStandardRange ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
-            }`}
-          >
-            {schema.hasStaticStandardRange ? "No Static Standard Range" : "No Range"}
-          </span>
-        </div>
-      </div>
 
+  const schemaJson = safeStringify(schema);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(schemaJson).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       <div className="bg-gray-50 rounded-lg border border-gray-200">
-        <div className="p-2">
-          <pre className="text-xs md:text-sm text-green-600 font-mono whitespace-pre-wrap break-words max-h-96 overflow-y-auto bg-gray-900  p-1 rounded border">
-            {safeStringify(schema)}
-          </pre>
+        <div className="p-4 flex bg-gray-200 justify-between items-center border-b border-gray-200">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-blue-600 text-center w-full hover:text-blue-800 font-medium text-sm transition-colors duration-200"
+          >
+            {isExpanded ? "Hide Schema" : "Show Schema"}
+          </button>
+          {isExpanded && (
+            <button
+              onClick={handleCopy}
+              className="px-4 py-1.5 rounded-full text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200"
+            >
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          )}
         </div>
+        {isExpanded && (
+          <div className="p-4">
+            <pre className="text-xs md:text-sm text-green-600 font-mono whitespace-pre-wrap break-words max-h-96 overflow-y-auto bg-gray-900 p-4 rounded-lg border border-gray-800">
+              {schemaJson}
+            </pre>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2093,9 +2102,11 @@ const Section = () => {
 
 export default Section;
 
+
 import { useEffect } from "react";
-import SelectField from "../../components/html/SelectField";
+import SearchAndSelect from "../../components/html/searchAndSelect";
 import useStore from "./store";
+
 const SelectTest = () => {
   const { loadTestList, testList, schema, setSchema } = useStore();
 
@@ -2103,39 +2114,26 @@ const SelectTest = () => {
     loadTestList();
   }, []);
 
-  const handleCategoryChange = (e) => {
-    setSchema("categoryId", e.target.value);
-    setSchema("testId", "");
-  };
+  const allTests = testList.map((test) => ({
+    value: test._id,
+    label: `${test.name}${test.schemaId ? " (Attached)" : ""}`,
+  }));
 
-  const testsForSelectedCategory = schema.categoryId
-    ? testList.find((cat) => cat._id === schema.categoryId)?.tests || []
-    : [];
+  const handleChange = (e) => {
+    setSchema("testId", e.target.value);
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Test Selection</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SelectField
-          label="Test Category"
-          value={schema.categoryId}
-          onChange={handleCategoryChange}
-          options={testList.map((category) => ({
-            value: category._id,
-            label: category.categoryName,
-          }))}
-          placeholder="Select a category"
-        />
-        <SelectField
+      <div className="grid grid-cols-1 gap-4">
+        <SearchAndSelect
           label="Specific Test"
+          name="testId"
           value={schema.testId}
-          onChange={(e) => setSchema("testId", e.target.value)}
-          options={testsForSelectedCategory.map((test) => ({
-            value: test._id,
-            label: `${test.name}${test.schemaId ? " (Attached)" : ""}`,
-          }))}
+          onChange={handleChange}
+          options={allTests}
           placeholder="Select a test"
-          disabled={!schema.categoryId}
         />
       </div>
     </div>
@@ -2143,7 +2141,6 @@ const SelectTest = () => {
 };
 
 export default SelectTest;
-
 
 import useStore from "./store";
 import TextAreaField from "../../components/html/TextAreaField";
@@ -2222,6 +2219,5 @@ const Status = () => {
 
 export default Status;
 
-
-now your task is: while adding a new schema I dont need category ang more.... i only need to select the test only....
-just modify the affected code only.
+Hey groke here is your task:
+in the schema (initialSchema) rename testName => description and change the affected code accrordingly..

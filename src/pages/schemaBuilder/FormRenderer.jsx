@@ -3,18 +3,14 @@ import useStore from "./store";
 import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
 import TextAreaField from "../../components/html/TextAreaField";
-
 const FormRenderer = () => {
   const { schema } = useStore();
-
   const [gender, setGender] = useState("");
   const [age, setAge] = useState("");
   const [formData, setFormData] = useState({});
   const [statuses, setStatuses] = useState({});
   const [isFormOpen, setIsFormOpen] = useState(false);
-
   const hasMultipleSections = schema.sections?.length > 1;
-
   const computeStatus = (field, value, gender, age) => {
     if (field.type === "number" && field.standardRange) {
       const range = getApplicableRange(field.standardRange, gender, age);
@@ -29,7 +25,6 @@ const FormRenderer = () => {
     }
     return "";
   };
-
   const updateAllStatuses = () => {
     const newStatuses = {};
     schema.sections.forEach((section) => {
@@ -42,11 +37,9 @@ const FormRenderer = () => {
     });
     setStatuses(newStatuses);
   };
-
   useEffect(() => {
     updateAllStatuses();
   }, [age, gender]);
-
   const handleChange = (fieldName, value, isCheckbox = false) => {
     setFormData((prev) => {
       if (isCheckbox) {
@@ -58,7 +51,6 @@ const FormRenderer = () => {
       }
       return { ...prev, [fieldName]: value };
     });
-
     // Compute status for this field
     const field = findField(fieldName);
     if (field) {
@@ -66,7 +58,6 @@ const FormRenderer = () => {
       setStatuses((prev) => ({ ...prev, [fieldName]: newStatus }));
     }
   };
-
   const findField = (name) => {
     for (let section of schema.sections || []) {
       for (let field of section.fields || []) {
@@ -75,17 +66,14 @@ const FormRenderer = () => {
     }
     return null;
   };
-
   const getApplicableRange = (sr, g, a) => {
     if (!g || !a) return null;
     const ageNum = parseFloat(a);
     if (isNaN(ageNum)) return null;
     const { type, data } = sr;
-
     let min,
       max,
       info = "";
-
     if (type === "simple") {
       min = parseFloat(data.min);
       max = parseFloat(data.max);
@@ -124,20 +112,17 @@ const FormRenderer = () => {
         }
       }
     }
-
     if (min !== undefined && max !== undefined) {
       return { min, max, info };
     }
     return null;
   };
-
   const renderField = (field) => {
     const { name, type, required, options = [], maxLength, unit = "", standardRange } = field;
     const value = formData[name] || (type === "checkbox" ? [] : "");
     const range = standardRange ? getApplicableRange(standardRange, gender, age) : null;
     const status = statuses[name] || "";
     const label = `${name}${unit ? ` (${unit})` : ""}${required ? " *" : ""}`;
-
     let inputElement;
     switch (type) {
       case "input":
@@ -230,7 +215,6 @@ const FormRenderer = () => {
       default:
         return null;
     }
-
     return (
       <div key={name} className="mb-6">
         {type === "radio" || type === "checkbox" ? (
@@ -252,7 +236,6 @@ const FormRenderer = () => {
       </div>
     );
   };
-
   return (
     <div className=" bg-white/30 ro shadow-sm rounded-xl">
       <div className="bg-gray-50 rounded-lg border border-gray-200">
@@ -302,5 +285,4 @@ const FormRenderer = () => {
     </div>
   );
 };
-
 export default FormRenderer;

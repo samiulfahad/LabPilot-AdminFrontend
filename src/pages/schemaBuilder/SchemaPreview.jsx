@@ -1,11 +1,9 @@
 import { useState } from "react";
 import useStore from "./store";
-
 const SchemaPreview = () => {
   const { schema } = useStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
-
   const safeStringify = (obj) => {
     return JSON.stringify(
       obj,
@@ -16,16 +14,13 @@ const SchemaPreview = () => {
       2
     );
   };
-
   const schemaJson = safeStringify(schema);
-
   const handleCopy = () => {
     navigator.clipboard.writeText(schemaJson).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   };
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       <div className="bg-gray-50 rounded-lg border border-gray-200">
@@ -56,5 +51,4 @@ const SchemaPreview = () => {
     </div>
   );
 };
-
 export default SchemaPreview;

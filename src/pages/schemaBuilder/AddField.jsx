@@ -3,12 +3,9 @@ import useStore from "./store";
 import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
 import Icons from "../../components/icons"; // Update this path
-
 const AddField = () => {
   const { Add: AddIcon, Edit: EditIcon, Delete: DeleteIcon, Close: CloseIcon } = Icons;
-
   const { schema, addField, setPopup } = useStore();
-
   const [showAddFieldForm, setShowAddFieldForm] = useState(false);
   const [fieldName, setFieldName] = useState("");
   const [fieldType, setFieldType] = useState("input");
@@ -20,19 +17,15 @@ const AddField = () => {
   const [rangeData, setRangeData] = useState(null);
   const [unit, setUnit] = useState(""); // Selected from dropdown
   const [customUnit, setCustomUnit] = useState(""); // For "Other"
-
   // Option editor
   const [newOption, setNewOption] = useState("");
   const [editingOptionIndex, setEditingOptionIndex] = useState(null);
   const [editingOptionValue, setEditingOptionValue] = useState("");
-
   // Range editor
   const [newRangeEntry, setNewRangeEntry] = useState({});
   const [editingRangeIndex, setEditingRangeIndex] = useState(null);
-
   const sections = schema.sections || [];
   const hasMultipleSections = sections.length > 1;
-
   // Common Medical Units
   const commonMedicalUnits = [
     { value: "", label: "No unit" },
@@ -60,15 +53,12 @@ const AddField = () => {
     { value: "mg/24h", label: "mg/24h" },
     { value: "other", label: "Other (type manually)" },
   ];
-
   const finalUnit = unit === "other" ? customUnit.trim() : unit;
-
   useEffect(() => {
     if (!hasMultipleSections && sections.length > 0) {
       setSelectedSection(sections[0].name);
     }
   }, [sections, hasMultipleSections]);
-
   useEffect(() => {
     if (!["select", "checkbox", "radio"].includes(fieldType)) {
       setOptions([]);
@@ -82,7 +72,6 @@ const AddField = () => {
       setStandardRangeType("none");
     }
   }, [fieldType]);
-
   useEffect(() => {
     if (standardRangeType === "simple") {
       setRangeData({ min: "", max: "" });
@@ -96,11 +85,9 @@ const AddField = () => {
     setNewRangeEntry({});
     setEditingRangeIndex(null);
   }, [standardRangeType]);
-
   const needsOptions = ["select", "checkbox", "radio"].includes(fieldType);
   const needsMaxLength = ["input", "textarea"].includes(fieldType);
   const needsStandardRange = fieldType === "number" && standardRangeType !== "none";
-
   // Handlers (unchanged)
   const handleAddOption = () => {
     if (newOption.trim()) {
@@ -108,7 +95,6 @@ const AddField = () => {
       setNewOption("");
     }
   };
-
   const handleRemoveOption = (i) => setOptions(options.filter((_, idx) => idx !== i));
   const handleStartEditOption = (i, val) => {
     setEditingOptionIndex(i);
@@ -127,26 +113,21 @@ const AddField = () => {
     setEditingOptionIndex(null);
     setEditingOptionValue("");
   };
-
   const handleSimpleOrGenderChange = (key, subKey, val) => {
     setRangeData((prev) => ({ ...prev, [key]: subKey ? { ...prev[key], [subKey]: val } : val }));
   };
-
   const handleNewRangeChange = (key, val) => {
     setNewRangeEntry((prev) => ({ ...prev, [key]: val }));
   };
-
   const validateRangeEntry = (entry, type) => {
     if (type === "age") return entry.minAge && entry.minValue && entry.maxValue;
     if (type === "combined") return entry.gender && entry.minAge && entry.minValue && entry.maxValue;
     return false;
   };
-
   const handleAddOrUpdateRange = () => {
     if (validateRangeEntry(newRangeEntry, standardRangeType)) {
       const entry = { ...newRangeEntry };
       if (!entry.maxAge) entry.maxAge = 999;
-
       if (editingRangeIndex !== null) {
         const updated = [...rangeData];
         updated[editingRangeIndex] = entry;
@@ -162,7 +143,6 @@ const AddField = () => {
       setPopup({ type: "error", message: "Fill all required fields" });
     }
   };
-
   const handleRemoveRange = (i) => setRangeData((prev) => prev.filter((_, idx) => idx !== i));
   const handleStartEditRange = (i) => {
     setEditingRangeIndex(i);
@@ -172,17 +152,13 @@ const AddField = () => {
     setEditingRangeIndex(null);
     setNewRangeEntry({});
   };
-
   const handleSubmit = () => {
     if (!fieldName.trim()) return setPopup({ type: "error", message: "Field name required" });
     if (hasMultipleSections && !selectedSection) return setPopup({ type: "error", message: "Select a section" });
-
     const allFields = sections.flatMap((s) => s.fields || []);
     if (allFields.some((f) => f.name === fieldName))
       return setPopup({ type: "error", message: "Field name already exists" });
-
     if (needsOptions && options.length === 0) return setPopup({ type: "error", message: "Add at least one option" });
-
     if (needsStandardRange) {
       if (standardRangeType === "simple" && (!rangeData.min || !rangeData.max))
         return setPopup({ type: "error", message: "Min and max required" });
@@ -194,19 +170,15 @@ const AddField = () => {
       if ((standardRangeType === "age" || standardRangeType === "combined") && rangeData.length === 0)
         return setPopup({ type: "error", message: "Add at least one range" });
     }
-
     const sectionName = selectedSection || sections[0]?.name;
     const newField = { name: fieldName, type: fieldType, required: isRequired };
-
     if (needsOptions) newField.options = options;
     if (needsMaxLength && maxLength) newField.maxLength = parseInt(maxLength, 10);
     if (needsStandardRange) newField.standardRange = { type: standardRangeType, data: rangeData };
     if (fieldType === "number" && finalUnit) newField.unit = finalUnit;
-
     addField(sectionName, newField);
     resetForm();
   };
-
   const resetForm = () => {
     setFieldName("");
     setFieldType("input");
@@ -225,7 +197,6 @@ const AddField = () => {
     setSelectedSection(hasMultipleSections ? "" : sections[0]?.name || "");
     setShowAddFieldForm(false);
   };
-
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
       {/* Header */}
@@ -244,7 +215,6 @@ const AddField = () => {
           </button>
         )}
       </div>
-
       {/* Form */}
       {showAddFieldForm && (
         <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl">
@@ -254,7 +224,6 @@ const AddField = () => {
               <CloseIcon className="w-6 h-6" />
             </button>
           </div>
-
           <div className="space-y-6">
             {/* Section */}
             {hasMultipleSections && (
@@ -270,9 +239,7 @@ const AddField = () => {
                 Attaching to: <span className="font-medium">{sections[0].name}</span>
               </p>
             )}
-
             <InputField label="Field Name" value={fieldName} onChange={(e) => setFieldName(e.target.value)} />
-
             <SelectField
               label="Field Type"
               value={fieldType}
@@ -286,7 +253,6 @@ const AddField = () => {
                 { value: "number", label: "Number Input" },
               ]}
             />
-
             {needsMaxLength && (
               <InputField
                 label="Max Length"
@@ -295,7 +261,6 @@ const AddField = () => {
                 onChange={(e) => setMaxLength(e.target.value)}
               />
             )}
-
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -305,7 +270,6 @@ const AddField = () => {
               />
               <span className="text-sm font-medium text-gray-700">Required field</span>
             </label>
-
             {/* Options */}
             {needsOptions && (
               <div className="space-y-4">
@@ -342,7 +306,12 @@ const AddField = () => {
                   </div>
                 ))}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <InputField label="Option" value={newOption} onChange={(e) => setNewOption(e.target.value)} className="flex-1 pl-2" />
+                  <InputField
+                    label="Option"
+                    value={newOption}
+                    onChange={(e) => setNewOption(e.target.value)}
+                    className="flex-1 pl-2"
+                  />
                   <button
                     onClick={handleAddOption}
                     disabled={!newOption.trim()}
@@ -353,7 +322,6 @@ const AddField = () => {
                 </div>
               </div>
             )}
-
             {/* Number Field Settings */}
             {fieldType === "number" && (
               <>
@@ -368,7 +336,6 @@ const AddField = () => {
                     }}
                     options={commonMedicalUnits}
                   />
-
                   {unit === "other" && (
                     <InputField
                       label="Custom Unit"
@@ -376,14 +343,12 @@ const AddField = () => {
                       onChange={(e) => setCustomUnit(e.target.value)}
                     />
                   )}
-
                   {finalUnit && finalUnit !== "" && (
                     <div className="text-sm text-gray-600">
                       <span className="font-medium">Selected unit:</span> <strong>{finalUnit}</strong>
                     </div>
                   )}
                 </div>
-
                 <SelectField
                   label="Standard Range"
                   value={standardRangeType}
@@ -396,7 +361,6 @@ const AddField = () => {
                     { value: "combined", label: "Age + Gender" },
                   ]}
                 />
-
                 {/* Simple Range */}
                 {standardRangeType === "simple" && rangeData && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -414,7 +378,6 @@ const AddField = () => {
                     />
                   </div>
                 )}
-
                 {/* Gender Range */}
                 {standardRangeType === "gender" && rangeData && (
                   <div className="space-y-4">
@@ -448,7 +411,6 @@ const AddField = () => {
                     </div>
                   </div>
                 )}
-
                 {/* Age / Combined Ranges */}
                 {(standardRangeType === "age" || standardRangeType === "combined") && rangeData && (
                   <div className="space-y-5">
@@ -469,7 +431,6 @@ const AddField = () => {
                         </button>
                       </div>
                     ))}
-
                     <div className="p-5 bg-gray-50 rounded-xl space-y-5 border">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {standardRangeType === "combined" && (
@@ -533,7 +494,6 @@ const AddField = () => {
                 )}
               </>
             )}
-
             {/* Submit */}
             <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-blue-200">
               <button
@@ -555,5 +515,4 @@ const AddField = () => {
     </div>
   );
 };
-
 export default AddField;
