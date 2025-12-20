@@ -41,7 +41,7 @@ const SchemaPreview = () => {
               onClick={handleCopy}
               className="px-4 py-1.5 rounded-full text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200"
             >
-              {copied ? "Copied!" : "Copy Schema"}
+              {copied ? "Copied!" : "Copy"}
             </button>
           )}
         </div>
