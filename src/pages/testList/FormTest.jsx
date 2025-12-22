@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import InputField from "../../components/html/InputField";
 import SelectField from "../../components/html/SelectField";
 import useStore from "./store";
@@ -25,9 +25,10 @@ const TestForm = () => {
     if (modal.view === "addTest") {
       addTest(selectedCategoryId, name);
     } else if (modal.view === "editTest") {
-      console.log("Test Id- " + modal.data.testId);
-      console.log("Category Id- " + selectedCategoryId);
-      console.log("Name- " + modal.data.name);
+      // console.log("Test Id- " + modal.data.testId);
+      // console.log("Category Id- " + modal.data.categoryId)
+      // console.log("Category Id- " + selectedCategoryId);
+      // console.log("Name- " + modal.data.name);
       editTest(modal.data.testId, selectedCategoryId, name);
     }
   };

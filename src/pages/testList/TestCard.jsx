@@ -52,7 +52,7 @@ const TestCard = ({ test }) => {
               onClick={() =>
                 setModal({
                   view: "setSchema",
-                  data: { categoryId: test.categoryId, testId: test._id, selectedSchema: test.schemaId },
+                  data: { testId: test._id, schemaId: test.schemaId },
                 })
               }
               className="p-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-center flex-1"
@@ -66,7 +66,7 @@ const TestCard = ({ test }) => {
                   type: "confirmation",
                   message: `Unset schema for ${test.name}?`,
                   action: "unsetSchema",
-                  data: { name: test.name, testId: test._id, categoryId: test.categoryId },
+                  data: { name: test.name, testId: test._id },
                 });
               }}
               className="p-3 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors flex items-center justify-center flex-1"
@@ -77,7 +77,7 @@ const TestCard = ({ test }) => {
           </>
         ) : (
           <button
-            onClick={() => setModal({ view: "setSchema", data: { categoryId: test.categoryId, testId: test._id } })}
+            onClick={() => setModal({ view: "setSchema", data: { testId: test._id, schemaId: test.schemaId } })}
             className="p-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center flex-1"
             title="Set Schema"
           >
@@ -88,7 +88,7 @@ const TestCard = ({ test }) => {
           onClick={() => {
             setModal({
               view: "editTest",
-              data: { categoryId: test.categoryId, testId: test._id, name: test.name },
+              data: { name: test.name, testId: test._id, categoryId: test.categoryId },
             });
           }}
           className="p-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-center flex-1"

@@ -87,7 +87,7 @@ const testSlice = (set, get) => ({
   loadTestSchema: async (testId) => {
     try {
       get().startLoading();
-      const response = await schemaServive.getByTestId(testId);
+      const response = await schemaServive.getByTestId(testId, true);
       set((state) => ({
         testAssociatedSchemaList: response.data,
       }));
@@ -107,6 +107,7 @@ const testSlice = (set, get) => ({
   setSchema: async (testId, schemaId) => {
     try {
       get().startLoading();
+      console.log(testId, schemaId);
       await testService.setSchema(testId, schemaId);
       get().closeModal();
       set((state) => ({

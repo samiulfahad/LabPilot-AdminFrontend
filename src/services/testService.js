@@ -5,8 +5,8 @@ const testService = {
   editTest: (data) => api.patch("/lab/test/edit", data),
   deleteTest: (testId) => api.delete(`/lab/test/delete/${testId}`),
   getTestList: () => api.get("/lab/test/all"),
-  setSchema: (categoryId, testId, schemaId) => api.patch("/lab/test/setTestSchema", { categoryId, testId, schemaId }),
-  unsetSchema: (categoryId, testId) => api.patch("/lab/test/setTestSchema", { categoryId, testId }),
+  setSchema: ( testId, schemaId) => api.patch("/lab/test/setTestSchema", { testId, schemaId }),
+  unsetSchema: (testId) => api.patch("/lab/test/setTestSchema", { testId }),
 };
 
 export default testService;

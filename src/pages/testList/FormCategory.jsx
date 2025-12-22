@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import InputField from "../../components/html/InputField";
 import useStore from "./store";
 import Icons from "../../components/icons";

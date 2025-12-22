@@ -9,6 +9,7 @@ import TestForm from "./FormTest";
 import CategoryForm from "./FormCategory";
 import CategoryCard from "./CategoryCard";
 import Container from "./Container";
+import SchemaForm from "./FormSchema";
 const TestList = () => {
   const [activeView, setActiveView] = useState("container"); // container, testList, categoryList
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
@@ -21,6 +22,7 @@ const TestList = () => {
     populate,
     deleteTest,
     deleteCategory,
+    unsetSchema,
     loading,
     modal,
     setModal,
@@ -34,6 +36,7 @@ const TestList = () => {
       populate();
     };
     loadData();
+    populate();
   }, []);
   // Handle view changes
   const switchView = (view) => {
@@ -54,6 +57,10 @@ const TestList = () => {
       {popup && popup.type === "confirmation" && popup.action === "deleteCategory" && (
         <Popup type="confirmation" message={popup.message} onConfirm={deleteCategory} onClose={closePopup} />
       )}
+      {popup && popup.type === "confirmation" && popup.action === "unsetSchema" && (
+        <Popup type="confirmation" message={popup.message} onConfirm={unsetSchema} onClose={closePopup} />
+      )}
+
       {popup && popup.type === "success" && <Popup type="success" message={popup.message} onClose={closePopup} />}
       {popup && popup.type === "error" && <Popup type="error" message={popup.message} onClose={closePopup} />}
       {/* Header */}
@@ -289,9 +296,9 @@ const TestList = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <div className="flex flex-wrap justify-start items-center gap-2">
                     {testList.map((test) => (
-                      <TestCard key={test._id} test={test} />
+                        <TestCard key={test._id} test={test} />
                     ))}
                   </div>
                 )}
@@ -331,6 +338,9 @@ const TestList = () => {
       </Modal>
       <Modal isOpen={modal.view === "addCategory" || modal.view === "editCategory"}>
         <CategoryForm />
+      </Modal>
+      <Modal isOpen={modal.view === "setSchema" || modal.view === "editCategory"}>
+        <SchemaForm />
       </Modal>
     </div>
   );

@@ -17,7 +17,7 @@ const SchemaBuilder = () => {
   const {
     schema,
     setSchema,
-    setFullSchema, // Add this
+    setFullSchema, 
     deleteSection,
     setPopup,
     popup,
