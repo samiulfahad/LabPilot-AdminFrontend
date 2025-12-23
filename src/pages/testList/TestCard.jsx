@@ -64,7 +64,7 @@ const TestCard = ({ test }) => {
               onClick={() => {
                 setPopup({
                   type: "confirmation",
-                  message: `Unset schema for ${test.name}?`,
+                  message: `Make offline? It will nnset schema for ${test.name}?`,
                   action: "unsetSchema",
                   data: { name: test.name, testId: test._id },
                 });
@@ -72,7 +72,7 @@ const TestCard = ({ test }) => {
               className="p-3 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors flex items-center justify-center flex-1"
               title="Unset Schema"
             >
-              <Icons.Unlink className="w-5 h-5" />
+              <Icons.PowerOff className="w-5 h-5" />
             </button>
           </>
         ) : (
